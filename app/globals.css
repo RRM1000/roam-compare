@@ -100,3 +100,65 @@ footer .brand { color:var(--ink); }
 @media (max-width:900px) { .hero { grid-template-columns:1fr; padding-top:56px; } .hero-copy { max-width:760px; } .compare-card { max-width:650px; } .provider-card { align-items:start; grid-template-columns:1fr; } .provider-decision { justify-content:space-between; } .price-block { text-align:left; } .how-section { gap:44px; grid-template-columns:1fr; } }
 @media (max-width:620px) { .nav-shell { padding:18px 20px; } .nav-note,.nav-actions a { display:none; } .hero { gap:36px; min-height:auto; padding:42px 20px 74px; } h1 { font-size:48px; } .field-grid { grid-template-columns:1fr; } .field-wide { grid-column:auto; } .usage-options { grid-template-columns:1fr; } .usage-options span { min-height:0; } .results-section,.how-section { padding:72px 20px; } .section-heading { align-items:start; flex-direction:column; gap:15px; } .roaming-banner { align-items:start; grid-template-columns:auto 1fr; padding:22px; } .roaming-price { grid-column:2; text-align:left; } .results-toolbar span { display:none; } .provider-card,.provider-card.top-pick { padding:23px 18px; } .provider-main { align-items:start; gap:13px; } .provider-logo { border-radius:12px; height:44px; width:44px; } .provider-decision { align-items:stretch; flex-direction:column; gap:14px; } .deal-button { width:100%; } .steps li { gap:8px; grid-template-columns:34px 1fr; } .steps p { grid-column:2; } footer { align-items:start; flex-direction:column; gap:18px; padding:30px 20px; } }
 @media (prefers-reduced-motion:reduce) { * { scroll-behavior:auto!important; transition:none!important; } .results-section.is-visible { animation:none; } }
+
+/* Compatibility and multi-plan comparison */
+.compatibility-trigger { align-items:center; background:transparent; border:1px solid var(--line); border-radius:12px; color:var(--ink); cursor:pointer; display:flex; font-size:12px; font-weight:800; justify-content:space-between; margin:-5px 0 18px; padding:12px 14px; text-align:left; width:100%; }
+.compatibility-trigger span { align-items:center; display:flex; gap:9px; }
+.compatibility-trigger i { background:#d1a429; border-radius:50%; display:inline-block; height:8px; width:8px; }
+.compatibility-trigger.ready { border-color:#8bbcb5; color:var(--teal); }
+.compatibility-trigger.ready i { background:var(--teal); }
+.compatibility-trigger.blocked { border-color:#e7a090; color:#9f321e; }
+.compatibility-trigger.blocked i { background:var(--accent); }
+.compatibility-trigger:focus-visible { outline:3px solid rgba(11,107,99,.2); outline-offset:2px; }
+.compatibility-panel { background:#f5f2ea; border-radius:14px; display:grid; gap:13px; grid-template-columns:1fr 1fr; margin:-8px 0 20px; padding:16px; }
+.compatibility-heading,.compatibility-result,.manufacturer-links { grid-column:1 / -1; }
+.compatibility-heading { display:flex; flex-direction:column; gap:3px; }
+.compatibility-heading strong { font-size:13px; }
+.compatibility-heading small { color:var(--muted); font-size:10px; line-height:1.4; }
+.compatibility-result { border-left:3px solid #d1a429; padding:2px 0 2px 11px; }
+.compatibility-result.ready { border-color:var(--teal); }
+.compatibility-result.blocked { border-color:var(--accent); }
+.compatibility-result strong { font-size:12px; }
+.compatibility-result p { color:var(--muted); font-size:10px; line-height:1.45; margin:3px 0 0; }
+.manufacturer-links { color:var(--muted); font-size:9px; line-height:1.5; margin:0; }
+.manufacturer-links a { color:var(--teal); font-weight:800; text-decoration:underline; text-underline-offset:2px; }
+.results-compatibility { align-items:center; background:#ece7d8; border-radius:14px; display:flex; gap:13px; margin:-10px 0 18px; padding:13px 16px; }
+.results-compatibility>span { align-items:center; background:#d1a429; border-radius:50%; color:#fff; display:flex; flex:0 0 auto; font-size:12px; font-weight:900; height:27px; justify-content:center; width:27px; }
+.results-compatibility.ready { background:#e2f0ed; }
+.results-compatibility.ready>span { background:var(--teal); }
+.results-compatibility.blocked { background:#fbe6e1; }
+.results-compatibility.blocked>span { background:var(--accent); }
+.results-compatibility strong { font-size:12px; }
+.results-compatibility p { color:var(--muted); font-size:10px; line-height:1.4; margin:2px 0 0; }
+.provider-card,.provider-card.top-pick { align-items:stretch; display:block; padding:0; }
+.provider-card.top-pick { border-width:2px; }
+.provider-header { align-items:center; display:flex; justify-content:space-between; padding:25px 26px 20px; }
+.provider-card.top-pick .provider-header { padding-top:29px; }
+.provider-link { color:var(--teal); font-size:11px; font-weight:800; }
+.provider-link:hover { text-decoration:underline; text-underline-offset:3px; }
+.plan-list { border-top:1px solid var(--line); }
+.plan-row { align-items:center; display:grid; gap:24px; grid-template-columns:1fr auto; padding:20px 26px; }
+.plan-row+.plan-row { border-top:1px solid #e8e4da; }
+.plan-copy>div { align-items:center; display:flex; flex-wrap:wrap; gap:9px; }
+.plan-copy strong { font-size:15px; }
+.fit-badge { background:#e2f0ed; border-radius:999px; color:var(--teal); font-size:9px; font-weight:850; letter-spacing:.06em; padding:4px 7px; text-transform:uppercase; }
+.plan-copy p { color:var(--ink); font-size:12px; margin:6px 0 4px; }
+.plan-copy small { color:var(--muted); font-size:10px; line-height:1.4; }
+.plan-decision { align-items:center; display:flex; gap:18px; }
+.plan-decision .price-block strong { font-size:24px; white-space:nowrap; }
+.plan-decision .deal-button { font-size:12px; min-width:132px; padding:13px 15px; }
+
+@media (max-width:900px) {
+  .provider-card,.provider-card.top-pick { padding:0; }
+  .plan-decision { justify-content:space-between; }
+}
+@media (max-width:620px) {
+  .compatibility-panel { grid-template-columns:1fr; }
+  .compatibility-heading,.compatibility-result,.manufacturer-links { grid-column:auto; }
+  .provider-card,.provider-card.top-pick { padding:0; }
+  .provider-header { align-items:flex-start; flex-direction:column; gap:15px; padding:24px 18px 17px; }
+  .provider-card.top-pick .provider-header { padding-top:28px; }
+  .plan-row { align-items:stretch; grid-template-columns:1fr; padding:19px 18px; }
+  .plan-decision { align-items:stretch; flex-direction:column; gap:12px; }
+  .plan-decision .deal-button { width:100%; }
+}

@@ -25,6 +25,13 @@ test("server-renders the RoamCompare experience", async () => {
   assert.match(html, /Klook/);
   assert.match(html, /Affiliate partner/);
   assert.match(html, /activity\/128551-turkey-esim/);
+  assert.match(html, /<option value="45">/);
+  assert.match(html, /<option value="60">/);
+  assert.match(html, /<option value="90">/);
+  assert.match(html, /Check whether your phone supports eSIM/);
+  assert.match(html, /1GB per day/);
+  assert.match(html, /2GB per day/);
+  assert.match(html, /Unlimited daily data/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/i);
 });
 
@@ -33,6 +40,7 @@ test("includes transparent affiliate and price caveats", async () => {
   const html = await response.text();
 
   assert.match(html, /rel="sponsored noopener noreferrer"/);
-  assert.match(html, /Prototype prices are illustrative/);
+  assert.match(html, /Klook prices are checked on its site rather than scraped/);
+  assert.match(html, /prototype prices are illustrative/i);
   assert.match(html, /rankings stay independent/i);
 });
