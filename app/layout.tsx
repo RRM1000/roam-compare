@@ -9,18 +9,18 @@ export async function generateMetadata(): Promise<Metadata> {
   const socialImage = `${protocol}://${host}/og.png`;
 
   return {
-    title: "RoamCompare — Compare eSIMs for UK travellers",
-    description: "Compare UK roaming costs with travel eSIMs in pounds, sized for your trip.",
+    title: "RoamCompare — UK roaming vs travel eSIMs",
+    description: "Compare sourced UK roaming estimates with Turkey travel eSIM plans, sized for your trip and shown in approximate pounds.",
     openGraph: {
-      title: "RoamCompare — Land connected for less",
-      description: "A clearer eSIM comparison for UK travellers.",
+      title: "RoamCompare — Know your roaming cost before take-off",
+      description: "A sourced UK roaming and travel eSIM comparison for Turkey.",
       type: "website",
       images: [{ url: socialImage, width: 1728, height: 910, alt: "RoamCompare — land connected without roaming shock" }],
     },
     twitter: {
       card: "summary_large_image",
-      title: "RoamCompare — Land connected for less",
-      description: "A clearer eSIM comparison for UK travellers.",
+      title: "RoamCompare — Know your roaming cost before take-off",
+      description: "A sourced UK roaming and travel eSIM comparison for Turkey.",
       images: [socialImage],
     },
   };

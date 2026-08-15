@@ -19,8 +19,8 @@ test("server-renders the RoamCompare experience", async () => {
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
 
   const html = await response.text();
-  assert.match(html, /<title>RoamCompare — Compare eSIMs for UK travellers<\/title>/i);
-  assert.match(html, /Land connected\. Leave roaming shock at home\./);
+  assert.match(html, /<title>RoamCompare — UK roaming vs travel eSIMs<\/title>/i);
+  assert.match(html, /Know the roaming cost before take-off\./);
   assert.match(html, /Compare my options/);
   assert.match(html, /Klook/);
   assert.match(html, /Affiliate partner/);
@@ -31,7 +31,12 @@ test("server-renders the RoamCompare experience", async () => {
   assert.match(html, /Check whether your phone supports eSIM/);
   assert.match(html, /1GB per day/);
   assert.match(html, /2GB per day/);
+  assert.match(html, /Current EE RoW Zone 1 passes/);
+  assert.match(html, /O2 Travel/);
+  assert.match(html, /Three Go Roam/);
   assert.match(html, /Unlimited daily data/);
+  assert.match(html, /Buy and install before you fly/);
+  assert.match(html, /EE price guide/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/i);
 });
 
@@ -40,7 +45,8 @@ test("includes transparent affiliate and price caveats", async () => {
   const html = await response.text();
 
   assert.match(html, /rel="sponsored noopener noreferrer"/);
-  assert.match(html, /Klook prices are checked on its site rather than scraped/);
-  assert.match(html, /prototype prices are illustrative/i);
-  assert.match(html, /rankings stay independent/i);
+  assert.match(html, /Klook’s live price is not scraped/);
+  assert.match(html, /manually checked on 15 August 2026/i);
+  assert.match(html, /commission does not change the order/i);
+  assert.doesNotMatch(html, /Example price|prototype prices are illustrative/i);
 });
