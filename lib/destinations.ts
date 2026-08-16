@@ -29,7 +29,7 @@ export const destinations: Destination[] = [
 
 export const destinationById = Object.fromEntries(destinations.map((destination) => [destination.id, destination])) as Record<DestinationId, Destination>;
 
-export function isDestination(value: string): value is DestinationId { return value in destinationById; }
+export function isDestination(value: string): value is DestinationId { return Object.hasOwn(destinationById, value); }
 
 export function getProviderUrl(provider: Provider, destination: Destination) {
   if (destination.id === "turkey") {
@@ -39,5 +39,5 @@ export function getProviderUrl(provider: Provider, destination: Destination) {
   if (provider === "Airalo") return `https://www.airalo.com/${destination.airaloSlug}-esim`;
   if (provider === "Saily") return `https://saily.com/esim-${destination.sailySlug}/`;
   if (provider === "Klook") return `https://www.klook.com/en-GB/search/result/?query=${encodeURIComponent(`${destination.name} eSIM`)}`;
-  return "https://www.nomadesim.com/";
+  return `https://www.nomadesim.com/en/${destination.id}-eSIM`;
 }

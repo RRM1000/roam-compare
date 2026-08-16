@@ -24,10 +24,10 @@ export const tripLengths = [...Array.from({ length: 30 }, (_, index) => index + 
 export const gbpRates: Record<Currency, number> = { EUR: 0.85, USD: 0.75 };
 
 export const providerDetails: Record<Provider, { accent: string; initials: string; affiliate: boolean; summary: string }> = {
-  Airalo: { accent: "#e63f78", initials: "AI", affiliate: false, summary: "Local, regional and global eSIM catalogues" },
-  Klook: { accent: "#ff5b47", initials: "KL", affiliate: true, summary: "Travel eSIM options alongside activities" },
-  Nomad: { accent: "#3455db", initials: "NO", affiliate: false, summary: "Fixed-data and unlimited travel plans" },
-  Saily: { accent: "#6437e8", initials: "SA", affiliate: false, summary: "Travel data plans with security features" },
+  Airalo: { accent: "#a82350", initials: "AI", affiliate: false, summary: "Local, regional and global eSIM catalogues" },
+  Klook: { accent: "#b33b27", initials: "KL", affiliate: true, summary: "Travel eSIM options alongside activities" },
+  Nomad: { accent: "#2943aa", initials: "NO", affiliate: false, summary: "Fixed-data and unlimited travel plans" },
+  Saily: { accent: "#4b28ae", initials: "SA", affiliate: false, summary: "Travel data plans with security features" },
 };
 
 export const plans: Plan[] = [

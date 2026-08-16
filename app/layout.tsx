@@ -6,7 +6,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const requestHeaders = await headers();
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  const socialImage = `${protocol}://${host}/og.png`;
+  const socialImage = `${protocol}://${host}/og-premium.png`;
 
   return {
     title: "RoamCompare — UK roaming vs travel eSIMs",
@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "RoamCompare — Know your roaming cost before take-off",
       description: "Compare UK roaming and travel eSIM options across 20 popular destinations.",
       type: "website",
-      images: [{ url: socialImage, width: 1728, height: 910, alt: "RoamCompare — land connected without roaming shock" }],
+      images: [{ url: socialImage, width: 1536, height: 1024, alt: "RoamCompare — know the roaming cost before take-off" }],
     },
     twitter: {
       card: "summary_large_image",

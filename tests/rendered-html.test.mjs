@@ -21,13 +21,14 @@ test("server-renders the RoamCompare experience", async () => {
   const html = await response.text();
   assert.match(html, /<title>RoamCompare — UK roaming vs travel eSIMs<\/title>/i);
   assert.match(html, /Know the roaming cost before take-off\./);
-  assert.match(html, /Compare my options/);
+  assert.match(html, /Compare priced options/);
   assert.match(html, /Klook/);
-  assert.match(html, /Affiliate partner/);
+  assert.match(html, /Affiliate relationship/);
   assert.match(html, /activity\/128551-turkey-esim/);
   assert.match(html, /<option value="45">/);
   assert.match(html, /<option value="60">/);
   assert.match(html, /<option value="90">/);
+  assert.match(html, /0 days — eSIM\/Wi-Fi only/);
   assert.match(html, /<option value="united-states">/);
   assert.match(html, /<option value="united-arab-emirates">/);
   assert.match(html, /<option value="japan">/);
@@ -51,6 +52,10 @@ test("server-renders the RoamCompare experience", async () => {
   assert.match(html, /Buy and install before you fly/);
   assert.match(html, /EE price guide/);
   assert.match(html, /Share comparison/);
+  assert.match(html, /<form[^>]+id="compare"/i);
+  assert.match(html, /Skip to comparison/);
+  assert.match(html, /Savings are shown only when/);
+  assert.match(html, /og-premium\.png/);
   assert.match(html, /Live APIs/);
   assert.match(html, /Are these live prices\?/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/i);
@@ -68,6 +73,8 @@ for (const [path, title, marker] of [
     assert.match(html, new RegExp(`<title>${title}</title>`, "i"));
     assert.match(html, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
     assert.doesNotMatch(html, /Know the roaming cost before take-off\./);
+    assert.match(html, /Skip to content/);
+    assert.match(html, /<main id="main-content">/i);
   });
 }
 
@@ -80,4 +87,30 @@ test("includes transparent affiliate and price caveats", async () => {
   assert.match(html, /manually checked on 15 August 2026/i);
   assert.match(html, /commission does not change the order/i);
   assert.doesNotMatch(html, /Example price|prototype prices are illustrative/i);
+});
+
+test("server-renders a validated shared comparison", async () => {
+  const response = await render("/?compare=1&destination=japan&days=10&roamingDays=0&network=o2&scenario=plan-check&usage=light");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const visibleHtml = html.replaceAll("<!-- -->", "");
+
+  assert.match(html, /<title>10 days in Japan — RoamCompare<\/title>/i);
+  assert.match(visibleHtml, /10 days in Japan · plan for about 4GB/);
+  assert.match(visibleHtml, /No UK-SIM roaming days/);
+  assert.match(visibleHtml, /results-section is-visible/);
+  assert.match(visibleHtml, /Live provider catalogues/);
+  assert.match(html, /og-premium\.png/);
+});
+
+test("rejects inherited and malformed shared-link values", async () => {
+  const response = await render("/?compare=1&destination=toString&days=999&roamingDays=-4&network=constructor&scenario=__proto__&usage=unknown");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const visibleHtml = html.replaceAll("<!-- -->", "");
+
+  assert.match(html, /<title>7 days in Turkey — RoamCompare<\/title>/i);
+  assert.match(visibleHtml, /7 days in Turkey · plan for about 6GB/);
+  assert.match(visibleHtml, /Current EE RoW Zone 1 passes/);
+  assert.doesNotMatch(visibleHtml, /999 days in/);
 });
