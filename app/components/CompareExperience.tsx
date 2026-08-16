@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import DeviceCompatibilityChecker from "@/app/components/DeviceCompatibilityChecker";
 import { DATA_CHECKED, plans, providerDetails, tripLengths, usagePerDay, type Plan, type Provider, type Usage } from "@/lib/catalog";
 import { getPlanMatch, money, nativeMoney } from "@/lib/comparison";
 import { destinationById, destinations, getProviderUrl, type DestinationId } from "@/lib/destinations";
+import { getEsimDevice, getEsimReadiness, type LockStatus } from "@/lib/esim-devices";
 import { getDefaultScenario, getRoamingResult, getScenarioOptions, networkNames, ROAMING_CHECKED, type Network } from "@/lib/roaming";
-
-type Device = "unknown" | "iphone" | "samsung" | "pixel" | "other" | "unsupported";
-type LockStatus = "unknown" | "unlocked" | "locked";
 
 export type InitialComparison = {
   destination: DestinationId;
@@ -31,7 +30,7 @@ export default function CompareExperience({ initial = defaultComparison }: { ini
   const [usage, setUsage] = useState<Usage>(initial.usage);
   const [hasCompared, setHasCompared] = useState(initial.compared);
   const [showCompatibility, setShowCompatibility] = useState(false);
-  const [device, setDevice] = useState<Device>("unknown");
+  const [selectedDeviceId, setSelectedDeviceId] = useState("");
   const [lockStatus, setLockStatus] = useState<LockStatus>("unknown");
   const [shareStatus, setShareStatus] = useState("");
   const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -41,7 +40,9 @@ export default function CompareExperience({ initial = defaultComparison }: { ini
   const neededRoamingData = roamingDays * usagePerDay[usage];
   const roaming = getRoamingResult(network, scenario, roamingDays, customCost, neededRoamingData, destination);
   const canCompareSavings = roaming.comparable && roamingDays === days;
-  const compatibility = device === "unsupported" || lockStatus === "locked" ? "blocked" : device !== "unknown" && lockStatus === "unlocked" ? "ready" : "unknown";
+  const selectedDevice = getEsimDevice(selectedDeviceId);
+  const compatibility = getEsimReadiness(selectedDevice, lockStatus);
+  const selectedDeviceName = selectedDevice ? `${selectedDevice.manufacturer} ${selectedDevice.model}` : "";
 
   const groupedPlans = useMemo(() => {
     const availablePlans: Plan[] = destination === "turkey" ? plans : (Object.keys(providerDetails) as Provider[]).map((provider) => ({ id: `${destination}-${provider.toLowerCase()}`, provider, name: `${activeDestination.name} eSIM catalogue`, validity: days, price: null, speed: "Options vary", network: "See live provider catalogue", note: "Live allowances, validity and prices shown by provider", catalogueOnly: true }));
@@ -141,17 +142,17 @@ export default function CompareExperience({ initial = defaultComparison }: { ini
           </fieldset>
 
           <button className={`compatibility-trigger ${compatibility}`} type="button" aria-expanded={showCompatibility} aria-controls="compatibility-panel" onClick={() => setShowCompatibility((shown) => !shown)}>
-            <span><i aria-hidden="true" />{compatibility === "ready" ? "Likely eSIM-ready" : compatibility === "blocked" ? "Compatibility needs attention" : "Check whether your phone supports eSIM"}</span><b aria-hidden="true">{showCompatibility ? "−" : "+"}</b>
+            <span><i aria-hidden="true" />{compatibility === "ready" ? `${selectedDeviceName} looks eSIM-ready` : compatibility === "check" ? "Check this phone’s exact version" : compatibility === "blocked" ? "Compatibility needs attention" : "Will an eSIM work on your phone?"}</span><b aria-hidden="true">{showCompatibility ? "−" : "+"}</b>
           </button>
 
           {showCompatibility && (
-            <div className="compatibility-panel" id="compatibility-panel">
-              <div className="compatibility-heading"><strong>Quick compatibility check</strong><small>We cannot inspect your phone, so confirm both items before buying.</small></div>
-              <label className="field"><span>Your device</span><select value={device} onChange={(event) => setDevice(event.target.value as Device)} aria-label="Device compatibility group"><option value="unknown">I’m not sure</option><option value="iphone">iPhone XS, XR, SE (2nd gen) or newer</option><option value="samsung">Compatible Samsung Galaxy S, Z or A model</option><option value="pixel">Google Pixel 4 or newer</option><option value="other">Another device with “Add eSIM”</option><option value="unsupported">My phone does not have “Add eSIM”</option></select></label>
-              <label className="field"><span>Is it unlocked?</span><select value={lockStatus} onChange={(event) => setLockStatus(event.target.value as LockStatus)} aria-label="Phone network lock status"><option value="unknown">I’m not sure</option><option value="unlocked">Yes, it is unlocked</option><option value="locked">No, it is network-locked</option></select></label>
-              <div className={`compatibility-result ${compatibility}`}><strong>{compatibility === "ready" ? "Likely compatible" : compatibility === "blocked" ? "Do not buy an eSIM yet" : "Two checks still matter"}</strong><p>{compatibility === "ready" ? "Your answers suggest a travel eSIM should work. Regional device variants can differ, so verify with the manufacturer." : compatibility === "blocked" ? "Travel eSIMs need an eSIM-capable, unlocked phone. Ask your UK network about unlocking or use a physical travel SIM." : "Look for “Add eSIM” in your mobile settings and ask your UK network whether the handset is unlocked."}</p></div>
-              <p className="manufacturer-links">Official checks: <a href="https://support.apple.com/en-gb/guide/iphone/iph9c5776d3c/ios" target="_blank" rel="noopener noreferrer">Apple</a> · <a href="https://www.samsung.com/uk/support/mobile-devices/galaxy-esim-and-supported-network-carriers/" target="_blank" rel="noopener noreferrer">Samsung</a> · <a href="https://support.google.com/pixelphone/answer/16115741?hl=en" target="_blank" rel="noopener noreferrer">Google Pixel</a></p>
-            </div>
+            <DeviceCompatibilityChecker
+              selectedDeviceId={selectedDeviceId}
+              lockStatus={lockStatus}
+              readiness={compatibility}
+              onDeviceChange={setSelectedDeviceId}
+              onLockStatusChange={setLockStatus}
+            />
           )}
 
           <button className="primary-button" type="submit">{destination === "turkey" ? "Compare priced options" : "Compare live catalogues"} <span aria-hidden="true">→</span></button>
@@ -167,7 +168,7 @@ export default function CompareExperience({ initial = defaultComparison }: { ini
       <section className={`results-section ${hasCompared ? "is-visible" : ""}`} id="results">
         <div className="section-heading"><div><p className="eyebrow">Your comparison</p><h2 ref={resultsHeadingRef} tabIndex={-1}>{days} {days === 1 ? "day" : "days"} in {activeDestination.name} · plan for about {neededData}GB</h2></div><div className="result-actions"><button className="text-button" type="button" onClick={shareComparison}>Share comparison ↗</button><button className="text-button" type="button" onClick={() => document.querySelector("#compare")?.scrollIntoView({ behavior: "smooth" })}>Change trip details ↑</button>{shareStatus && <span role="status">{shareStatus}</span>}</div></div>
 
-        <div className={`results-compatibility ${compatibility}`}><span aria-hidden="true">{compatibility === "ready" ? "✓" : compatibility === "blocked" ? "!" : "?"}</span><div><strong>{compatibility === "ready" ? "Your phone looks eSIM-ready" : compatibility === "blocked" ? "Pause before purchasing" : "Compatibility not confirmed"}</strong><p>{compatibility === "ready" ? "Still verify the exact regional model before checkout." : compatibility === "blocked" ? "Your answers indicate an eSIM may not work on this phone." : "Use the compatibility check above before choosing a plan."}</p></div></div>
+        <div className={`results-compatibility ${compatibility}`}><span aria-hidden="true">{compatibility === "ready" ? "✓" : compatibility === "blocked" ? "!" : compatibility === "check" ? "i" : "?"}</span><div><strong>{compatibility === "ready" ? `${selectedDeviceName} looks eSIM-ready` : compatibility === "check" ? "Check this phone’s exact version" : compatibility === "blocked" ? "Pause before purchasing" : "Phone compatibility not checked"}</strong><p>{compatibility === "ready" ? "The model and network-lock checks look good. Confirm the regional version before checkout." : compatibility === "check" ? "eSIM support varies for this model. Check for “Add eSIM” in Settings before buying." : compatibility === "blocked" ? "This model or its network-lock status means a travel eSIM may not work." : "Search for your exact phone model above before choosing a plan."}</p></div></div>
 
         <div className={`roaming-banner ${roaming.cost === null ? "needs-input" : ""}`}>
           <div className="network-badge">{networkNames[network].slice(0, 2).toUpperCase()}</div>
@@ -238,7 +239,7 @@ export default function CompareExperience({ initial = defaultComparison }: { ini
         <div className="faq-list">
           <details><summary>Are these live prices?</summary><p>Turkey has manually dated snapshots, while the other destinations link directly to provider catalogues and deliberately show no stored price. Klook is never assigned a guessed price. Approved provider APIs can replace both paths later.</p></details>
           <details><summary>Can one provider show several suggestions?</summary><p>Yes. The comparison can show multiple suitable plans from the same provider, including different data allowances, validity periods and daily-data options.</p></details>
-          <details><summary>How does the eSIM compatibility check work?</summary><p>It is a self-check, not device detection. Your phone must support eSIM and be network-unlocked. Confirm the exact regional model with its manufacturer before buying.</p></details>
+          <details><summary>How does the phone compatibility check work?</summary><p>Search your exact model against our dated snapshot of manufacturer guidance, then confirm the phone can use SIMs from another network. We flag regional variants instead of guessing, and link to the source used for each result.</p></details>
           <details><summary>Why can roaming be cheaper?</summary><p>Some contracts include Turkey, and Sky’s current daily pass can be competitive for short trips. The results show the difference instead of assuming an eSIM always wins.</p></details>
           <details><summary>Why should I install before travelling?</summary><p>Some travel-eSIM apps and websites can be restricted in Turkey. Buy, install and save any QR code while you still have reliable access in the UK.</p></details>
         </div>

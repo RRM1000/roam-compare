@@ -95,20 +95,41 @@ h2 { font-family:Georgia,"Times New Roman",serif; font-size:clamp(35px,4.5vw,58p
 .compatibility-trigger i { background:#9b7920; border-radius:50%; display:inline-block; height:8px; width:8px; }
 .compatibility-trigger.ready { border-color:#82b5ac; color:var(--teal); }
 .compatibility-trigger.ready i { background:var(--teal); }
+.compatibility-trigger.check { border-color:#c6a54f; color:#76570c; }
+.compatibility-trigger.check i { background:#a67a0c; }
 .compatibility-trigger.blocked { border-color:#da8d7a; color:#8b2f20; }
 .compatibility-trigger.blocked i { background:var(--coral-dark); }
-.compatibility-panel { background:#eceae3; border-radius:14px; display:grid; gap:14px; grid-template-columns:1fr 1fr; margin:-7px 0 20px; padding:17px; }
-.compatibility-heading,.compatibility-result,.manufacturer-links { grid-column:1 / -1; }
+.compatibility-panel { background:#eceae3; border:1px solid #dddad0; border-radius:16px; display:grid; gap:16px; grid-template-columns:minmax(0,1.35fr) minmax(190px,.65fr); margin:-7px 0 20px; padding:19px; }
+.compatibility-heading,.compatibility-result,.compatibility-fallback { grid-column:1 / -1; }
 .compatibility-heading { display:flex; flex-direction:column; gap:4px; }
-.compatibility-heading strong { font-size:13px; }
-.compatibility-heading small,.manufacturer-links { color:var(--muted); font-size:12px; line-height:1.5; }
-.compatibility-result { border-left:3px solid #9b7920; padding:2px 0 2px 12px; }
+.compatibility-heading strong { font-family:Georgia,"Times New Roman",serif; font-size:18px; font-weight:500; }
+.compatibility-heading small { color:var(--muted); font-size:12px; line-height:1.5; }
+.device-search { position:relative; z-index:4; }
+.device-search-label { display:block; font-size:12px; font-weight:850; margin-bottom:8px; }
+.search-help { color:var(--muted); display:block; font-size:11px; line-height:1.4; margin-top:7px; }
+.device-results { background:var(--white); border:1px solid #cac7bc; border-radius:13px; box-shadow:0 18px 45px rgba(13,37,35,.18); left:0; list-style:none; margin:6px 0 0; max-height:280px; overflow-y:auto; padding:5px; position:absolute; right:0; top:72px; z-index:10; }
+.device-results li { align-items:center; border-radius:9px; cursor:pointer; display:flex; gap:12px; justify-content:space-between; min-height:48px; padding:8px 9px; }
+.device-results li.is-active { background:#e5ece8; }
+.device-results li[aria-selected="true"] { box-shadow:inset 0 0 0 1px var(--teal); }
+.device-results li>span { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.device-results li strong { font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.device-results li small { color:var(--muted); font-size:10px; }
+.device-results em { border-radius:999px; flex:0 0 auto; font-size:9px; font-style:normal; font-weight:900; letter-spacing:.05em; padding:5px 7px; text-transform:uppercase; }
+.device-results em.supported { background:#dcece7; color:#075f57; }
+.device-results em.variant-dependent { background:#f2e6c4; color:#6d510b; }
+.device-results em.unsupported { background:#f2dcd6; color:#8b2f20; }
+.device-results .no-device-result { color:var(--muted); cursor:default; font-size:12px; line-height:1.4; }
+.lock-field { align-self:start; }
+.compatibility-result { background:rgba(255,255,255,.46); border-left:3px solid #9b7920; border-radius:0 10px 10px 0; padding:11px 13px; }
 .compatibility-result.ready { border-color:var(--teal); }
+.compatibility-result.check { border-color:#a67a0c; }
 .compatibility-result.blocked { border-color:var(--coral-dark); }
 .compatibility-result strong { font-size:13px; }
 .compatibility-result p { color:var(--muted); font-size:12px; line-height:1.5; margin:4px 0 0; }
-.manufacturer-links { margin:0; }
-.manufacturer-links a { color:#075f57; font-weight:850; text-decoration:underline; text-underline-offset:3px; }
+.device-source a { color:#075f57; font-weight:850; text-decoration:underline; text-underline-offset:3px; }
+.compatibility-fallback { border-top:1px solid #d5d1c6; padding-top:11px; }
+.compatibility-fallback summary { color:#075f57; cursor:pointer; font-size:12px; font-weight:850; min-height:44px; padding:13px 2px 10px; }
+.compatibility-fallback p { color:var(--muted); font-size:12px; line-height:1.55; margin:0 0 4px; }
 .primary-button,.deal-button,.decision-card>a { align-items:center; border:0; border-radius:999px; cursor:pointer; display:flex; font-weight:900; justify-content:space-between; min-height:50px; transition:background .2s ease,transform .2s ease,box-shadow .2s ease; }
 .primary-button { background:var(--coral); box-shadow:0 12px 30px rgba(255,107,69,.22); color:var(--forest); padding:16px 21px; width:100%; }
 .primary-button:hover { background:#ff7b5a; box-shadow:0 15px 34px rgba(255,107,69,.3); transform:translateY(-1px); }
@@ -143,6 +164,8 @@ h2 { font-family:Georgia,"Times New Roman",serif; font-size:clamp(35px,4.5vw,58p
 .results-compatibility>span { align-items:center; background:#89670f; border-radius:50%; color:#fff; display:flex; flex:0 0 auto; font-size:12px; font-weight:900; height:29px; justify-content:center; width:29px; }
 .results-compatibility.ready { background:#e2efeb; border-color:#bdd8d1; }
 .results-compatibility.ready>span { background:var(--teal); }
+.results-compatibility.check { background:#f3ead1; border-color:#ddc681; }
+.results-compatibility.check>span { background:#89670f; }
 .results-compatibility.blocked { background:#f5e2dd; border-color:#e2b3a7; }
 .results-compatibility.blocked>span { background:var(--coral-dark); }
 .results-compatibility strong { font-size:13px; }
@@ -276,7 +299,7 @@ footer .brand { color:var(--ink); }
   .hero-lede { font-size:17px; }
   .compare-card { border-radius:25px; padding:27px 22px; }
   .field-grid,.compatibility-panel { grid-template-columns:1fr; }
-  .field-wide,.compatibility-heading,.compatibility-result,.manufacturer-links { grid-column:auto; }
+  .field-wide,.compatibility-heading,.compatibility-result,.compatibility-fallback { grid-column:auto; }
   .usage-options { grid-template-columns:1fr; }
   .usage-options span { min-height:0; }
   .destination-rail { grid-template-columns:1fr auto; padding:19px 22px 24px; }

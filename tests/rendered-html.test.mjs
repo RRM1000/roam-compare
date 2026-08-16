@@ -36,7 +36,7 @@ test("server-renders the RoamCompare experience", async () => {
   assert.match(html, /United States/);
   assert.match(html, /United Arab Emirates/);
   assert.equal((html.match(/<option value="(?:turkey|united-states|spain|france|italy|greece|portugal|germany|netherlands|ireland|cyprus|united-arab-emirates|thailand|japan|australia|canada|mexico|morocco|egypt|indonesia)"/g) ?? []).length, 20);
-  assert.match(html, /Check whether your phone supports eSIM/);
+  assert.match(html, /Will an eSIM work on your phone\?/);
   assert.match(html, /1GB per day/);
   assert.match(html, /2GB per day/);
   assert.match(html, /Current EE RoW Zone 1 passes/);
@@ -58,6 +58,7 @@ test("server-renders the RoamCompare experience", async () => {
   assert.match(html, /og-premium\.png/);
   assert.match(html, /Live APIs/);
   assert.match(html, /Are these live prices\?/);
+  assert.match(html, /dated snapshot of manufacturer guidance/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/i);
 });
 
