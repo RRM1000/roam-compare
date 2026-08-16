@@ -4,7 +4,7 @@ UK-first roaming and travel-eSIM comparison site built with vinext and OpenAI Si
 
 ## What is implemented
 
-- allowance-matched UK roaming estimates for Turkey
+- allowance-matched, official-source UK roaming estimates for Turkey, the United States, Spain, Japan and the UAE
 - dated manual eSIM price snapshots for Turkey, the United States, Spain, Japan and the UAE
 - live provider handoffs for 15 additional destinations without guessed prices
 - Klook, Airalo, Nomad and Saily options, with multiple suitable plans per provider
@@ -13,7 +13,7 @@ UK-first roaming and travel-eSIM comparison site built with vinext and OpenAI Si
 - browser-local saved comparisons; no account or comparison database
 - private-launch robots policy, canonical destination pages and a launch-ready sitemap
 
-Manual snapshots are removed from ranking after seven days. Provider currency is preserved and GBP is labelled as an estimate.
+Manual snapshots are removed from ranking after seven days. Provider currency is preserved and GBP is labelled as an estimate. The test command also fails when a manual data review is overdue.
 
 ## Local development
 
@@ -24,6 +24,7 @@ npm install
 npm run dev
 npm test
 npm run lint
+npm run data:check
 ```
 
 ## Klook affiliate links
@@ -38,7 +39,7 @@ NEXT_PUBLIC_KLOOK_AFFILIATE_URL_JAPAN
 NEXT_PUBLIC_KLOOK_AFFILIATE_URL_UAE
 ```
 
-The first variable is the Turkey URL retained for backwards compatibility. Never place partner credentials or private tokens in source control.
+The first variable is the Turkey URL retained for backwards compatibility. Configured links are accepted only when they use HTTPS on Klook’s domain; invalid values fall back to the verified public product page. Never place partner credentials or private tokens in source control.
 
 ## Before public launch
 

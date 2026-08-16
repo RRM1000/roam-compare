@@ -35,6 +35,16 @@ export type Plan = {
 
 export const DATA_CHECKED = "16 August 2026";
 export const CALLS_CHECKED = "16 August 2026";
+export const DATA_CHECKED_AT = "2026-08-16";
+export const DATA_REVIEW_AFTER = "2026-08-23";
+export const FX_CHECKED_AT = "2026-08-16";
+export const FX_REVIEW_AFTER = "2026-08-23";
+export const FX_EVIDENCE = {
+  label: "Bank of England daily spot exchange rates",
+  url: "https://www.bankofengland.co.uk/statistics/exchange-rates",
+  checkedAt: FX_CHECKED_AT,
+  reviewAfter: FX_REVIEW_AFTER,
+} as const;
 export const usagePerDay: Record<Usage, number> = { light: 0.35, everyday: 0.8, heavy: 2 };
 export const tripLengths = [...Array.from({ length: 30 }, (_, index) => index + 1), 45, 60, 90];
 export const gbpRates: Record<Currency, number> = { GBP: 1, EUR: 0.85, USD: 0.75 };
@@ -46,8 +56,8 @@ export const providerDetails: Record<Provider, { accent: string; initials: strin
   Saily: { accent: "#4b28ae", initials: "SA", affiliate: false, summary: "Travel data plans with security features" },
 };
 
-const CHECKED_AT = "2026-08-16";
-const REVIEW_AFTER = "2026-08-23";
+const CHECKED_AT = DATA_CHECKED_AT;
+const REVIEW_AFTER = DATA_REVIEW_AFTER;
 const turkeySources: Record<Provider, string> = {
   Airalo: "https://www.airalo.com/turkey-esim/merhaba-30days-20gb/",
   Klook: "https://www.klook.com/en-GB/activity/128551-turkey-esim-high-speed-internet-qr-code-voucher/",
@@ -186,8 +196,14 @@ export function hasPricedPlans(destination: DestinationId) {
 }
 
 export function isPlanStale(plan: Plan, now = new Date()) {
-  const reviewBoundary = Date.parse(`${plan.reviewAfter}T23:59:59Z`);
-  return Number.isNaN(reviewBoundary) || now.getTime() > reviewBoundary;
+  return isReviewDateDue(plan.reviewAfter, now);
+}
+
+export function isReviewDateDue(reviewAfter: string, now = new Date()) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(reviewAfter)) return true;
+  const reviewDate = new Date(`${reviewAfter}T23:59:59Z`);
+  if (Number.isNaN(reviewDate.getTime()) || reviewDate.toISOString().slice(0, 10) !== reviewAfter) return true;
+  return now.getTime() > reviewDate.getTime();
 }
 
 export function formatCheckedDate(isoDate: string) {

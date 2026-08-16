@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
   const canonical = `${protocol}://${host}/destinations/${destination.id}`;
   const title = `${destination.name} eSIM and UK roaming comparison — RoamCompare`;
   const description = `Compare dated ${destination.name} eSIM prices, hotspot rules, speed caps and fair-use limits for a trip from the UK.`;
-  return { title, description, alternates: { canonical }, openGraph: { title, description, type: "website", url: canonical }, twitter: { card: "summary_large_image", title, description } };
+  return { title, description, alternates: { canonical }, openGraph: { title, description, type: "website", url: canonical, images: [] }, twitter: { card: "summary", title, description, images: [] } };
 }
 
 export default async function DestinationPage({ params }: DestinationPageProps) {

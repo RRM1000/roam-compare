@@ -22,6 +22,7 @@ test("compatibility records are uniquely identified and traceable", () => {
 
   for (const source of Object.values(esimSources)) {
     assert.equal(source.checkedAt, "2026-08-16");
+    assert.equal(source.reviewAfter, "2026-09-16");
     assert.match(source.url, /^https:\/\//);
     assert.ok(source.label.length > 10);
   }

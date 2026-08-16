@@ -28,8 +28,9 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.match(html, /aria-label="UK mobile network" required=""/);
   assert.match(text, /We will not assume a network for you\./);
   assert.match(text, /Do you need normal calls or SMS\?/);
-  assert.match(text, /Fine-tune your roaming estimate/);
-  assert.match(text, /How many days might you switch on UK roaming\?/);
+  assert.match(text, /Choose your roaming tariff/);
+  assert.match(text, /Which tariff or roaming option applies\?/);
+  assert.match(text, /On how many trip days will you use paid UK-network roaming\?/);
   assert.match(text, /0 — eSIM\/Wi-Fi only/);
   assert.match(text, /Data available through your UK plan abroad \(GB\)/);
   assert.match(html, /<option value="45">/);
@@ -52,6 +53,7 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.equal(rows, (html.match(/class="calls-texts-status data-only"/g) ?? []).length);
   assert.equal(rows, (html.match(/class="plan-limits"/g) ?? []).length);
   assert.match(text, /Klook prices are never scraped or guessed/);
+  assert.match(text, /Do you calculate the roaming charge\?/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/i);
 });
 
@@ -71,15 +73,17 @@ for (const [path, title, marker] of [
   });
 }
 
-test("shared Japan comparison renders prices and an unguessed roaming handoff", async () => {
-  const response = await render("/?compare=1&destination=japan&days=10&roamingDays=10&network=o2&scenario=plan-check&usage=light&calls=no");
+test("shared Japan comparison renders prices and a sourced roaming calculation", async () => {
+  const response = await render("/?compare=1&destination=japan&days=10&roamingDays=10&network=o2&scenario=o2-travel&usage=light&calls=no");
   assert.equal(response.status, 200);
   const html = await response.text();
   const text = visible(html);
   assert.match(html, /<title>10 days in Japan — RoamCompare<\/title>/i);
   assert.match(text, /10 days in Japan · plan for about 4GB/);
-  assert.match(text, /Check O2 for Japan/);
-  assert.match(text, /A live roaming total is not stored/);
+  assert.match(text, /O2 Travel estimate/);
+  assert.match(text, /£7 × 10 24-hour periods/);
+  assert.match(text, /Official O2 Travel/);
+  assert.match(text, /2Mbps/);
   assert.match(html, /results-section is-visible/);
   assert.match(html, /aria-hidden="false"/);
   assert.match(text, /Nomad/);
@@ -90,7 +94,7 @@ test("shared Japan comparison renders prices and an unguessed roaming handoff", 
 });
 
 test("normal-call requirement can select the verified US voice plan", async () => {
-  const response = await render("/?compare=1&destination=united-states&days=7&roamingDays=7&network=ee&scenario=plan-check&usage=light&calls=yes");
+  const response = await render("/?compare=1&destination=united-states&days=7&roamingDays=7&network=ee&scenario=ee-row1&usage=light&calls=yes&allowance=10");
   assert.equal(response.status, 200);
   const text = visible(await response.text());
   assert.match(text, /Change\+ 5GB \+ 50 min\/SMS/);
@@ -101,7 +105,7 @@ test("normal-call requirement can select the verified US voice plan", async () =
 });
 
 test("shared filters and sorting are restored before recommendations are rendered", async () => {
-  const response = await render("/?compare=1&destination=united-states&days=7&roamingDays=7&network=ee&scenario=plan-check&usage=light&calls=no&sort=data&unlimited=1&fiveG=1&tethering=1");
+  const response = await render("/?compare=1&destination=united-states&days=7&roamingDays=7&network=ee&scenario=ee-row1&usage=light&calls=no&sort=data&unlimited=1&fiveG=1&tethering=1&allowance=10");
   assert.equal(response.status, 200);
   const html = await response.text();
   const text = visible(html);
@@ -141,15 +145,18 @@ test("rejects inherited and malformed shared-link values without assuming EE", a
   assert.doesNotMatch(text, /999 days in/);
 });
 
-test("priced destination pages have distinct canonical metadata", async () => {
-  const response = await render("/destinations/spain");
-  assert.equal(response.status, 200);
-  const html = await response.text();
-  assert.match(html, /<title>Spain eSIM and UK roaming comparison — RoamCompare<\/title>/i);
-  assert.match(html, /rel="canonical" href="http:\/\/localhost:3000\/destinations\/spain"/i);
-  assert.match(visible(html), /UK → Spain · roaming vs eSIM/);
-  assert.match(visible(html), /Compare eSIMs for Spain\./);
-});
+for (const [slug, name] of [["spain", "Spain"], ["japan", "Japan"]]) {
+  test(`${name} destination page has distinct canonical and social metadata`, async () => {
+    const response = await render(`/destinations/${slug}`);
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, new RegExp(`<title>${name} eSIM and UK roaming comparison — RoamCompare<\\/title>`, "i"));
+    assert.match(html, new RegExp(`rel="canonical" href="http:\\/\\/localhost:3000\\/destinations\\/${slug}"`, "i"));
+    assert.match(visible(html), new RegExp(`UK → ${name} · roaming vs eSIM`));
+    assert.match(visible(html), new RegExp(`Compare eSIMs for ${name}\\.`));
+    assert.doesNotMatch(html, /og-premium\.png|og\.png/);
+  });
+}
 
 test("private launch controls block crawlers and expose launch-ready routes", async () => {
   const robots = await render("/robots.txt");

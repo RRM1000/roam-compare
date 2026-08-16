@@ -8,6 +8,7 @@ import {
   type EsimReadiness,
   type LockStatus,
 } from "@/lib/esim-devices";
+import { formatCheckedDate } from "@/lib/catalog";
 
 type DeviceCompatibilityCheckerProps = {
   selectedDeviceId: string;
@@ -164,7 +165,7 @@ export default function DeviceCompatibilityChecker({
       <div className={`compatibility-result ${readiness}`} role="status" aria-live="polite">
         <strong>{resultTitle}</strong>
         <p>{resultCopy}</p>
-        {selectedSource && <p className="device-source">Source: <a href={selectedSource.url} target="_blank" rel="noopener noreferrer">{selectedSource.label}</a> · checked 16 August 2026</p>}
+        {selectedSource && <p className="device-source">Source: <a href={selectedSource.url} target="_blank" rel="noopener noreferrer">{selectedSource.label}</a> · checked {formatCheckedDate(selectedSource.checkedAt)} · review by {formatCheckedDate(selectedSource.reviewAfter)}</p>}
       </div>
 
       <details className="compatibility-fallback">

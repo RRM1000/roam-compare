@@ -5,9 +5,12 @@ import DeviceCompatibilityChecker from "@/app/components/DeviceCompatibilityChec
 import {
   CALLS_CHECKED,
   DATA_CHECKED,
+  DATA_REVIEW_AFTER,
+  FX_EVIDENCE,
   formatCheckedDate,
   hasPricedPlans,
   isPlanStale,
+  isReviewDateDue,
   plans,
   pricedDestinationIds,
   providerDetails,
@@ -20,7 +23,7 @@ import {
 import { getPlanMatch, money, nativeMoney } from "@/lib/comparison";
 import { destinationById, destinations, getProviderUrl, type Destination, type DestinationId } from "@/lib/destinations";
 import { getEsimDevice, getEsimReadiness, type LockStatus } from "@/lib/esim-devices";
-import { getDefaultScenario, getRoamingResult, getScenarioOptions, networkNames, ROAMING_CHECKED, type Network } from "@/lib/roaming";
+import { getRoamingResult, getScenarioOptions, networkNames, ROAMING_CHECKED, ROAMING_REVIEW_AFTER, type Network } from "@/lib/roaming";
 
 export type CallsNeed = "no" | "yes" | "unsure";
 export type SortMode = "price" | "data" | "validity";
@@ -155,10 +158,13 @@ export default function CompareExperience({ initial = defaultComparison, destina
   const shortlistRef = useRef<HTMLDivElement>(null);
 
   const activeDestination = destinationById[destination];
+  const dataReviewDue = isReviewDateDue(DATA_REVIEW_AFTER);
+  const roamingReviewDue = isReviewDateDue(ROAMING_REVIEW_AFTER);
+  const fxReviewDue = isReviewDateDue(FX_EVIDENCE.reviewAfter);
   const pricedDestination = hasPricedPlans(destination);
   const neededData = Math.max(1, Math.ceil(days * usagePerDay[usage]));
   const neededRoamingData = roamingDays * usagePerDay[usage];
-  const roaming = network ? getRoamingResult(network, scenario, roamingDays, customCost, neededRoamingData, destination, roamingAllowance) : null;
+  const roaming = network && scenario ? getRoamingResult(network, scenario, roamingDays, customCost, neededRoamingData, destination, roamingAllowance) : null;
   const canCompareSavings = Boolean(
     roaming?.comparable
     && roamingDays === days
@@ -257,14 +263,14 @@ export default function CompareExperience({ initial = defaultComparison, destina
 
   function updateNetwork(nextNetwork: Network | "") {
     setNetwork(nextNetwork);
-    setScenario(nextNetwork ? getDefaultScenario(nextNetwork, destination) : "");
+    setScenario("");
     setCustomCost("");
     setRoamingAllowance("");
   }
 
   function updateDestination(nextDestination: DestinationId) {
     setDestination(nextDestination);
-    setScenario(network ? getDefaultScenario(network, nextDestination) : "");
+    setScenario("");
     setCustomCost("");
     setRoamingAllowance("");
     setPinnedIds([]);
@@ -272,7 +278,7 @@ export default function CompareExperience({ initial = defaultComparison, destina
   }
 
   function compare() {
-    if (!network) return;
+    if (!network || !scenario) return;
     setHasCompared(true);
     setShareStatus("");
     window.setTimeout(() => {
@@ -407,11 +413,11 @@ export default function CompareExperience({ initial = defaultComparison, destina
 
               <fieldset className="calls-need"><legend>Do you need normal calls or SMS?</legend><div>{([ ["no", "No", "App calls are fine"], ["yes", "Yes", "I need a phone number"], ["unsure", "Not sure", "Show me the difference"] ] as const).map(([value, title, detail]) => <label key={value}><input aria-label={`${title}: ${detail}`} type="radio" name="calls" value={value} checked={callsNeed === value} onChange={() => setCallsNeed(value)} /><span><strong>{title}</strong><small>{detail}</small></span></label>)}</div></fieldset>
 
-              <details className="advanced-controls" open={scenario === "custom" || undefined}>
-                <summary>Fine-tune your roaming estimate <span>allowance, days and tariff</span></summary>
+              <details className="advanced-controls" open={Boolean(network) || undefined}>
+                <summary>Choose your roaming tariff <span>then fine-tune allowance and days</span></summary>
                 <div className="field-grid">
-                  <label className="field"><span>How many days might you switch on UK roaming?</span><select value={roamingDays} onChange={(event) => updateRoamingDays(Number(event.target.value))} aria-label="UK roaming days">{Array.from({ length: days + 1 }, (_, index) => index).map((length) => <option value={length} key={length}>{length === 0 ? "0 — eSIM/Wi-Fi only" : `${length} ${length === 1 ? "day" : "days"}`}</option>)}</select><small className="field-help">Usually your full trip. Choose 0 if you will use only eSIM or Wi-Fi.</small></label>
-                  <label className="field"><span>Your roaming situation</span><select value={scenario} onChange={(event) => updateScenario(event.target.value)} aria-label="Roaming plan situation" disabled={!network}>{network ? getScenarioOptions(network, destination).map((option) => <option value={option.value} key={option.value}>{option.label}</option>) : <option value="">Choose a network first</option>}</select></label>
+                  <label className="field"><span>On how many trip days will you use paid UK-network roaming?</span><select value={roamingDays} onChange={(event) => updateRoamingDays(Number(event.target.value))} aria-label="UK roaming days">{Array.from({ length: days + 1 }, (_, index) => index).map((length) => <option value={length} key={length}>{length === 0 ? "0 — eSIM/Wi-Fi only" : `${length} ${length === 1 ? "day" : "days"}`}</option>)}</select><small className="field-help">Usually your full trip. Choose 0 if data, calls and texts will use only eSIM, Wi-Fi or another line.</small></label>
+                  <label className="field"><span>Which tariff or roaming option applies?</span><select value={scenario} onChange={(event) => updateScenario(event.target.value)} aria-label="Roaming plan situation" disabled={!network} required><option value="" disabled>{network ? "Choose your tariff or entitlement" : "Choose a network first"}</option>{network && getScenarioOptions(network, destination).map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select><small className="field-help">Plan dates and included benefits change the answer. Choose the closest verified option.</small></label>
                   {scenario === "custom" && <label className="field"><span>Total roaming cost for this trip (£)</span><input inputMode="decimal" min="0" step="0.01" type="number" value={customCost} onChange={(event) => setCustomCost(event.target.value)} placeholder="For example, 35" required /></label>}
                   <label className="field"><span>Data available through your UK plan abroad (GB)</span><input inputMode="decimal" min="0" step="0.1" type="number" value={roamingAllowance} onChange={(event) => setRoamingAllowance(event.target.value)} placeholder="For example, 12" /><small className="field-help">Needed for passes that use your UK allowance. Leave blank if unknown.</small></label>
                 </div>
@@ -439,7 +445,7 @@ export default function CompareExperience({ initial = defaultComparison, destina
 
           {roaming && <div className={`roaming-banner ${roaming.cost === null || !roaming.comparable ? "needs-input" : ""}`}>
             <div className="network-badge">{networkNames[network as Network].slice(0, 2).toUpperCase()}</div>
-            <div><span className="overline">Your current network</span><h3>{roaming.title}</h3><p>{roaming.detail} {roaming.caveat}</p><div className="roaming-facts"><span>Data: {roaming.unlimitedData ? "Unlimited" : roaming.dataAllowanceGb === null ? "Not confirmed" : `${roaming.dataAllowanceGb}GB`}</span><span>Speed cap: {roaming.speedCap ?? "Check plan"}</span><span>Hotspot: {roaming.tethering === "allowed" ? "Allowed" : roaming.tethering === "not-allowed" ? "Not allowed" : "Check plan"}</span><span>Calls/SMS: {roaming.callsTexts === "included" ? "Included" : roaming.callsTexts === "not-included" ? "Not included" : roaming.callsTexts === "extra" ? "Extra" : "Check plan"}</span></div><strong className={`match-note ${roaming.matched === false ? "no-match" : roaming.matched === true ? "matched" : "unknown"}`}>{roaming.matchReason}</strong></div>
+            <div><span className="overline">Your current network</span><h3>{roaming.title}</h3><p>{roaming.detail} {roaming.caveat}</p><div className="roaming-facts"><span>Data: {roaming.unlimitedData ? "Unlimited" : roaming.dataAllowanceGb === null ? "Not confirmed" : `${roaming.dataAllowanceGb}GB`}</span><span>Speed cap: {roaming.speedCap ?? "Check plan"}</span><span>Hotspot: {roaming.tethering === "allowed" ? "Allowed" : roaming.tethering === "not-allowed" ? "Not allowed" : "Check plan"}</span><span>Calls/SMS: {roaming.callsTexts === "included" ? "Included — check scope" : roaming.callsTexts === "not-included" ? "Not included" : roaming.callsTexts === "extra" ? "Extra" : "Check plan"}</span></div><strong className={`match-note ${roaming.matched === false ? "no-match" : roaming.matched === true ? "matched" : "unknown"}`}>{roaming.matchReason}</strong><a className="roaming-source" href={roaming.evidence.url} target="_blank" rel="noopener noreferrer">Official {roaming.evidence.label} · checked {formatCheckedDate(roaming.evidence.checkedAt)} · review by {formatCheckedDate(roaming.evidence.reviewAfter)} ↗</a></div>
             <div className="roaming-price"><strong>{roaming.cost === null ? "Check plan" : money.format(roaming.cost)}</strong><span>{roamingComparisonStatus}</span></div>
           </div>}
 
@@ -496,11 +502,11 @@ export default function CompareExperience({ initial = defaultComparison, destina
           <p className="results-disclaimer">Manual prices were checked on {DATA_CHECKED} in the provider currency shown and expire from ranking after seven days. GBP figures use rounded reference rates (€1 ≈ £0.85 and $1 ≈ £0.75), so they are estimates rather than checkout prices. Klook prices are never scraped or guessed. Commission does not change the order. Savings appear only when UK roaming covers the full trip and data target, plus any selected calls/SMS, unlimited-data, 5G or hotspot requirement. Always confirm coverage, price, hotspot rules, speed caps, fair use, calls/texts and activation at checkout.</p>
         </section>
 
-        <section className="methodology-section" id="methodology"><div className="methodology-intro"><p className="eyebrow">Receipts, not guesses</p><h2>Every number shows its assumptions.</h2><p>{pricedDestinationIds.length} destinations have short-lived manual price snapshots. The other {destinations.length - pricedDestinationIds.length} are clearly labelled provider finders until an approved feed is connected.</p><div className="data-status"><span><i className="fresh" />Turkey roaming rules checked <strong>{ROAMING_CHECKED}</strong></span><span><i className="fresh" />eSIM catalogue snapshots <strong>{DATA_CHECKED}</strong></span><span><i className="fresh" />Calls and texts labels <strong>{CALLS_CHECKED}</strong></span><span><i className="manual" />Price refresh rule <strong>7 days, then removed from ranking</strong></span><span><i className="manual" />Live APIs <strong>not connected</strong></span></div></div><details className="source-register"><summary>Sources for {activeDestination.name} <span>{currentSources.length} eSIM receipts</span></summary><div className="source-grid">{currentSources.length > 0 ? currentSources.map((plan) => <a href={plan.sourceUrl} target="_blank" rel="noopener noreferrer" key={plan.sourceUrl}><span>eSIM catalogue</span><strong>{plan.provider} {activeDestination.name}</strong><small>{plan.note} · checked {formatCheckedDate(plan.checkedAt)}</small></a>) : (Object.keys(providerDetails) as Provider[]).map((provider) => <a href={getProviderUrl(provider, activeDestination)} target="_blank" rel="noopener noreferrer" key={provider}><span>Live catalogue</span><strong>{provider} {activeDestination.name}</strong><small>Price and exact limits must be checked live</small></a>)}</div></details></section>
+        <section className="methodology-section" id="methodology"><div className="methodology-intro"><p className="eyebrow">Receipts, not guesses</p><h2>Every number shows its assumptions.</h2><p>{pricedDestinationIds.length} destinations have short-lived manual price snapshots. The other {destinations.length - pricedDestinationIds.length} are clearly labelled provider finders until an approved feed is connected.</p><div className="data-status"><span><i className={roamingReviewDue ? "stale" : "fresh"} />UK roaming rules <strong>{ROAMING_CHECKED} · {roamingReviewDue ? "review overdue" : `review by ${formatCheckedDate(ROAMING_REVIEW_AFTER)}`}</strong></span><span><i className={dataReviewDue ? "stale" : "fresh"} />eSIM catalogue snapshots <strong>{DATA_CHECKED} · {dataReviewDue ? "review overdue" : `review by ${formatCheckedDate(DATA_REVIEW_AFTER)}`}</strong></span><span><i className={dataReviewDue ? "stale" : "fresh"} />Calls and texts labels <strong>{CALLS_CHECKED} · {dataReviewDue ? "review overdue" : `review by ${formatCheckedDate(DATA_REVIEW_AFTER)}`}</strong></span><span><i className={fxReviewDue ? "stale" : "fresh"} />Rounded GBP reference rates <strong>{fxReviewDue ? "review overdue" : `review by ${formatCheckedDate(FX_EVIDENCE.reviewAfter)}`}</strong></span><span><i className="manual" />Price refresh rule <strong>7 days, then removed from ranking</strong></span><span><i className="manual" />Live APIs <strong>not connected</strong></span></div></div><details className="source-register"><summary>Sources for {activeDestination.name} <span>eSIM, roaming & FX receipts</span></summary><div className="source-grid">{currentSources.length > 0 ? currentSources.map((plan) => <a href={plan.sourceUrl} target="_blank" rel="noopener noreferrer" key={plan.sourceUrl}><span>eSIM catalogue</span><strong>{plan.provider} {activeDestination.name}</strong><small>{plan.note} · checked {formatCheckedDate(plan.checkedAt)} · review by {formatCheckedDate(plan.reviewAfter)}</small></a>) : (Object.keys(providerDetails) as Provider[]).map((provider) => <a href={getProviderUrl(provider, activeDestination)} target="_blank" rel="noopener noreferrer" key={provider}><span>Live catalogue</span><strong>{provider} {activeDestination.name}</strong><small>Price and exact limits must be checked live</small></a>)}{roaming && <a href={roaming.evidence.url} target="_blank" rel="noopener noreferrer"><span>UK roaming</span><strong>{roaming.evidence.label}</strong><small>Checked {formatCheckedDate(roaming.evidence.checkedAt)} · review by {formatCheckedDate(roaming.evidence.reviewAfter)}</small></a>}<a href={FX_EVIDENCE.url} target="_blank" rel="noopener noreferrer"><span>Currency method</span><strong>{FX_EVIDENCE.label}</strong><small>Rounded comparison assumptions · checked {formatCheckedDate(FX_EVIDENCE.checkedAt)} · review by {formatCheckedDate(FX_EVIDENCE.reviewAfter)}</small></a></div></details></section>
 
         <section className="how-section" id="how-it-works"><div><p className="eyebrow">A safer setup</p><h2>Keep your UK number. Stop its data roaming.</h2></div><ol className="steps"><li><span>01</span><strong>Install at home</strong><p>Buy before departure, install on Wi-Fi and keep the new line switched off until arrival.</p></li><li><span>02</span><strong>Choose the data line</strong><p>Set the travel eSIM as Mobile Data and disable data switching so your UK SIM cannot take over.</p></li><li><span>03</span><strong>Keep texts available</strong><p>Leave the UK line on for banking texts if needed, but turn off its data roaming and avoid chargeable calls.</p></li></ol></section>
 
-        <section className="faq-section" id="faq"><div><p className="eyebrow">Common questions</p><h2>Before you pick a plan.</h2></div><div className="faq-list"><details><summary>Are these live prices?</summary><p>Turkey, the United States, Spain, Japan and the UAE have dated manual snapshots. They stop ranking after seven days. Other destinations and Klook package prices open the live provider catalogue and show no guessed price.</p></details><details><summary>Can one provider show several suggestions?</summary><p>Yes. Suitable allowances and durations can appear together, then be filtered, sorted and pinned into a side-by-side shortlist.</p></details><details><summary>Where are tethering and speed limits?</summary><p>Every plan has a “Hotspot, speed & other limits” panel covering hotspot permission, speed caps or throttling, fair-use/exhaustion rules, activation and network. “Check plan” means the source did not support a safe general claim.</p></details><details><summary>Can I make calls with these eSIMs?</summary><p>Most shown plans are data-only: app calls work, but normal calls and SMS do not. Select “Yes” in the form and only a verified phone-number plan can become the top recommendation.</p></details><details><summary>How does phone compatibility work?</summary><p>Search your exact model against a dated manufacturer-guidance snapshot, then confirm the regional version and that the phone is network-unlocked.</p></details></div></section>
+        <section className="faq-section" id="faq"><div><p className="eyebrow">Common questions</p><h2>Before you pick a plan.</h2></div><div className="faq-list"><details><summary>Do you calculate the roaming charge?</summary><p>Yes, for the five priced destinations. Choose the tariff or entitlement that applies and RoamCompare calculates published day fees, pass combinations or per-megabyte charges. It shows a savings figure only when the roaming data allowance covers the same trip target and selected needs; uncertain account-only pricing stays unranked.</p></details><details><summary>Are these live prices?</summary><p>Turkey, the United States, Spain, Japan and the UAE have dated manual snapshots. They stop ranking after seven days. Other destinations and Klook package prices open the live provider catalogue and show no guessed price.</p></details><details><summary>Can one provider show several suggestions?</summary><p>Yes. Suitable allowances and durations can appear together, then be filtered, sorted and pinned into a side-by-side shortlist.</p></details><details><summary>Where are tethering and speed limits?</summary><p>Every plan has a “Hotspot, speed & other limits” panel covering hotspot permission, speed caps or throttling, fair-use/exhaustion rules, activation and network. “Check plan” means the source did not support a safe general claim.</p></details><details><summary>Can I make calls with these eSIMs?</summary><p>Most shown plans are data-only: app calls work, but normal calls and SMS do not. Select “Yes” in the form and only a verified phone-number plan can become the top recommendation.</p></details><details><summary>How does phone compatibility work?</summary><p>Search your exact model against a dated manufacturer-guidance snapshot, then confirm the regional version and that the phone is network-unlocked.</p></details></div></section>
       </main>
       <footer><a className="brand" href="#top"><span className="brand-mark" aria-hidden="true">RC</span><span>RoamCompare</span></a><p>Independent comparisons for UK travellers · snapshots checked {DATA_CHECKED}</p><div className="footer-links"><a href="/about">About & disclosure</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div></footer>
     </>

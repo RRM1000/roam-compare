@@ -62,6 +62,14 @@ test("EE and Sky use the user-entered UK allowance to decide equivalence", () =>
 
   const skyMatched = turkeyResult("sky-mobile", "sky-passport", 4, 4, 4);
   assert.equal(skyMatched.comparable, true);
+
+  const eeOverFairUse = turkeyResult("ee", "ee-current", 7, 51, 100);
+  assert.equal(eeOverFairUse.dataAllowanceGb, 50);
+  assert.equal(eeOverFairUse.comparable, false);
+
+  const skyOverFairUse = turkeyResult("sky-mobile", "sky-passport", 7, 26, 100);
+  assert.equal(skyOverFairUse.dataAllowanceGb, 25);
+  assert.equal(skyOverFairUse.comparable, false);
 });
 
 test("only selected UK-SIM days are charged and partial days round up", () => {
@@ -113,13 +121,15 @@ test("iD pass selection covers both roaming days and required data", () => {
   assert.match(sixDays.detail, /1-day \/ 2GB/);
 });
 
-test("metered estimates price the selected data amount while unchecked destinations stay unknown", () => {
+test("metered estimates price the selected data amount but respect spend safeguards", () => {
   const smarty = turkeyResult("smarty", "smarty-metered", 2, 1.5);
   assert.equal(smarty.cost, 153.6);
   assert.equal(smarty.dataAllowanceGb, 1.5);
   assert.equal(smarty.allowanceSource, "metered");
   assert.equal(smarty.callsTexts, "extra");
-  assert.equal(smarty.comparable, true);
+  assert.equal(smarty.matched, false);
+  assert.equal(smarty.comparable, false);
+  assert.match(smarty.matchReason, /£45 spend limit/);
 
   const unchecked = getRoamingResult("ee", "plan-check", 7, "", 5, "spain", 20);
   assert.equal(unchecked.cost, null);

@@ -47,7 +47,18 @@ function configuredKlookUrl(destination: DestinationId) {
     japan: process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL_JAPAN,
     "united-arab-emirates": process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL_UAE,
   };
-  return configured[destination];
+
+  const value = configured[destination];
+  if (!value) return undefined;
+
+  try {
+    const url = new URL(value);
+    const isKlookHost = url.hostname === "klook.com" || url.hostname.endsWith(".klook.com");
+    if (url.protocol !== "https:" || !isKlookHost || url.username || url.password) return undefined;
+    return url.toString();
+  } catch {
+    return undefined;
+  }
 }
 
 export function getProviderUrl(provider: Provider, destination: Destination) {

@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import CompareExperience, { type CallsNeed, type InitialComparison, type SortMode } from "@/app/components/CompareExperience";
 import { tripLengths, type Usage } from "@/lib/catalog";
 import { destinationById, isDestination, type DestinationId } from "@/lib/destinations";
-import { getDefaultScenario, getScenarioOptions, isNetwork, type Network } from "@/lib/roaming";
+import { getScenarioOptions, isNetwork, type Network } from "@/lib/roaming";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 type PageProps = { searchParams?: Promise<SearchParams> };
@@ -27,7 +27,7 @@ function resolveComparison(params: SearchParams): InitialComparison {
   const scenario = network
     ? getScenarioOptions(network, destination).some((option) => option.value === requestedScenario)
       ? requestedScenario
-      : getDefaultScenario(network, destination)
+      : ""
     : "";
   const requestedCalls = first(params.calls) ?? "";
   const callsNeed: CallsNeed = requestedCalls === "yes" || requestedCalls === "unsure" ? requestedCalls : "no";
@@ -40,7 +40,7 @@ function resolveComparison(params: SearchParams): InitialComparison {
   const fiveGOnly = first(params.fiveG) === "1";
   const tetheringOnly = first(params.tethering) === "1";
 
-  return { destination, days, roamingDays, network, scenario, usage, callsNeed, roamingAllowance, sortMode, unlimitedOnly, fiveGOnly, tetheringOnly, compared: first(params.compare) === "1" && network !== "" };
+  return { destination, days, roamingDays, network, scenario, usage, callsNeed, roamingAllowance, sortMode, unlimitedOnly, fiveGOnly, tetheringOnly, compared: first(params.compare) === "1" && network !== "" && scenario !== "" };
 }
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {

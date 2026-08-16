@@ -5,6 +5,7 @@ export type Network = "ee" | "o2" | "vodafone" | "three" | "id-mobile" | "sky-mo
 export type RoamingTethering = "allowed" | "not-allowed" | "check-plan";
 export type RoamingCallsTexts = "included" | "not-included" | "extra" | "check-plan";
 export type RoamingAllowanceSource = "published" | "user-entered" | "metered" | "unknown" | "not-applicable";
+export type RoamingEvidence = { label: string; url: string; checkedAt: string; reviewAfter: string };
 
 export type RoamingResult = {
   cost: number | null;
@@ -20,9 +21,54 @@ export type RoamingResult = {
   callsTexts: RoamingCallsTexts;
   matched: boolean | null;
   matchReason: string;
+  evidence: RoamingEvidence;
 };
 
 export const ROAMING_CHECKED = "16 August 2026";
+export const ROAMING_CHECKED_AT = "2026-08-16";
+export const ROAMING_REVIEW_AFTER = "2026-08-23";
+
+function evidence(label: string, url: string): RoamingEvidence {
+  return { label, url, checkedAt: ROAMING_CHECKED_AT, reviewAfter: ROAMING_REVIEW_AFTER };
+}
+
+export const networkRoamingEvidence: Record<Network, RoamingEvidence> = {
+  ee: evidence("EE mobile price guide", "https://ee.co.uk/content/dam/help/terms-and-conditions/price-plans/mobile/pay-monthly-price-plans/ee-mobile-plan-price-guide-04082026.pdf"),
+  o2: evidence("O2 roaming guidance", "https://www.o2.co.uk/help/international-and-network/using-your-phone-abroad/roaming"),
+  vodafone: evidence("Vodafone global roaming", "https://www.vodafone.co.uk/mobile/global-roaming"),
+  three: evidence("Three Go Roam guidance", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad/go-roam"),
+  "id-mobile": evidence("iD Mobile roaming guidance", "https://www.idmobile.co.uk/help-and-support/roaming"),
+  "sky-mobile": evidence("Sky Mobile roaming guidance", "https://www.sky.com/help/articles/sky-mobile-roaming"),
+  giffgaff: evidence("giffgaff roaming checker", "https://www.giffgaff.com/roaming"),
+  smarty: evidence("SMARTY roaming guidance", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international"),
+  voxi: evidence("VOXI roaming guidance", "https://www.voxi.co.uk/help/roaming-international/how-to-use-voxi-plan-abroad"),
+  "tesco-mobile": evidence("Tesco Mobile roaming checker", "https://www.tescomobile.com/roaming"),
+};
+
+export const scenarioRoamingEvidence: Record<string, RoamingEvidence> = {
+  "o2-travel": evidence("O2 Travel", "https://www.o2.co.uk/international/o2-travel"),
+  "three-europe-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad"),
+  "three-world-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad"),
+  "three-extra-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad"),
+  "id-europe": evidence("iD Mobile EU fair-use policy", "https://www.idmobile.co.uk/help-and-support/eu-roaming/fair-usage-policy"),
+  "id-roam-beyond": evidence("iD Mobile Roam Beyond", "https://www.idmobile.co.uk/help-and-support/roaming"),
+  "giffgaff-europe": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu"),
+  "giffgaff-europe-overage": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu"),
+  "giffgaff-metered": evidence("giffgaff Zone A price sheet", "https://static.giffgaff.com/documents/roaming/row-zone-a/v1/roaming-row-zone-a.pdf"),
+  "smarty-europe": evidence("SMARTY roaming in Spain", "https://smarty.co.uk/roaming/europe/spain/"),
+  "smarty-metered-us": evidence("SMARTY roaming in the USA", "https://smarty.co.uk/roaming/international/united-states-of-america/"),
+  "smarty-metered-world": evidence("SMARTY worldwide roaming guidance", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international"),
+  "voxi-europe": evidence("VOXI European Roaming Pass", "https://www.voxi.co.uk/help/roaming-international/does-voxi-have-european-roaming"),
+  "voxi-global": evidence("VOXI Global Roaming Extra", "https://www.voxi.co.uk/help/roaming-international/what-are-global-roaming-extras"),
+  "voxi-metered": evidence("VOXI standard roaming charges", "https://www.voxi.co.uk/charges"),
+  "tesco-europe": evidence("Tesco Mobile Home From Home", "https://www.tescomobile.com/why-tesco-mobile/awards-and-reviews/home-from-home"),
+  "tesco-metered-us": evidence("Tesco Mobile roaming checker", "https://www.tescomobile.com/roaming"),
+  "tesco-metered-world": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go"),
+};
+
+export function getRoamingEvidence(network: Network, scenario: string) {
+  return scenarioRoamingEvidence[scenario] ?? networkRoamingEvidence[network];
+}
 
 export const networkNames: Record<Network, string> = {
   ee: "EE", o2: "O2", vodafone: "Vodafone", three: "Three", "id-mobile": "iD Mobile", "sky-mobile": "Sky Mobile", giffgaff: "giffgaff", smarty: "SMARTY", voxi: "VOXI", "tesco-mobile": "Tesco Mobile",
@@ -32,7 +78,8 @@ export const defaultScenario: Record<Network, string> = {
   ee: "ee-current", o2: "o2-travel", vodafone: "vodafone-check", three: "three-new", "id-mobile": "id-roam-beyond", "sky-mobile": "sky-passport", giffgaff: "giffgaff-check", smarty: "smarty-metered", voxi: "voxi-check", "tesco-mobile": "tesco-check",
 };
 
-const common = [{ value: "included", label: "Roaming is included in my plan" }, { value: "custom", label: "Enter my own trip cost" }];
+type ScenarioOption = { value: string; label: string };
+const common: ScenarioOption[] = [{ value: "included", label: "Roaming is included in my plan" }, { value: "custom", label: "Enter my own trip cost" }];
 export const scenarioOptions: Record<Network, Array<{ value: string; label: string }>> = {
   ee: [{ value: "ee-current", label: "Current EE RoW Zone 1 passes" }, ...common],
   o2: [{ value: "o2-travel", label: "O2 Travel — £7 on days used" }, { value: "included", label: "O2 Travel is included in my plan" }, { value: "custom", label: "Enter my own trip cost" }],
@@ -46,18 +93,70 @@ export const scenarioOptions: Record<Network, Array<{ value: string; label: stri
   "tesco-mobile": [{ value: "tesco-check", label: "Check whether I’m PAYG or pay-monthly" }, { value: "tesco-payg", label: "Pay as you go data — £5/MB" }, ...common],
 };
 
-const genericScenarioOptions = [
+const genericScenarioOptions: ScenarioOption[] = [
   { value: "plan-check", label: "Check my network’s current roaming price" },
   { value: "included", label: "Roaming is included in my plan" },
   { value: "custom", label: "Enter my own trip cost" },
 ];
 
+const destinationScenarioOptions: Partial<Record<DestinationId, Partial<Record<Network, ScenarioOption[]>>>> = {
+  spain: {
+    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
+    o2: [{ value: "o2-europe", label: "O2 Europe Zone — included, up to 25GB" }, ...common],
+    vodafone: [{ value: "vodafone-europe-pass", label: "Vodafone Europe pass — £16/8d or £21/15d" }, { value: "vodafone-europe-day", label: "Vodafone Zone B — £2.75/day" }, ...common],
+    three: [{ value: "three-europe-new", label: "Three — joined/upgraded from 18 Dec 2025" }, { value: "three-europe-older", label: "Three — joined/upgraded Oct 2021–17 Dec 2025" }, { value: "three-europe-pass", label: "Three Go Roam pass — 3, 7 or 14 days" }, ...common],
+    "id-mobile": [{ value: "id-europe", label: "iD Roam Free — up to 30GB" }, ...common],
+    "sky-mobile": [{ value: "sky-passport", label: "Sky Passport Plus — £2/24h" }, ...common],
+    giffgaff: [{ value: "giffgaff-europe", label: "Eligible giffgaff plan — up to 5GB" }, { value: "giffgaff-europe-overage", label: "Beyond allowance — 10p/MB" }, ...common],
+    smarty: [{ value: "smarty-europe", label: "SMARTY EU roaming — up to 12GB" }, ...common],
+    voxi: [{ value: "voxi-europe", label: "VOXI European pass — 1, 2, 8 or 15 days" }, ...common],
+    "tesco-mobile": [{ value: "tesco-europe", label: "Tesco Home From Home — UK allowance" }, ...common],
+  },
+  "united-states": {
+    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    vodafone: [{ value: "vodafone-world-new", label: "Vodafone Zone C — newer plan, £8/day" }, { value: "vodafone-world-older", label: "Vodafone Zone C — eligible older plan, £6/day" }, ...common],
+    three: [{ value: "three-world-new", label: "Three Go Roam World — newer plan, £8/day" }, { value: "three-world-older", label: "Three Go Roam World — Oct 2021–17 Dec 2025, £5/day" }, { value: "three-world-pass", label: "Three Go Roam World pass" }, ...common],
+    "id-mobile": [{ value: "id-roam-beyond", label: "iD Roam Beyond data passes" }, ...common],
+    "sky-mobile": [{ value: "sky-passport", label: "Sky Passport Plus — £2/24h" }, ...common],
+    giffgaff: [{ value: "giffgaff-check", label: "Check giffgaff travel add-on in app" }, { value: "giffgaff-metered", label: "giffgaff Zone A — 20p/MB" }, ...common],
+    smarty: [{ value: "smarty-metered-us", label: "SMARTY USA — 10p/MB" }, ...common],
+    voxi: [{ value: "voxi-global", label: "VOXI Global Extra — 8 or 15 days" }, ...common],
+    "tesco-mobile": [{ value: "tesco-metered-us", label: "Tesco USA — 1p/MB" }, ...common],
+  },
+  japan: {
+    ee: [{ value: "ee-row3", label: "EE RoW Zone 3 — £8/24h, 500MB" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    vodafone: [{ value: "plan-check", label: "Check Japan in Vodafone’s live checker" }, ...common],
+    three: [{ value: "three-extra-new", label: "Three Go Roam Extra — newer plan, £8/day" }, { value: "three-extra-older", label: "Three Go Roam Extra — older plan, £7/day" }, { value: "three-extra-pass", label: "Three Go Roam Extra pass" }, ...common],
+    "id-mobile": [{ value: "id-roam-beyond", label: "iD Roam Beyond data passes" }, ...common],
+    "sky-mobile": [{ value: "plan-check", label: "Sky does not currently list Japan" }, ...common],
+    giffgaff: [{ value: "giffgaff-check", label: "Check giffgaff travel add-on in app" }, { value: "giffgaff-metered", label: "giffgaff Zone A — 20p/MB" }, ...common],
+    smarty: [{ value: "smarty-metered-world", label: "SMARTY Japan — £1/MB" }, ...common],
+    voxi: [{ value: "voxi-global", label: "VOXI Global Extra — 8 or 15 days" }, ...common],
+    "tesco-mobile": [{ value: "tesco-metered-world", label: "Tesco Japan — £5/MB" }, ...common],
+  },
+  "united-arab-emirates": {
+    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    vodafone: [{ value: "vodafone-world-new", label: "Vodafone Zone D — newer plan, £8/day" }, { value: "vodafone-world-older", label: "Vodafone Zone D — eligible older plan, £6/day" }, ...common],
+    three: [{ value: "three-extra-new", label: "Three Go Roam Extra — newer plan, £8/day" }, { value: "three-extra-older", label: "Three Go Roam Extra — older plan, £7/day" }, { value: "three-extra-pass", label: "Three Go Roam Extra pass" }, ...common],
+    "id-mobile": [{ value: "id-metered-world", label: "iD standard UAE data — £9.60/MB" }, ...common],
+    "sky-mobile": [{ value: "sky-passport", label: "Sky Passport Plus — £2/24h" }, ...common],
+    giffgaff: [{ value: "giffgaff-metered", label: "giffgaff Zone A — 20p/MB" }, ...common],
+    smarty: [{ value: "smarty-metered-world", label: "SMARTY UAE — £1/MB" }, ...common],
+    voxi: [{ value: "voxi-metered", label: "VOXI UAE — 12p/MB" }, ...common],
+    "tesco-mobile": [{ value: "tesco-metered-world", label: "Tesco UAE — £5/MB" }, ...common],
+  },
+};
+
 export function getScenarioOptions(network: Network, destination: DestinationId) {
-  return destination === "turkey" ? scenarioOptions[network] : genericScenarioOptions;
+  if (destination === "turkey") return scenarioOptions[network];
+  return destinationScenarioOptions[destination]?.[network] ?? genericScenarioOptions;
 }
 
 export function getDefaultScenario(network: Network, destination: DestinationId) {
-  return destination === "turkey" ? defaultScenario[network] : "plan-check";
+  return getScenarioOptions(network, destination)[0]?.value ?? "plan-check";
 }
 
 type PassOffer = { days: number; cost: number; label: string; dataGb?: number };
@@ -147,9 +246,11 @@ export function getRoamingResult(
   const neededDataGb = Number.isFinite(neededData) ? Math.max(0, neededData) : 0;
   const formattedData = formatGb(neededDataGb);
   const enteredAllowanceGb = parseAllowance(ukRoamingAllowance);
+  const selectedEvidence = getRoamingEvidence(network, scenario);
+  const finish = (input: Omit<RoamingResult, "comparable" | "evidence">) => result({ ...input, evidence: selectedEvidence });
 
   if (billableDays === 0) {
-    return result({
+    return finish({
       cost: 0,
       title: "No UK-SIM roaming days",
       detail: "You selected eSIM or Wi-Fi only for this trip.",
@@ -167,7 +268,7 @@ export function getRoamingResult(
 
   if (scenario === "included") {
     const match = allowanceMatch(enteredAllowanceGb, neededDataGb, "Enter the data available abroad through your UK plan before showing savings against it.");
-    return result({
+    return finish({
       cost: 0,
       title: "Roaming appears to be included",
       detail: "No extra roaming fee entered for this trip.",
@@ -186,7 +287,7 @@ export function getRoamingResult(
     const parsedCost = Number(customCost);
     const cost = customCost.trim() !== "" && Number.isFinite(parsedCost) && parsedCost >= 0 ? parsedCost : null;
     const match = allowanceMatch(enteredAllowanceGb, neededDataGb, "Enter how much data that roaming price includes before showing savings against it.");
-    return result({
+    return finish({
       cost,
       title: "Your own roaming estimate",
       detail: "Based on the total trip cost you entered.",
@@ -201,12 +302,154 @@ export function getRoamingResult(
     });
   }
 
+  const ukAllowanceResult = ({
+    cost,
+    title,
+    detail,
+    caveat,
+    capGb,
+    tethering = "check-plan",
+    callsTexts = "check-plan",
+    speedCap = null,
+  }: {
+    cost: number;
+    title: string;
+    detail: string;
+    caveat: string;
+    capGb?: number;
+    tethering?: RoamingTethering;
+    callsTexts?: RoamingCallsTexts;
+    speedCap?: string | null;
+  }) => {
+    const effectiveAllowance = enteredAllowanceGb === null ? null : capGb === undefined ? enteredAllowanceGb : Math.min(enteredAllowanceGb, capGb);
+    const capCopy = capGb === undefined ? "" : ` The published roaming ceiling is ${formatGb(capGb)}GB.`;
+    const match = allowanceMatch(effectiveAllowance, neededDataGb, `Enter the part of your UK allowance available abroad before showing savings.${capCopy}`);
+    return finish({
+      cost,
+      title,
+      detail,
+      caveat,
+      dataAllowanceGb: effectiveAllowance,
+      unlimitedData: false,
+      allowanceSource: effectiveAllowance === null ? "unknown" : "user-entered",
+      speedCap,
+      tethering,
+      callsTexts,
+      ...match,
+    });
+  };
+
+  const meteredResult = (ratePerMb: number, title: string, caveat: string, tethering: RoamingTethering = "check-plan", spendCap?: number, comparisonSafe = true): RoamingResult => {
+    const cost = Math.round(neededDataGb * 1024 * ratePerMb * 100) / 100;
+    const capWouldStopUsage = spendCap !== undefined && cost > spendCap;
+    const matched = comparisonSafe && !capWouldStopUsage;
+    return finish({
+      cost,
+      title,
+      detail: `${formattedData}GB selected roaming-days target × 1,024MB × ${ratePerMb >= 1 ? `£${ratePerMb}` : `${ratePerMb * 100}p`}/MB.`,
+      caveat,
+      dataAllowanceGb: neededDataGb,
+      unlimitedData: false,
+      allowanceSource: "metered",
+      speedCap: null,
+      tethering,
+      callsTexts: "extra",
+      matched,
+      matchReason: capWouldStopUsage
+        ? `The theoretical data charge exceeds the published default £${spendCap} spend limit, so service may stop before ${formattedData}GB is used.`
+        : !comparisonSafe
+          ? "The per-MB maths is shown, but the network’s account safeguards make full-target delivery unconfirmed."
+          : `The estimate prices all ${formattedData}GB needed for the selected UK-SIM roaming days. A network spend limit can still stop service.`,
+    });
+  };
+
   if (destination !== "turkey") {
-    return result({
+    if (scenario === "ee-europe-new") {
+      const pass = getPasses(billableDays, [{ days: 15, cost: 30, label: "15-day" }, { days: 7, cost: 16.5, label: "7-day" }, { days: 1, cost: 2.72, label: "calendar-day" }]);
+      return ukAllowanceResult({ cost: pass.cost, title: "EE Europe roaming estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "For plans joined or upgraded from 7 July 2021. Uses the UK allowance, subject to a 50GB roaming fair-use ceiling.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
+    }
+    if (scenario === "ee-row1") {
+      const pass = getPasses(billableDays, [{ days: 15, cost: 50, label: "15-day" }, { days: 7, cost: 30, label: "7-day" }, { days: 1, cost: 6, label: "24-hour" }]);
+      return ukAllowanceResult({ cost: pass.cost, title: "EE RoW Zone 1 pass estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses the UK allowance, subject to a 50GB roaming fair-use ceiling. Full Works and some older plans may include this zone.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
+    }
+    if (scenario === "ee-row3") {
+      const allowance = billableDays * 0.5;
+      const match = allowanceMatch(allowance, neededDataGb, "");
+      return finish({ cost: billableDays * 8, title: "EE RoW Zone 3 pass estimate", detail: `£8 × ${billableDays} 24-hour ${billableDays === 1 ? "period" : "periods"}; each includes 500MB.`, caveat: "Includes unlimited minutes and SMS. Data is a daily 500MB allowance rather than one pooled bundle.", dataAllowanceGb: allowance, unlimitedData: false, allowanceSource: "published", speedCap: "Your EE plan’s UK speed cap", tethering: "allowed", callsTexts: "included", ...match });
+    }
+    if (scenario === "o2-europe") {
+      return ukAllowanceResult({ cost: 0, title: "O2 Europe Zone estimate", detail: "Eligible Pay Monthly phone tariffs use their UK allowance at no extra roaming charge.", caveat: "The published data ceiling is 25GB. Calls and texts within the Europe Zone and to the UK are included.", capGb: 25, tethering: "allowed", callsTexts: "included" });
+    }
+    if (scenario === "o2-travel") {
+      return finish({ cost: billableDays * 7, title: "O2 Travel estimate", detail: `£7 × ${billableDays} 24-hour ${billableDays === 1 ? "period" : "periods"} when outgoing calls, texts or data are used.`, caveat: "Unlimited data, minutes and texts are advertised at up to 2Mbps. Ultimate and some Plus/Volt plans may include the destination.", dataAllowanceGb: null, unlimitedData: true, allowanceSource: "published", speedCap: "2Mbps", tethering: "check-plan", callsTexts: "included", matched: true, matchReason: `Published unlimited data covers the ${formattedData}GB needed for the selected UK-SIM roaming days.` });
+    }
+    if (scenario === "vodafone-europe-pass") {
+      const pass = getPasses(billableDays, [{ days: 15, cost: 21, label: "15-day" }, { days: 8, cost: 16, label: "8-day" }]);
+      return ukAllowanceResult({ cost: pass.cost, title: "Vodafone European pass estimate", detail: `${pass.labels.join(" + ")} covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses the UK allowance, capped at 25GB abroad. Confirm pass availability for your plan before buying.", capGb: 25, tethering: "allowed", callsTexts: "included" });
+    }
+    if (scenario === "vodafone-europe-day") return ukAllowanceResult({ cost: billableDays * 2.75, title: "Vodafone Zone B daily estimate", detail: `£2.75 × ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "For newer, non-inclusive plans. Uses the UK allowance, capped at 25GB abroad.", capGb: 25, tethering: "allowed", callsTexts: "included" });
+    if (scenario === "vodafone-world-new" || scenario === "vodafone-world-older") {
+      const dailyRate = scenario === "vodafone-world-new" ? 8 : 6;
+      return ukAllowanceResult({ cost: billableDays * dailyRate, title: "Vodafone worldwide daily estimate", detail: `£${dailyRate} × ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: `${scenario === "vodafone-world-new" ? "For plans from 11 August 2021." : "For eligible older plans."} Uses the UK allowance, capped at 25GB abroad.`, capGb: 25, tethering: "allowed", callsTexts: "included" });
+    }
+    if (scenario === "three-europe-new" || scenario === "three-europe-older") {
+      const dailyRate = scenario === "three-europe-new" ? 2.75 : 2;
+      return ukAllowanceResult({ cost: billableDays * dailyRate, title: "Three Go Roam Europe estimate", detail: `£${dailyRate} × ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: `${scenario === "three-europe-new" ? "For plans joined or upgraded from 18 December 2025." : "For most plans joined or upgraded October 2021–17 December 2025."} Up to 12GB abroad.`, capGb: 12, tethering: "allowed", callsTexts: "included" });
+    }
+    if (scenario === "three-europe-pass") {
+      const pass = getPasses(billableDays, [{ days: 14, cost: 24, label: "14-day" }, { days: 7, cost: 12, label: "7-day" }, { days: 3, cost: 5, label: "3-day" }]);
+      return ukAllowanceResult({ cost: pass.cost, title: "Three Go Roam Europe pass estimate", detail: `${pass.labels.join(" + ")} covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses the UK allowance, with up to 12GB abroad. Check eligibility in My3.", capGb: 12, tethering: "allowed", callsTexts: "included" });
+    }
+    if (["three-world-new", "three-world-older", "three-extra-new", "three-extra-older"].includes(scenario)) {
+      const dailyRate = scenario.endsWith("new") ? 8 : scenario.includes("world") ? 5 : 7;
+      const zone = scenario.includes("extra") ? "Around World Extra" : "Around World";
+      return ukAllowanceResult({ cost: billableDays * dailyRate, title: `Three Go Roam ${zone} estimate`, detail: `£${dailyRate} × ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: `${scenario.endsWith("new") ? "For plans joined or upgraded from 18 December 2025." : "For most plans joined or upgraded October 2021–17 December 2025."} Up to 12GB; hotspot use is prohibited.`, capGb: 12, tethering: "not-allowed", callsTexts: "included" });
+    }
+    if (scenario === "three-world-pass" || scenario === "three-extra-pass") {
+      const offers = scenario === "three-world-pass"
+        ? [{ days: 14, cost: 60, label: "14-day" }, { days: 7, cost: 30, label: "7-day" }, { days: 3, cost: 12.5, label: "3-day" }]
+        : [{ days: 14, cost: 84, label: "14-day" }, { days: 7, cost: 42, label: "7-day" }, { days: 5, cost: 29.75, label: "5-day" }, { days: 3, cost: 17.5, label: "3-day" }];
+      const pass = getPasses(billableDays, offers);
+      return ukAllowanceResult({ cost: pass.cost, title: `Three Go Roam ${scenario === "three-world-pass" ? "World" : "Extra"} pass estimate`, detail: `${pass.labels.join(" + ")} covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses the UK allowance, with up to 12GB abroad. Hotspot use is prohibited.", capGb: 12, tethering: "not-allowed", callsTexts: "included" });
+    }
+    if (scenario === "id-europe") return ukAllowanceResult({ cost: 0, title: "iD Mobile Roam Free estimate", detail: "Uses the UK allowance at no extra charge on eligible contracts.", caveat: "A conservative 30GB fair-use ceiling is applied; iD may advertise a temporary larger allowance in your account.", capGb: 30, tethering: "allowed", callsTexts: "included" });
+    if (scenario === "id-roam-beyond") {
+      const pass = getPasses(billableDays, [{ days: 10, cost: 35, label: "10-day / 20GB", dataGb: 20 }, { days: 5, cost: 20, label: "5-day / 10GB", dataGb: 10 }, { days: 1, cost: 5, label: "1-day / 2GB", dataGb: 2 }], neededDataGb);
+      return finish({ cost: pass.cost, title: "iD Mobile Roam Beyond estimate", detail: `${pass.labels.join(" + ")} supplies ${formatGb(pass.dataGb)}GB and covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "Data-only passes activate immediately and do not auto-renew. Standard calls and SMS cost extra.", dataAllowanceGb: pass.dataGb, unlimitedData: false, allowanceSource: "published", speedCap: "No published cap; 5G on selected networks", tethering: "allowed", callsTexts: "not-included", matched: true, matchReason: `${formatGb(pass.dataGb)}GB covers the ${formattedData}GB needed for the selected UK-SIM roaming days.` });
+    }
+    if (scenario === "id-metered-world") return meteredResult(9.6, "iD Mobile standard data estimate", "Data alone is £9.60/MB and a safety cap may stop service. Calls and texts are extra; use a travel eSIM or Wi-Fi instead.", "allowed", undefined, false);
+    if (scenario === "sky-passport") return ukAllowanceResult({ cost: billableDays * 2, title: "Sky Roaming Passport Plus estimate", detail: `£2 × ${billableDays} activated 24-hour ${billableDays === 1 ? "period" : "periods"}.`, caveat: "Uses the UK allowance, capped at 25GB per billing period. Standard UK calls/texts use the UK allowance; VoLTE handset support may be required.", capGb: 25, tethering: "allowed", callsTexts: "included" });
+    if (scenario === "giffgaff-europe") return ukAllowanceResult({ cost: 0, title: "giffgaff EU roaming estimate", detail: "An active, eligible plan can be used at no extra charge.", caveat: "Uses up to 5GB or the smaller plan allowance. UK-residency and fair-use rules apply.", capGb: 5, tethering: "allowed", callsTexts: "included" });
+    if (scenario === "giffgaff-europe-overage") {
+      if (enteredAllowanceGb === null) return finish({ cost: null, title: "giffgaff EU data overage", detail: "Enter the eligible plan data available in the EU before calculating the chargeable excess.", caveat: "The inclusive portion is capped at 5GB; data beyond it is 10p/MB.", ...unknownFacts, tethering: "allowed", callsTexts: "included", matchReason: "The inclusive EU allowance is needed before the overage can be calculated." });
+      const inclusiveGb = Math.min(enteredAllowanceGb, 5);
+      const chargeableGb = Math.max(0, neededDataGb - inclusiveGb);
+      const cost = Math.round(chargeableGb * 1024 * 0.1 * 100) / 100;
+      return finish({ cost, title: "giffgaff EU data overage estimate", detail: `${formatGb(neededDataGb)}GB target − ${formatGb(inclusiveGb)}GB included = ${formatGb(chargeableGb)}GB charged at 10p/MB.`, caveat: "Requires an active, eligible plan and credit for the excess. UK-residency and fair-use rules apply.", dataAllowanceGb: neededDataGb, unlimitedData: false, allowanceSource: "metered", speedCap: null, tethering: "allowed", callsTexts: "included", matched: true, matchReason: `The estimate combines ${formatGb(inclusiveGb)}GB of eligible plan data with priced overage for the remaining ${formatGb(chargeableGb)}GB.` });
+    }
+    if (scenario === "giffgaff-metered") return meteredResult(0.2, "giffgaff Zone A data estimate", "Data-only estimate; calls and texts cost extra. USA pricing excludes Alaska and Hawaii.", "allowed");
+    if (scenario === "smarty-europe") return ukAllowanceResult({ cost: 0, title: "SMARTY EU roaming estimate", detail: "An active plan can use its UK allowance in the EU.", caveat: "Up to 12GB per plan month. Voice plans include calls/texts; data-only plans do not. APN setup may be required.", capGb: 12, tethering: "allowed", callsTexts: "check-plan" });
+    if (scenario === "smarty-metered-us") return meteredResult(0.1, "SMARTY USA data estimate", "Requires an Out-of-plan add-on balance; calls and texts cost extra. The default worldwide spend limit is £45.", "allowed", 45);
+    if (scenario === "smarty-metered-world") return meteredResult(1, "SMARTY worldwide data estimate", "Requires an Out-of-plan add-on balance; calls and texts cost extra. The default worldwide spend limit is £45.", "allowed", 45);
+    if (scenario === "voxi-europe") {
+      const pass = getPasses(billableDays, [{ days: 15, cost: 20, label: "15-day" }, { days: 8, cost: 15, label: "8-day" }, { days: 2, cost: 4.8, label: "2-day" }, { days: 1, cost: 2.6, label: "1-day" }]);
+      return ukAllowanceResult({ cost: pass.cost, title: "VOXI European Roaming Pass estimate", detail: `${pass.labels.join(" + ")} covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "Pass time starts at purchase. Uses the smaller of the core UK allowance or 20GB; UK-only Endless benefits do not roam.", capGb: 20, callsTexts: "included" });
+    }
+    if (scenario === "voxi-global") {
+      const pass = getPasses(billableDays, [{ days: 15, cost: 26.6, label: "15-day / 4GB", dataGb: 4 }, { days: 8, cost: 16, label: "8-day / 2GB", dataGb: 2 }]);
+      const match = allowanceMatch(pass.dataGb, neededDataGb, "");
+      return finish({ cost: pass.cost, title: "VOXI Global Roaming Extra estimate", detail: `${pass.labels.join(" + ")} supplies ${formatGb(pass.dataGb)}GB and covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "Includes limited minutes and texts to the UK and visited country. Incoming calls use the minutes allowance.", dataAllowanceGb: pass.dataGb, unlimitedData: false, allowanceSource: "published", speedCap: null, tethering: "check-plan", callsTexts: "included", ...match });
+    }
+    if (scenario === "voxi-metered") return meteredResult(0.12, "VOXI pay-as-you-roam data estimate", "The UAE is not in the current Global Roaming Extra list. Calls and texts use separate credit rates.");
+    if (scenario === "tesco-europe") return ukAllowanceResult({ cost: 0, title: "Tesco Mobile Home From Home estimate", detail: "Uses the UK allowance at no extra charge for Pay Monthly and Pay As You Go customers.", caveat: "Enter the actual UK allowance; no separate numerical data ceiling is published. Fair-use rules apply.", callsTexts: "included" });
+    if (scenario === "tesco-metered-us") return meteredResult(0.01, "Tesco Mobile USA data estimate", "Data is 1p/MB. Calls and SMS are charged separately and a safety buffer may stop service.", "check-plan", undefined, false);
+    if (scenario === "tesco-metered-world") return meteredResult(5, "Tesco Mobile worldwide data estimate", "Data is £5/MB. Calls and SMS are charged separately and a safety buffer may stop service.", "check-plan", undefined, false);
+
+    return finish({
       cost: null,
       title: `Check ${networkNames[network]} for ${formatDestinationName(destination)}`,
-      detail: "A live roaming total is not stored for this destination yet.",
-      caveat: "Use your network’s current checker, then enter its cost and data allowance for an allowance-matched comparison.",
+      detail: destination === "japan" && network === "sky-mobile" ? "Sky does not currently list Japan in its consumer roaming directory." : "The selected tariff or entitlement needs a live account check.",
+      caveat: "Use the official network checker, then enter its total cost and overseas data allowance for an allowance-matched comparison.",
       ...unknownFacts,
       matchReason: "The roaming cost and overseas data allowance have not both been entered.",
     });
@@ -214,24 +457,11 @@ export function getRoamingResult(
 
   if (scenario === "ee-current") {
     const pass = getPasses(billableDays, [{ days: 15, cost: 50, label: "15-day" }, { days: 7, cost: 30, label: "7-day" }, { days: 1, cost: 6, label: "24-hour" }]);
-    const match = allowanceMatch(enteredAllowanceGb, neededDataGb, "Enter the part of your UK allowance available in Turkey before showing savings against the EE pass.");
-    return result({
-      cost: pass.cost,
-      title: "EE RoW Zone 1 pass estimate",
-      detail: `${pass.labels.join(" + ")} covers ${billableDays} consecutive roaming ${billableDays === 1 ? "day" : "days"}.`,
-      caveat: "Uses your UK allowance. Pass timing is measured from purchase, so separated roaming days can need a different pass mix.",
-      dataAllowanceGb: enteredAllowanceGb,
-      unlimitedData: false,
-      allowanceSource: enteredAllowanceGb === null ? "unknown" : "user-entered",
-      speedCap: null,
-      tethering: "check-plan",
-      callsTexts: "check-plan",
-      ...match,
-    });
+    return ukAllowanceResult({ cost: pass.cost, title: "EE RoW Zone 1 pass estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} consecutive roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses the UK allowance, subject to a 50GB roaming fair-use ceiling. Pass timing is measured from purchase, so separated roaming days can need a different pass mix.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
   }
 
   if (scenario === "o2-travel") {
-    return result({
+    return finish({
       cost: billableDays * 7,
       title: "O2 Travel estimate",
       detail: `£7 × ${billableDays} ${billableDays === 1 ? "day" : "days"} when you use calls, texts or data.`,
@@ -250,7 +480,7 @@ export function getRoamingResult(
   if (scenario === "three-new" || scenario === "three-older") {
     const isNewPlan = scenario === "three-new";
     const match = allowanceMatch(12, neededDataGb, "");
-    return result({
+    return finish({
       cost: billableDays * (isNewPlan ? 8 : 7),
       title: "Three Go Roam Extra estimate",
       detail: `£${isNewPlan ? 8 : 7} × ${billableDays} ${billableDays === 1 ? "day" : "days"}.`,
@@ -273,7 +503,7 @@ export function getRoamingResult(
       { days: 5, cost: 20, label: "5-day / 10GB", dataGb: 10 },
       { days: 1, cost: 5, label: "1-day / 2GB", dataGb: 2 },
     ], neededDataGb);
-    return result({
+    return finish({
       cost: pass.cost,
       title: "iD Mobile Roam Beyond estimate",
       detail: `${pass.labels.join(" + ")} supplies ${formatGb(pass.dataGb)}GB and covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`,
@@ -282,7 +512,7 @@ export function getRoamingResult(
       unlimitedData: false,
       allowanceSource: "published",
       speedCap: null,
-      tethering: "check-plan",
+      tethering: "allowed",
       callsTexts: "not-included",
       matched: true,
       matchReason: `${formatGb(pass.dataGb)}GB covers the ${formattedData}GB needed for the selected UK-SIM roaming days.`,
@@ -290,40 +520,12 @@ export function getRoamingResult(
   }
 
   if (scenario === "sky-passport") {
-    const match = allowanceMatch(enteredAllowanceGb, neededDataGb, "Enter the part of your UK allowance available in Turkey before showing savings against Sky’s pass.");
-    return result({
-      cost: billableDays * 2,
-      title: "Sky Roaming Passport Plus estimate",
-      detail: `£2 × ${billableDays} 24-hour ${billableDays === 1 ? "period" : "periods"}.`,
-      caveat: "Uses your UK allowance; Turkey is charged as its own Passport destination.",
-      dataAllowanceGb: enteredAllowanceGb,
-      unlimitedData: false,
-      allowanceSource: enteredAllowanceGb === null ? "unknown" : "user-entered",
-      speedCap: null,
-      tethering: "check-plan",
-      callsTexts: "check-plan",
-      ...match,
-    });
+    return ukAllowanceResult({ cost: billableDays * 2, title: "Sky Roaming Passport Plus estimate", detail: `£2 × ${billableDays} activated 24-hour ${billableDays === 1 ? "period" : "periods"}.`, caveat: "Uses the UK allowance, capped at 25GB per billing period. Standard UK calls/texts use the UK allowance; VoLTE handset support may be required.", capGb: 25, tethering: "allowed", callsTexts: "included" });
   }
 
-  const meteredResult = (ratePerMb: number, title: string, caveat: string): RoamingResult => result({
-    cost: Math.round(neededDataGb * 1024 * ratePerMb * 100) / 100,
-    title,
-    detail: `${formattedData}GB selected roaming-days target × 1,024MB × ${ratePerMb >= 1 ? `£${ratePerMb}` : `${ratePerMb * 100}p`}/MB.`,
-    caveat,
-    dataAllowanceGb: neededDataGb,
-    unlimitedData: false,
-    allowanceSource: "metered",
-    speedCap: null,
-    tethering: "check-plan",
-    callsTexts: "extra",
-    matched: true,
-    matchReason: `The estimate prices all ${formattedData}GB needed for the selected UK-SIM roaming days.`,
-  });
-
   if (scenario === "giffgaff-metered") return meteredResult(0.2, "giffgaff standard data estimate", "Data-only estimate; calls and texts cost extra. Check whether a Turkey travel add-on is cheaper.");
-  if (scenario === "smarty-metered") return meteredResult(0.1, "SMARTY standard data estimate", "Data-only estimate; calls and texts cost extra. Requires an out-of-plan add-on balance.");
-  if (scenario === "tesco-payg") return meteredResult(5, "Tesco Mobile PAYG data estimate", "Illustrates the published PAYG Region 2 rate; a spend cap may stop usage. Do not rely on this for pay-monthly plans.");
+  if (scenario === "smarty-metered") return meteredResult(0.1, "SMARTY standard data estimate", "Data-only estimate; calls and texts cost extra. Requires an out-of-plan add-on balance; the default worldwide spend limit is £45.", "allowed", 45);
+  if (scenario === "tesco-payg") return meteredResult(5, "Tesco Mobile PAYG data estimate", "Illustrates the published PAYG Region 2 rate; a spend cap may stop usage. Do not rely on this for pay-monthly plans.", "check-plan", undefined, false);
 
   const checkCopy: Record<Network, [string, string]> = {
     vodafone: ["Check your Vodafone plan first", "Turkey pricing is personalised by mobile number and plan."],
@@ -332,7 +534,7 @@ export function getRoamingResult(
     "tesco-mobile": ["Check your Tesco Mobile plan", "Pay-monthly roaming charges and safeguards depend on your tariff."],
     ee: ["Check your EE plan", "Your plan may include roaming."], o2: ["Check your O2 plan", "Your plan may include O2 Travel."], three: ["Check My3", "Your plan may include Go Roam."], "id-mobile": ["Check your iD plan", "Pass availability can change."], "sky-mobile": ["Check your Sky plan", "Pass availability can change."], smarty: ["Check your SMARTY account", "Charges can change."],
   };
-  return result({
+  return finish({
     cost: null,
     title: checkCopy[network][0],
     detail: checkCopy[network][1],

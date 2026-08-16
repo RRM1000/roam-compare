@@ -6,48 +6,59 @@ export type EsimSource = {
   label: string;
   url: string;
   checkedAt: string;
+  reviewAfter: string;
 };
+
+export const ESIM_COMPATIBILITY_REVIEW_AFTER = "2026-09-16";
 
 export const esimSources = {
   apple: {
     label: "Apple Support — Dual SIM with eSIM",
     url: "https://support.apple.com/en-gb/109322",
     checkedAt: "2026-08-16",
+    reviewAfter: ESIM_COMPATIBILITY_REVIEW_AFTER,
   },
   samsung: {
     label: "Samsung UK — Galaxy eSIM and supported devices",
     url: "https://www.samsung.com/uk/support/mobile-devices/galaxy-esim-and-supported-network-carriers/",
     checkedAt: "2026-08-16",
+    reviewAfter: ESIM_COMPATIBILITY_REVIEW_AFTER,
   },
   samsungA57: {
     label: "Samsung UK — Galaxy A57 5G specifications",
     url: "https://www.samsung.com/uk/smartphones/galaxy-a/galaxy-a57-5g-awesome-gray-256gb-sm-a576bzadeub/",
     checkedAt: "2026-08-16",
+    reviewAfter: ESIM_COMPATIBILITY_REVIEW_AFTER,
   },
   samsungA37: {
     label: "Samsung UK — Galaxy A37 5G specifications",
     url: "https://www.samsung.com/uk/smartphones/galaxy-a/galaxy-a37-5g-awesome-charcoal-256gb-sm-a376bzageub/",
     checkedAt: "2026-08-16",
+    reviewAfter: ESIM_COMPATIBILITY_REVIEW_AFTER,
   },
   google: {
     label: "Google Pixel Help — Get a SIM or eSIM",
     url: "https://support.google.com/pixelphone/answer/7086887?hl=en-GB",
     checkedAt: "2026-08-16",
+    reviewAfter: ESIM_COMPATIBILITY_REVIEW_AFTER,
   },
   sony: {
     label: "Sony UK — SIM, eSIM and SD card support by Xperia model",
     url: "https://www.sony.co.uk/electronics/support/mobile-phones-tablets-mobile-phones/xperia-1-vii-256gb/articles/00300757",
     checkedAt: "2026-08-16",
+    reviewAfter: ESIM_COMPATIBILITY_REVIEW_AFTER,
   },
   sony10vii: {
     label: "Sony UK — Xperia 10 VII specifications",
     url: "https://www.sony.co.uk/electronics/support/mobile-phones-tablets-mobile-phones/xperia-10-vii/specifications",
     checkedAt: "2026-08-16",
+    reviewAfter: ESIM_COMPATIBILITY_REVIEW_AFTER,
   },
   sony1viii: {
     label: "Sony UK — Xperia 1 VIII specifications",
     url: "https://www.sony.co.uk/electronics/support/mobile-phones-tablets-mobile-phones/xperia-1-viii-1tb/specifications",
     checkedAt: "2026-08-16",
+    reviewAfter: ESIM_COMPATIBILITY_REVIEW_AFTER,
   },
 } as const satisfies Record<string, EsimSource>;
 
