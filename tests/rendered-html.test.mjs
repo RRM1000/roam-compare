@@ -37,6 +37,11 @@ test("server-renders the RoamCompare experience", async () => {
   assert.match(html, /United Arab Emirates/);
   assert.equal((html.match(/<option value="(?:turkey|united-states|spain|france|italy|greece|portugal|germany|netherlands|ireland|cyprus|united-arab-emirates|thailand|japan|australia|canada|mexico|morocco|egypt|indonesia)"/g) ?? []).length, 20);
   assert.match(html, /Will an eSIM work on your phone\?/);
+  assert.match(html, /Every priced eSIM shown here is data-only/);
+  assert.match(html, /Best priced data fit/);
+  assert.match(html, /Calls and texts labels checked/);
+  assert.equal((html.match(/class="plan-row"/g) ?? []).length, (html.match(/class="calls-texts-status data-only"/g) ?? []).length);
+  assert.ok((html.match(/class="calls-texts-status data-only"/g) ?? []).length > 0);
   assert.match(html, /1GB per day/);
   assert.match(html, /2GB per day/);
   assert.match(html, /Current EE RoW Zone 1 passes/);
@@ -101,6 +106,9 @@ test("server-renders a validated shared comparison", async () => {
   assert.match(visibleHtml, /No UK-SIM roaming days/);
   assert.match(visibleHtml, /results-section is-visible/);
   assert.match(visibleHtml, /Live provider catalogues/);
+  assert.match(visibleHtml, /Calls and texts vary by provider plan/);
+  assert.equal((visibleHtml.match(/data-status="check-plan"/g) ?? []).length, 4);
+  assert.match(visibleHtml, /Calls &amp; texts: check plan/);
   assert.match(html, /og-premium\.png/);
 });
 
