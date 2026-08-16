@@ -10,17 +10,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: "RoamCompare — UK roaming vs travel eSIMs",
-    description: "Compare sourced UK roaming estimates with Turkey travel eSIM plans, sized for your trip and shown in approximate pounds.",
+    description: "Compare UK roaming with travel eSIM options across 20 popular destinations, with dated prices or clearly labelled live catalogue links.",
     openGraph: {
       title: "RoamCompare — Know your roaming cost before take-off",
-      description: "A sourced UK roaming and travel eSIM comparison for Turkey.",
+      description: "Compare UK roaming and travel eSIM options across 20 popular destinations.",
       type: "website",
       images: [{ url: socialImage, width: 1728, height: 910, alt: "RoamCompare — land connected without roaming shock" }],
     },
     twitter: {
       card: "summary_large_image",
       title: "RoamCompare — Know your roaming cost before take-off",
-      description: "A sourced UK roaming and travel eSIM comparison for Turkey.",
+      description: "Compare UK roaming and travel eSIM options across 20 popular destinations.",
       images: [socialImage],
     },
   };

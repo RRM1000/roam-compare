@@ -15,6 +15,7 @@ export type Plan = {
   speed: string;
   network: string;
   note: string;
+  catalogueOnly?: boolean;
 };
 
 export const DATA_CHECKED = "15 August 2026";
@@ -22,11 +23,11 @@ export const usagePerDay: Record<Usage, number> = { light: 0.35, everyday: 0.8, 
 export const tripLengths = [...Array.from({ length: 30 }, (_, index) => index + 1), 45, 60, 90];
 export const gbpRates: Record<Currency, number> = { EUR: 0.85, USD: 0.75 };
 
-export const providerDetails: Record<Provider, { accent: string; initials: string; affiliate: boolean; url: string; summary: string }> = {
-  Airalo: { accent: "#e63f78", initials: "AI", affiliate: false, url: "https://www.airalo.com/turkey-esim/merhaba-30days-20gb/", summary: "Fixed-data and unlimited Turkey plans" },
-  Klook: { accent: "#ff5b47", initials: "KL", affiliate: true, url: process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL ?? "https://www.klook.com/en-GB/activity/128551-turkey-esim-high-speed-internet-qr-code-voucher/", summary: "Daily-data choices with flexible trip lengths" },
-  Nomad: { accent: "#3455db", initials: "NO", affiliate: false, url: "https://www.nomadesim.com/turkey-eSIM", summary: "Fixed-data and unlimited Turkey plans" },
-  Saily: { accent: "#6437e8", initials: "SA", affiliate: false, url: "https://saily.com/esim-turkey/", summary: "Fixed-data plans with unrestricted hotspot use" },
+export const providerDetails: Record<Provider, { accent: string; initials: string; affiliate: boolean; summary: string }> = {
+  Airalo: { accent: "#e63f78", initials: "AI", affiliate: false, summary: "Local, regional and global eSIM catalogues" },
+  Klook: { accent: "#ff5b47", initials: "KL", affiliate: true, summary: "Travel eSIM options alongside activities" },
+  Nomad: { accent: "#3455db", initials: "NO", affiliate: false, summary: "Fixed-data and unlimited travel plans" },
+  Saily: { accent: "#6437e8", initials: "SA", affiliate: false, summary: "Travel data plans with security features" },
 };
 
 export const plans: Plan[] = [

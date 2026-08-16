@@ -1,18 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { DATA_CHECKED, plans, providerDetails, tripLengths, usagePerDay, type Provider, type Usage } from "@/lib/catalog";
+import { DATA_CHECKED, plans, providerDetails, tripLengths, usagePerDay, type Plan, type Provider, type Usage } from "@/lib/catalog";
 import { getPlanMatch, money, nativeMoney } from "@/lib/comparison";
-import { defaultScenario, getRoamingResult, isNetwork, networkNames, ROAMING_CHECKED, scenarioOptions, type Network } from "@/lib/roaming";
+import { destinationById, destinations, getProviderUrl, isDestination, type DestinationId } from "@/lib/destinations";
+import { getDefaultScenario, getRoamingResult, getScenarioOptions, isNetwork, networkNames, ROAMING_CHECKED, type Network } from "@/lib/roaming";
 
 type Device = "unknown" | "iphone" | "samsung" | "pixel" | "other" | "unsupported";
 type LockStatus = "unknown" | "unlocked" | "locked";
 
 export default function Home() {
+  const [destination, setDestination] = useState<DestinationId>("turkey");
   const [days, setDays] = useState(7);
   const [roamingDays, setRoamingDays] = useState(7);
   const [network, setNetwork] = useState<Network>("ee");
-  const [scenario, setScenario] = useState(defaultScenario.ee);
+  const [scenario, setScenario] = useState(getDefaultScenario("ee", "turkey"));
   const [customCost, setCustomCost] = useState("");
   const [usage, setUsage] = useState<Usage>("everyday");
   const [hasCompared, setHasCompared] = useState(false);
@@ -21,16 +23,18 @@ export default function Home() {
   const [lockStatus, setLockStatus] = useState<LockStatus>("unknown");
   const [shareStatus, setShareStatus] = useState("");
 
+  const activeDestination = destinationById[destination];
   const neededData = Math.max(1, Math.ceil(days * usagePerDay[usage]));
-  const roaming = getRoamingResult(network, scenario, roamingDays, customCost, neededData);
+  const roaming = getRoamingResult(network, scenario, roamingDays, customCost, neededData, destination);
   const compatibility = device === "unsupported" || lockStatus === "locked" ? "blocked" : device !== "unknown" && lockStatus === "unlocked" ? "ready" : "unknown";
 
   const groupedPlans = useMemo(() => {
+    const availablePlans: Plan[] = destination === "turkey" ? plans : (Object.keys(providerDetails) as Provider[]).map((provider) => ({ id: `${destination}-${provider.toLowerCase()}`, provider, name: `${activeDestination.name} eSIM catalogue`, validity: days, price: null, speed: "Options vary", network: "See live provider catalogue", note: "Live allowances, validity and prices shown by provider", catalogueOnly: true }));
     return (Object.keys(providerDetails) as Provider[]).map((provider) => {
-      const matches = plans.filter((plan) => plan.provider === provider).map((plan) => getPlanMatch(plan, days, neededData)).filter((plan) => plan.suppliedData >= neededData).sort((a, b) => (a.gbpTotal ?? Number.POSITIVE_INFINITY) - (b.gbpTotal ?? Number.POSITIVE_INFINITY) || a.suppliedData - b.suppliedData).slice(0, provider === "Klook" ? 3 : 2);
+      const matches = availablePlans.filter((plan) => plan.provider === provider).map((plan) => getPlanMatch(plan, days, neededData)).filter((plan) => plan.suppliedData >= neededData).sort((a, b) => (a.gbpTotal ?? Number.POSITIVE_INFINITY) - (b.gbpTotal ?? Number.POSITIVE_INFINITY) || a.suppliedData - b.suppliedData).slice(0, provider === "Klook" ? 3 : 2);
       return { provider, matches, bestPrice: matches[0]?.gbpTotal ?? Number.POSITIVE_INFINITY };
     }).filter((group) => group.matches.length > 0).sort((a, b) => a.bestPrice - b.bestPrice);
-  }, [days, neededData]);
+  }, [activeDestination.name, days, destination, neededData]);
 
   const suggestionCount = groupedPlans.reduce((total, group) => total + group.matches.length, 0);
 
@@ -41,13 +45,17 @@ export default function Home() {
     const queryRoamingDays = Number(params.get("roamingDays"));
     const queryNetwork = params.get("network") ?? "";
     const queryUsage = params.get("usage") ?? "";
+    const queryDestinationValue = params.get("destination") ?? "turkey";
+    const queryDestination = isDestination(queryDestinationValue) ? queryDestinationValue : "turkey";
     const timer = window.setTimeout(() => {
+      setDestination(queryDestination);
       if (tripLengths.includes(queryDays)) setDays(queryDays);
       if (Number.isInteger(queryRoamingDays) && queryRoamingDays >= 1 && queryRoamingDays <= queryDays) setRoamingDays(queryRoamingDays);
       if (isNetwork(queryNetwork)) {
         setNetwork(queryNetwork);
         const queryScenario = params.get("scenario") ?? "";
-        setScenario(scenarioOptions[queryNetwork].some((option) => option.value === queryScenario) ? queryScenario : defaultScenario[queryNetwork]);
+        const validOptions = getScenarioOptions(queryNetwork, queryDestination);
+        setScenario(validOptions.some((option) => option.value === queryScenario) ? queryScenario : getDefaultScenario(queryNetwork, queryDestination));
       }
       if (["light", "everyday", "heavy"].includes(queryUsage)) setUsage(queryUsage as Usage);
       setHasCompared(true);
@@ -62,8 +70,15 @@ export default function Home() {
 
   function updateNetwork(nextNetwork: Network) {
     setNetwork(nextNetwork);
-    setScenario(defaultScenario[nextNetwork]);
+    setScenario(getDefaultScenario(nextNetwork, destination));
     setCustomCost("");
+  }
+
+  function updateDestination(nextDestination: DestinationId) {
+    setDestination(nextDestination);
+    setScenario(getDefaultScenario(network, nextDestination));
+    setCustomCost("");
+    setHasCompared(false);
   }
 
   function compare() {
@@ -74,7 +89,7 @@ export default function Home() {
 
   async function shareComparison() {
     const url = new URL(window.location.href);
-    url.search = new URLSearchParams({ compare: "1", days: String(days), roamingDays: String(roamingDays), network, scenario, usage }).toString();
+    url.search = new URLSearchParams({ compare: "1", destination, days: String(days), roamingDays: String(roamingDays), network, scenario, usage }).toString();
     try {
       await navigator.clipboard.writeText(url.toString());
       setShareStatus("Comparison link copied");
@@ -93,20 +108,20 @@ export default function Home() {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">UK → Turkey · roaming vs eSIM</p>
+          <p className="eyebrow">UK → {activeDestination.name} · roaming vs eSIM</p>
           <h1>Know the roaming cost before take-off.</h1>
-          <p className="hero-lede">Compare your UK network’s Turkey roaming route with eSIM plans sized for your trip—using dated sources, transparent assumptions and no mystery prices.</p>
-          <div className="trust-row" aria-label="Service benefits"><span>10 UK networks</span><span>Approximate prices in GBP</span><span>No account needed</span></div>
+          <p className="hero-lede">Compare your UK network’s {activeDestination.name} roaming route with eSIM options sized for your trip—using dated sources, transparent assumptions and no mystery prices.</p>
+          <div className="trust-row" aria-label="Service benefits"><span>{destinations.length} destinations</span><span>10 UK networks</span><span>No account needed</span></div>
         </div>
 
         <div className="compare-card" aria-labelledby="compare-title">
           <div className="card-heading"><span className="step-pill">Takes under a minute</span><h2 id="compare-title">What does your trip look like?</h2></div>
           <div className="field-grid">
-            <label className="field field-wide"><span>Where are you going?</span><select defaultValue="turkey" aria-label="Destination"><option value="turkey">🇹🇷 Turkey</option></select></label>
+            <label className="field field-wide"><span>Where are you going?</span><select value={destination} onChange={(event) => updateDestination(event.target.value as DestinationId)} aria-label="Destination">{destinations.map((place) => <option value={place.id} key={place.id}>{place.flag} {place.name}</option>)}</select></label>
             <label className="field"><span>Trip length</span><select value={days} onChange={(event) => updateDays(Number(event.target.value))} aria-label="Trip length">{tripLengths.map((length) => <option value={length} key={length}>{length} {length === 1 ? "day" : "days"}</option>)}</select></label>
             <label className="field"><span>Days using your UK SIM</span><select value={roamingDays} onChange={(event) => setRoamingDays(Number(event.target.value))} aria-label="Days using UK SIM">{Array.from({ length: days }, (_, index) => index + 1).map((length) => <option value={length} key={length}>{length} {length === 1 ? "day" : "days"}</option>)}</select></label>
             <label className="field"><span>Your UK network</span><select value={network} onChange={(event) => updateNetwork(event.target.value as Network)} aria-label="UK mobile network">{Object.entries(networkNames).map(([key, name]) => <option value={key} key={key}>{name}</option>)}</select></label>
-            <label className="field"><span>Your roaming situation</span><select value={scenario} onChange={(event) => setScenario(event.target.value)} aria-label="Roaming plan situation">{scenarioOptions[network].map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select></label>
+            <label className="field"><span>Your roaming situation</span><select value={scenario} onChange={(event) => setScenario(event.target.value)} aria-label="Roaming plan situation">{getScenarioOptions(network, destination).map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select></label>
             {scenario === "custom" && <label className="field field-wide"><span>Your total roaming cost for this trip (£)</span><input inputMode="decimal" min="0" step="0.01" type="number" value={customCost} onChange={(event) => setCustomCost(event.target.value)} placeholder="For example, 35" aria-label="Custom roaming cost for trip" /></label>}
           </div>
 
@@ -137,7 +152,7 @@ export default function Home() {
       </section>
 
       <section className={`results-section ${hasCompared ? "is-visible" : ""}`} id="results" aria-live="polite">
-        <div className="section-heading"><div><p className="eyebrow">Your comparison</p><h2>{days} {days === 1 ? "day" : "days"} in Turkey · plan for about {neededData}GB</h2></div><div className="result-actions"><button className="text-button" type="button" onClick={shareComparison}>Share comparison ↗</button><button className="text-button" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Change trip details ↑</button>{shareStatus && <span role="status">{shareStatus}</span>}</div></div>
+        <div className="section-heading"><div><p className="eyebrow">Your comparison</p><h2>{days} {days === 1 ? "day" : "days"} in {activeDestination.name} · plan for about {neededData}GB</h2></div><div className="result-actions"><button className="text-button" type="button" onClick={shareComparison}>Share comparison ↗</button><button className="text-button" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>Change trip details ↑</button>{shareStatus && <span role="status">{shareStatus}</span>}</div></div>
 
         <div className={`results-compatibility ${compatibility}`}><span aria-hidden="true">{compatibility === "ready" ? "✓" : compatibility === "blocked" ? "!" : "?"}</span><div><strong>{compatibility === "ready" ? "Your phone looks eSIM-ready" : compatibility === "blocked" ? "Pause before purchasing" : "Compatibility not confirmed"}</strong><p>{compatibility === "ready" ? "Still verify the exact regional model before checkout." : compatibility === "blocked" ? "Your answers indicate an eSIM may not work on this phone." : "Use the compatibility check above before choosing a plan."}</p></div></div>
 
@@ -147,25 +162,26 @@ export default function Home() {
           <div className="roaming-price"><strong>{roaming.cost === null ? "Check plan" : money.format(roaming.cost)}</strong><span>{roaming.cost === null ? "before comparing" : "estimated trip cost"}</span></div>
         </div>
 
-        <aside className="travel-alert"><span aria-hidden="true">!</span><div><strong>Buy and install before you fly</strong><p>Some provider websites and apps have limited access in Turkey. Airalo says purchases are currently unavailable there, while Saily warns its app may be restricted. Install on reliable Wi-Fi before departure and save the QR code.</p></div></aside>
+        <aside className="travel-alert"><span aria-hidden="true">!</span><div><strong>Buy and install before you fly</strong><p>{destination === "turkey" ? "Some provider websites and apps have limited access in Turkey. Airalo says purchases are currently unavailable there, while Saily warns its app may be restricted. Install on reliable Wi-Fi before departure and save the QR code." : `Install your ${activeDestination.name} eSIM on reliable Wi-Fi before departure, keep it switched off until arrival and save any QR code or manual setup details.`}</p></div></aside>
 
-        <div className="results-toolbar"><p><strong>{suggestionCount} suitable plan options</strong> across {groupedPlans.length} providers</p><span>Priced options ordered by approximate trip total</span></div>
+        <div className="results-toolbar"><p><strong>{destination === "turkey" ? `${suggestionCount} suitable plan options` : `${groupedPlans.length} live catalogues`}</strong> across {groupedPlans.length} providers</p><span>{destination === "turkey" ? "Priced options ordered by approximate trip total" : "No stored prices for this destination yet"}</span></div>
         <div className="provider-list">
           {groupedPlans.map(({ provider, matches }) => {
             const details = providerDetails[provider];
+            const providerUrl = getProviderUrl(provider, activeDestination);
             return (
               <article className="provider-card" key={provider}>
                 <header className="provider-header">
                   <div className="provider-main"><div className="provider-logo" style={{ background: details.accent }}>{details.initials}</div><div><div className="provider-name-row"><h3>{provider}</h3>{details.affiliate && <span className="affiliate-badge">Affiliate partner</span>}</div><p>{details.summary}</p></div></div>
-                  <a className="provider-link" href={details.url} target="_blank" rel={details.affiliate ? "sponsored noopener noreferrer" : "noopener noreferrer"}>Check live catalogue ↗</a>
+                  <a className="provider-link" href={providerUrl} target="_blank" rel={details.affiliate ? "sponsored noopener noreferrer" : "noopener noreferrer"}>Check live catalogue ↗</a>
                 </header>
                 <div className="plan-list">
                   {matches.map((plan, planIndex) => {
                     const delta = roaming.cost !== null && plan.gbpTotal !== null ? roaming.cost - plan.gbpTotal : null;
                     return (
                       <div className="plan-row" key={plan.id}>
-                        <div className="plan-copy"><div><strong>{plan.name}</strong>{planIndex === 0 && <span className="fit-badge">Lowest suitable snapshot</span>}</div><p>{plan.unlimited ? "Unlimited data" : plan.dailyDataGb ? `${plan.dailyDataGb}GB high-speed data each day` : `${plan.suppliedData}GB supplied`} · {plan.speed}</p><small>{plan.packs > 1 ? `${plan.packs} packs estimated for ${days} days` : `${plan.validity}-day validity`} · {plan.network} · {plan.note}</small></div>
-                        <div className="plan-decision"><div className="price-block"><span>{plan.nativeTotal === null ? "Price unavailable" : `${nativeMoney(plan.nativeTotal, plan.currency!)} snapshot`}</span><strong>{plan.gbpTotal === null ? "Check price" : `≈ ${money.format(plan.gbpTotal)}`}</strong>{delta !== null && delta > 0.5 && <small>About {money.format(delta)} less than roaming</small>}{delta !== null && delta < -0.5 && <small className="negative">Roaming may cost {money.format(Math.abs(delta))} less</small>}</div><a className="deal-button" href={details.url} target="_blank" rel={details.affiliate ? "sponsored noopener noreferrer" : "noopener noreferrer"} aria-label={`Check ${provider} ${plan.name} live price (opens in a new tab)`}>Check live <span aria-hidden="true">↗</span></a></div>
+                        <div className="plan-copy"><div><strong>{plan.name}</strong>{planIndex === 0 && <span className="fit-badge">{plan.catalogueOnly ? "Live provider search" : "Lowest suitable snapshot"}</span>}</div><p>{plan.catalogueOnly ? `Browse current ${activeDestination.name} allowances and durations` : `${plan.unlimited ? "Unlimited data" : plan.dailyDataGb ? `${plan.dailyDataGb}GB high-speed data each day` : `${plan.suppliedData}GB supplied`} · ${plan.speed}`}</p><small>{plan.catalogueOnly ? plan.note : `${plan.packs > 1 ? `${plan.packs} packs estimated for ${days} days` : `${plan.validity}-day validity`} · ${plan.network} · ${plan.note}`}</small></div>
+                        <div className="plan-decision"><div className="price-block"><span>{plan.catalogueOnly ? "Live price only" : plan.nativeTotal === null ? "Price unavailable" : `${nativeMoney(plan.nativeTotal, plan.currency!)} snapshot`}</span><strong>{plan.gbpTotal === null ? "Check price" : `≈ ${money.format(plan.gbpTotal)}`}</strong>{delta !== null && delta > 0.5 && <small>About {money.format(delta)} less than roaming</small>}{delta !== null && delta < -0.5 && <small className="negative">Roaming may cost {money.format(Math.abs(delta))} less</small>}</div><a className="deal-button" href={providerUrl} target="_blank" rel={details.affiliate ? "sponsored noopener noreferrer" : "noopener noreferrer"} aria-label={`Check ${provider} ${plan.name} live price (opens in a new tab)`}>Check live <span aria-hidden="true">↗</span></a></div>
                       </div>
                     );
                   })}
@@ -175,11 +191,11 @@ export default function Home() {
           })}
         </div>
 
-        <p className="results-disclaimer">Provider snapshots were manually checked on 15 August 2026 in the currencies shown. GBP figures use rounded reference rates (€1 ≈ £0.85 and $1 ≈ £0.75), so card and checkout totals can differ. Klook’s live price is not scraped. Rankings use only the approximate total needed for your duration and data target; commission does not change the order. Always confirm price, validity, fair-use terms and activation at checkout.</p>
+        <p className="results-disclaimer">{destination === "turkey" ? "Provider snapshots were manually checked on 15 August 2026 in the currencies shown. GBP figures use rounded reference rates (€1 ≈ £0.85 and $1 ≈ £0.75), so card and checkout totals can differ. Klook’s live price is not scraped. Rankings use only the approximate total needed for your duration and data target; commission does not change the order." : `RoamCompare does not store eSIM prices for ${activeDestination.name} yet. These links open each provider’s live catalogue so no price is guessed. Enter your network’s current total above to keep the comparison useful while approved data feeds are pending.`} Always confirm price, coverage, validity, fair-use terms and activation at checkout.</p>
       </section>
 
       <section className="methodology-section" id="methodology">
-        <div className="methodology-intro"><p className="eyebrow">Receipts, not guesses</p><h2>Every estimate shows its assumptions.</h2><p>Network rules and provider catalogues change. These are dated snapshots with direct source links, ready to be replaced by approved partner feeds when access arrives.</p><div className="data-status"><span><i className="fresh" />Roaming rules checked <strong>{ROAMING_CHECKED}</strong></span><span><i />eSIM prices checked <strong>{DATA_CHECKED}</strong></span><span><i className="manual" />Live APIs <strong>not connected</strong></span></div></div>
+        <div className="methodology-intro"><p className="eyebrow">Receipts, not guesses</p><h2>Every number shows its assumptions.</h2><p>Turkey has dated price snapshots and sourced UK roaming maths. The other destinations use live catalogue handoffs until approved feeds arrive, so missing prices are never guessed.</p><div className="data-status"><span><i className="fresh" />Turkey roaming rules checked <strong>{ROAMING_CHECKED}</strong></span><span><i />Turkey eSIM prices checked <strong>{DATA_CHECKED}</strong></span><span><i className="manual" />Other destinations <strong>live catalogue links</strong></span><span><i className="manual" />Live APIs <strong>not connected</strong></span></div></div>
         <div className="source-grid">
           <a href="https://ee.co.uk/content/dam/help/terms-and-conditions/price-plans/mobile/pay-monthly-price-plans/ee-mobile-plan-price-guide-04082026.pdf" target="_blank" rel="noopener noreferrer"><span>UK roaming</span><strong>EE price guide</strong><small>Turkey: RoW Zone 1 · checked 15 Aug 2026</small></a>
           <a href="https://www.o2.co.uk/international/o2-travel" target="_blank" rel="noopener noreferrer"><span>UK roaming</span><strong>O2 Travel</strong><small>£7/day Turkey bolt-on · checked 15 Aug 2026</small></a>
@@ -206,7 +222,7 @@ export default function Home() {
       <section className="faq-section" id="faq">
         <div><p className="eyebrow">Common questions</p><h2>Before you pick a plan.</h2></div>
         <div className="faq-list">
-          <details><summary>Are these live prices?</summary><p>No. eSIM prices are manually dated snapshots, and Klook is deliberately shown without a guessed price. Every checkout link says “check live”. Approved provider APIs can replace the static catalogue later.</p></details>
+          <details><summary>Are these live prices?</summary><p>Turkey has manually dated snapshots, while the other destinations link directly to provider catalogues and deliberately show no stored price. Klook is never assigned a guessed price. Approved provider APIs can replace both paths later.</p></details>
           <details><summary>Can one provider show several suggestions?</summary><p>Yes. The comparison can show multiple suitable plans from the same provider, including different data allowances, validity periods and daily-data options.</p></details>
           <details><summary>How does the eSIM compatibility check work?</summary><p>It is a self-check, not device detection. Your phone must support eSIM and be network-unlocked. Confirm the exact regional model with its manufacturer before buying.</p></details>
           <details><summary>Why can roaming be cheaper?</summary><p>Some contracts include Turkey, and Sky’s current daily pass can be competitive for short trips. The results show the difference instead of assuming an eSIM always wins.</p></details>

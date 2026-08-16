@@ -1,3 +1,5 @@
+import { destinationById, type DestinationId } from "./destinations";
+
 export type Network = "ee" | "o2" | "vodafone" | "three" | "id-mobile" | "sky-mobile" | "giffgaff" | "smarty" | "voxi" | "tesco-mobile";
 
 export type RoamingResult = { cost: number | null; title: string; detail: string; caveat: string };
@@ -26,6 +28,20 @@ export const scenarioOptions: Record<Network, Array<{ value: string; label: stri
   "tesco-mobile": [{ value: "tesco-payg", label: "Pay as you go data — £5/MB" }, { value: "tesco-check", label: "Check my pay-monthly plan" }, ...common],
 };
 
+const genericScenarioOptions = [
+  { value: "plan-check", label: "Check my network’s current roaming price" },
+  { value: "included", label: "Roaming is included in my plan" },
+  { value: "custom", label: "Enter my own trip cost" },
+];
+
+export function getScenarioOptions(network: Network, destination: DestinationId) {
+  return destination === "turkey" ? scenarioOptions[network] : genericScenarioOptions;
+}
+
+export function getDefaultScenario(network: Network, destination: DestinationId) {
+  return destination === "turkey" ? defaultScenario[network] : "plan-check";
+}
+
 function getPasses(days: number, offers: Array<{ days: number; cost: number; label: string }>) {
   let best = { cost: Number.POSITIVE_INFINITY, labels: [] as string[], covered: 0 };
   function visit(index: number, remaining: number, cost: number, labels: string[], covered: number) {
@@ -41,12 +57,13 @@ function getPasses(days: number, offers: Array<{ days: number; cost: number; lab
   return best;
 }
 
-export function getRoamingResult(network: Network, scenario: string, roamingDays: number, customCost: string, neededData: number): RoamingResult {
+export function getRoamingResult(network: Network, scenario: string, roamingDays: number, customCost: string, neededData: number, destination: DestinationId): RoamingResult {
   if (scenario === "included") return { cost: 0, title: "Roaming appears to be included", detail: "No extra roaming fee entered for this trip.", caveat: "Fair-use limits and excluded activities can still apply. Confirm in your network app." };
   if (scenario === "custom") {
     const parsed = Number(customCost);
     return { cost: customCost !== "" && Number.isFinite(parsed) && parsed >= 0 ? parsed : null, title: "Your own roaming estimate", detail: "Based on the total trip cost you entered.", caveat: "Confirm what data, calls and texts that price includes." };
   }
+  if (destination !== "turkey") return { cost: null, title: `Check ${networkNames[network]} for ${destinationById[destination].name}`, detail: "A live roaming total is not stored for this destination yet.", caveat: "Use your network’s current checker, then select “Enter my own trip cost” for a like-for-like comparison." };
   if (scenario === "ee-current") {
     const pass = getPasses(roamingDays, [{ days: 15, cost: 50, label: "15-day" }, { days: 7, cost: 30, label: "7-day" }, { days: 1, cost: 6, label: "24-hour" }]);
     return { cost: pass.cost, title: "EE RoW Zone 1 pass estimate", detail: `${pass.labels.join(" + ")} covers ${roamingDays} consecutive roaming ${roamingDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance. Pass timing is measured from purchase." };

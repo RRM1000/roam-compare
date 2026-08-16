@@ -7,6 +7,7 @@ export function nativeMoney(value: number, currency: Currency) {
 }
 
 export function getPlanMatch(plan: Plan, days: number, neededData: number) {
+  if (plan.catalogueOnly) return { ...plan, packs: 1, suppliedData: Number.POSITIVE_INFINITY, nativeTotal: null, gbpTotal: null };
   const packsForTime = Math.ceil(days / plan.validity);
   const packsForData = plan.unlimited || plan.dailyDataGb ? 1 : Math.ceil(neededData / (plan.dataGb ?? 1));
   const packs = Math.max(packsForTime, packsForData);

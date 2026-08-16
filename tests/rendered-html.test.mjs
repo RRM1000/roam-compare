@@ -28,6 +28,13 @@ test("server-renders the RoamCompare experience", async () => {
   assert.match(html, /<option value="45">/);
   assert.match(html, /<option value="60">/);
   assert.match(html, /<option value="90">/);
+  assert.match(html, /<option value="united-states">/);
+  assert.match(html, /<option value="united-arab-emirates">/);
+  assert.match(html, /<option value="japan">/);
+  assert.match(html, /<option value="indonesia">/);
+  assert.match(html, /United States/);
+  assert.match(html, /United Arab Emirates/);
+  assert.equal((html.match(/<option value="(?:turkey|united-states|spain|france|italy|greece|portugal|germany|netherlands|ireland|cyprus|united-arab-emirates|thailand|japan|australia|canada|mexico|morocco|egypt|indonesia)"/g) ?? []).length, 20);
   assert.match(html, /Check whether your phone supports eSIM/);
   assert.match(html, /1GB per day/);
   assert.match(html, /2GB per day/);
