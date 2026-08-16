@@ -4,6 +4,7 @@ import { InfoPage } from "@/app/components/InfoPage";
 export const metadata: Metadata = {
   title: "Terms — RoamCompare",
   description: "Terms for using the private RoamCompare working build.",
+  alternates: { canonical: "/terms" },
   openGraph: { title: "RoamCompare terms", description: "Terms for using RoamCompare.", images: [] },
   twitter: { title: "RoamCompare terms", description: "Terms for using RoamCompare.", images: [] },
 };

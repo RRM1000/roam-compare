@@ -34,7 +34,7 @@ export default function DeviceCompatibilityChecker({
   const selectedSource = selectedDevice ? esimSources[selectedDevice.sourceId] : undefined;
   const [query, setQuery] = useState(selectedDevice ? deviceName(selectedDevice.manufacturer, selectedDevice.model) : "");
   const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const matches = useMemo(() => searchEsimDevices(query), [query]);
   const showMatches = isOpen && query.trim().length > 0;
   const activeOption = showMatches && matches[activeIndex] ? `${listboxId}-option-${activeIndex}` : undefined;
@@ -45,7 +45,7 @@ export default function DeviceCompatibilityChecker({
     onDeviceChange(device.id);
     setQuery(deviceName(device.manufacturer, device.model));
     setIsOpen(false);
-    setActiveIndex(0);
+    setActiveIndex(-1);
   }
 
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -56,7 +56,7 @@ export default function DeviceCompatibilityChecker({
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
       setIsOpen(true);
-      setActiveIndex((index) => Math.max(index - 1, 0));
+      setActiveIndex((index) => index <= 0 ? Math.max(matches.length - 1, 0) : index - 1);
     } else if (event.key === "Enter" && isOpen && matches[activeIndex]) {
       event.preventDefault();
       chooseDevice(matches[activeIndex].id);
@@ -115,17 +115,18 @@ export default function DeviceCompatibilityChecker({
           aria-describedby={helpId}
           value={query}
           placeholder="iPhone 15, Galaxy S24 or Pixel 8"
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => { setIsOpen(true); setActiveIndex(-1); }}
           onClick={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
           onChange={(event) => {
             setQuery(event.target.value);
             setIsOpen(true);
-            setActiveIndex(0);
+            setActiveIndex(-1);
             if (selectedDeviceId) onDeviceChange("");
           }}
         />
         <small className="search-help" id={helpId}>Start typing a model, then choose a result.</small>
+        <span className="sr-only" aria-live="polite">{showMatches ? `${matches.length} matching phone ${matches.length === 1 ? "model" : "models"}` : ""}</span>
         {showMatches && (
           <ul className="device-results" id={listboxId} role="listbox" aria-label="Matching phone models">
             {matches.length > 0 ? matches.map((device, index) => (

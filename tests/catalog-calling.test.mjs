@@ -1,16 +1,44 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { CALLS_CHECKED, plans } from "../lib/catalog.ts";
+import { CALLS_CHECKED, hasPricedPlans, isPlanStale, plans, pricedDestinationIds } from "../lib/catalog.ts";
 
-test("every priced catalogue plan declares its calls and texts support", () => {
+test("every catalogue record declares calls, hotspot, limits and provenance", () => {
   assert.equal(CALLS_CHECKED, "16 August 2026");
-  assert.ok(plans.length > 20);
+  assert.ok(plans.length > 45);
   assert.equal(new Set(plans.map((plan) => plan.id)).size, plans.length);
 
   for (const plan of plans) {
     assert.ok(["data-only", "calls-texts", "check-plan"].includes(plan.callingSupport));
+    assert.ok(["allowed", "restricted", "not-allowed", "check-plan"].includes(plan.tethering));
+    assert.ok(plan.tetheringNote.length > 5);
+    assert.ok(plan.speedCap.length > 5);
+    assert.ok(plan.fairUse.length > 5);
+    assert.ok(plan.activation.length > 5);
+    assert.match(plan.sourceUrl, /^https:\/\//);
+    assert.match(plan.checkedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.match(plan.reviewAfter, /^\d{4}-\d{2}-\d{2}$/);
   }
 
-  assert.ok(plans.every((plan) => plan.callingSupport === "data-only"));
+  assert.ok(plans.some((plan) => plan.callingSupport === "calls-texts"));
+  assert.ok(plans.some((plan) => plan.provider === "Klook" && plan.price === null));
+});
+
+test("Klook uses verified destination products and never invents package prices", () => {
+  const klookPlans = plans.filter((plan) => plan.provider === "Klook");
+  assert.match(klookPlans.find((plan) => plan.destination === "turkey")?.sourceUrl ?? "", /activity\/128551-/);
+  assert.match(klookPlans.find((plan) => plan.destination === "united-states")?.sourceUrl ?? "", /activity\/108033-/);
+  assert.match(klookPlans.find((plan) => plan.destination === "spain")?.sourceUrl ?? "", /activity\/163606-/);
+  assert.match(klookPlans.find((plan) => plan.destination === "japan")?.sourceUrl ?? "", /activity\/109393-/);
+  assert.match(klookPlans.find((plan) => plan.destination === "united-arab-emirates")?.sourceUrl ?? "", /activity\/123940-/);
+  assert.ok(klookPlans.every((plan) => plan.price === null));
+});
+
+test("five destinations have manual prices and stale snapshots cannot rank", () => {
+  assert.deepEqual([...pricedDestinationIds], ["turkey", "united-states", "spain", "japan", "united-arab-emirates"]);
+  assert.ok(pricedDestinationIds.every((destination) => hasPricedPlans(destination)));
+  const plan = plans.find((candidate) => candidate.price !== null);
+  assert.ok(plan);
+  assert.equal(isPlanStale(plan, new Date("2026-08-23T12:00:00Z")), false);
+  assert.equal(isPlanStale(plan, new Date("2026-08-24T00:00:00Z")), true);
 });

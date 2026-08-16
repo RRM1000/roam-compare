@@ -9,11 +9,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const socialImage = `${protocol}://${host}/og-premium.png`;
 
   return {
+    metadataBase: new URL(`${protocol}://${host}`),
     title: "RoamCompare — UK roaming vs travel eSIMs",
-    description: "Compare UK roaming with travel eSIM options across 20 popular destinations, with dated prices or clearly labelled live catalogue links.",
+    description: "Compare UK roaming with travel eSIMs across 20 destinations, including dated prices, hotspot rules, speed caps and fair-use limits.",
+    robots: { index: false, follow: false, nocache: true },
+    alternates: { canonical: `${protocol}://${host}/` },
     openGraph: {
       title: "RoamCompare — Know your roaming cost before take-off",
-      description: "Compare UK roaming and travel eSIM options across 20 popular destinations.",
+      description: "Compare UK roaming and travel eSIMs with visible hotspot rules, speed caps and fair-use limits.",
       type: "website",
       images: [{ url: socialImage, width: 1536, height: 1024, alt: "RoamCompare — know the roaming cost before take-off" }],
     },

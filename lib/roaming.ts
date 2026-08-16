@@ -1,8 +1,26 @@
-import { destinationById, type DestinationId } from "./destinations";
+import type { DestinationId } from "./destinations";
 
 export type Network = "ee" | "o2" | "vodafone" | "three" | "id-mobile" | "sky-mobile" | "giffgaff" | "smarty" | "voxi" | "tesco-mobile";
 
-export type RoamingResult = { cost: number | null; title: string; detail: string; caveat: string; comparable: boolean };
+export type RoamingTethering = "allowed" | "not-allowed" | "check-plan";
+export type RoamingCallsTexts = "included" | "not-included" | "extra" | "check-plan";
+export type RoamingAllowanceSource = "published" | "user-entered" | "metered" | "unknown" | "not-applicable";
+
+export type RoamingResult = {
+  cost: number | null;
+  title: string;
+  detail: string;
+  caveat: string;
+  comparable: boolean;
+  dataAllowanceGb: number | null;
+  unlimitedData: boolean;
+  allowanceSource: RoamingAllowanceSource;
+  speedCap: string | null;
+  tethering: RoamingTethering;
+  callsTexts: RoamingCallsTexts;
+  matched: boolean | null;
+  matchReason: string;
+};
 
 export const ROAMING_CHECKED = "16 August 2026";
 
@@ -42,45 +60,270 @@ export function getDefaultScenario(network: Network, destination: DestinationId)
   return destination === "turkey" ? defaultScenario[network] : "plan-check";
 }
 
-function getPasses(days: number, offers: Array<{ days: number; cost: number; label: string }>) {
-  let best = { cost: Number.POSITIVE_INFINITY, labels: [] as string[], covered: 0 };
-  function visit(index: number, remaining: number, cost: number, labels: string[], covered: number) {
+type PassOffer = { days: number; cost: number; label: string; dataGb?: number };
+
+function getPasses(days: number, offers: PassOffer[], neededDataGb = 0) {
+  let best = { cost: Number.POSITIVE_INFINITY, labels: [] as string[], coveredDays: 0, dataGb: 0 };
+  function visit(index: number, remainingDays: number, remainingDataGb: number, cost: number, labels: string[], coveredDays: number, dataGb: number) {
+    if (cost > best.cost) return;
     if (index === offers.length) {
-      if (remaining <= 0 && (cost < best.cost || (cost === best.cost && covered < best.covered))) best = { cost, labels, covered };
+      const coversDays = remainingDays <= 0;
+      const coversData = remainingDataGb <= 0;
+      const overProvision = Math.max(0, coveredDays - days) + Math.max(0, dataGb - neededDataGb);
+      const bestOverProvision = Math.max(0, best.coveredDays - days) + Math.max(0, best.dataGb - neededDataGb);
+      if (coversDays && coversData && (cost < best.cost || (cost === best.cost && overProvision < bestOverProvision))) {
+        best = { cost, labels, coveredDays, dataGb };
+      }
       return;
     }
     const offer = offers[index];
-    const maxForOffer = Math.ceil(days / offer.days) + 1;
-    for (let count = 0; count <= maxForOffer; count += 1) visit(index + 1, remaining - count * offer.days, cost + count * offer.cost, count ? [...labels, `${count} × ${offer.label}`] : labels, covered + count * offer.days);
+    const maxForDays = Math.ceil(days / offer.days) + 1;
+    const maxForData = offer.dataGb ? Math.ceil(neededDataGb / offer.dataGb) + 1 : 0;
+    const maxForOffer = Math.max(maxForDays, maxForData);
+    for (let count = 0; count <= maxForOffer; count += 1) {
+      visit(
+        index + 1,
+        remainingDays - count * offer.days,
+        remainingDataGb - count * (offer.dataGb ?? 0),
+        cost + count * offer.cost,
+        count ? [...labels, `${count} × ${offer.label}`] : labels,
+        coveredDays + count * offer.days,
+        dataGb + count * (offer.dataGb ?? 0),
+      );
+    }
   }
-  visit(0, days, 0, [], 0);
+  visit(0, days, neededDataGb, 0, [], 0, 0);
   return best;
 }
 
-export function getRoamingResult(network: Network, scenario: string, roamingDays: number, customCost: string, neededData: number, destination: DestinationId): RoamingResult {
-  const formattedData = Number.isInteger(neededData) ? String(neededData) : neededData.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
-  if (roamingDays === 0) return { cost: 0, title: "No UK-SIM roaming days", detail: "You selected eSIM or Wi-Fi only for this trip.", caveat: "Keep data roaming disabled on your UK line to avoid accidental charges.", comparable: false };
-  if (scenario === "included") return { cost: 0, title: "Roaming appears to be included", detail: "No extra roaming fee entered for this trip.", caveat: "Fair-use limits and excluded activities can still apply. Confirm in your network app.", comparable: false };
+type RoamingResultInput = Omit<RoamingResult, "comparable">;
+
+function result(input: RoamingResultInput): RoamingResult {
+  return { ...input, comparable: input.cost !== null && input.matched === true };
+}
+
+function parseAllowance(value: string | number | null | undefined) {
+  if (value === null || value === undefined || (typeof value === "string" && value.trim() === "")) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
+}
+
+function formatGb(value: number) {
+  return Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+}
+
+function formatDestinationName(destination: DestinationId) {
+  return destination.split("-").map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join(" ");
+}
+
+function allowanceMatch(allowanceGb: number | null, neededDataGb: number, missingReason: string) {
+  if (allowanceGb === null) return { matched: null, matchReason: missingReason } as const;
+  if (allowanceGb + Number.EPSILON >= neededDataGb) {
+    return { matched: true, matchReason: `${formatGb(allowanceGb)}GB covers the ${formatGb(neededDataGb)}GB needed for the selected UK-SIM roaming days.` } as const;
+  }
+  return { matched: false, matchReason: `${formatGb(allowanceGb)}GB does not cover the ${formatGb(neededDataGb)}GB needed for the selected UK-SIM roaming days.` } as const;
+}
+
+const unknownFacts = {
+  dataAllowanceGb: null,
+  unlimitedData: false,
+  allowanceSource: "unknown" as const,
+  speedCap: null,
+  tethering: "check-plan" as const,
+  callsTexts: "check-plan" as const,
+  matched: null,
+};
+
+export function getRoamingResult(
+  network: Network,
+  scenario: string,
+  roamingDays: number,
+  customCost: string,
+  neededData: number,
+  destination: DestinationId,
+  ukRoamingAllowance?: string | number | null,
+): RoamingResult {
+  const billableDays = Number.isFinite(roamingDays) ? Math.max(0, Math.ceil(roamingDays)) : 0;
+  const neededDataGb = Number.isFinite(neededData) ? Math.max(0, neededData) : 0;
+  const formattedData = formatGb(neededDataGb);
+  const enteredAllowanceGb = parseAllowance(ukRoamingAllowance);
+
+  if (billableDays === 0) {
+    return result({
+      cost: 0,
+      title: "No UK-SIM roaming days",
+      detail: "You selected eSIM or Wi-Fi only for this trip.",
+      caveat: "Keep data roaming disabled on your UK line to avoid accidental charges.",
+      dataAllowanceGb: 0,
+      unlimitedData: false,
+      allowanceSource: "not-applicable",
+      speedCap: null,
+      tethering: "check-plan",
+      callsTexts: "check-plan",
+      matched: null,
+      matchReason: "There is no UK-SIM roaming option to compare for the selected days.",
+    });
+  }
+
+  if (scenario === "included") {
+    const match = allowanceMatch(enteredAllowanceGb, neededDataGb, "Enter the data available abroad through your UK plan before showing savings against it.");
+    return result({
+      cost: 0,
+      title: "Roaming appears to be included",
+      detail: "No extra roaming fee entered for this trip.",
+      caveat: "Fair-use limits and excluded activities can still apply. Confirm in your network app.",
+      dataAllowanceGb: enteredAllowanceGb,
+      unlimitedData: false,
+      allowanceSource: enteredAllowanceGb === null ? "unknown" : "user-entered",
+      speedCap: null,
+      tethering: "check-plan",
+      callsTexts: "check-plan",
+      ...match,
+    });
+  }
+
   if (scenario === "custom") {
-    const parsed = Number(customCost);
-    return { cost: customCost !== "" && Number.isFinite(parsed) && parsed >= 0 ? parsed : null, title: "Your own roaming estimate", detail: "Based on the total trip cost you entered.", caveat: "Confirm what data, calls and texts that price includes.", comparable: customCost !== "" && Number.isFinite(parsed) && parsed >= 0 };
+    const parsedCost = Number(customCost);
+    const cost = customCost.trim() !== "" && Number.isFinite(parsedCost) && parsedCost >= 0 ? parsedCost : null;
+    const match = allowanceMatch(enteredAllowanceGb, neededDataGb, "Enter how much data that roaming price includes before showing savings against it.");
+    return result({
+      cost,
+      title: "Your own roaming estimate",
+      detail: "Based on the total trip cost you entered.",
+      caveat: "Confirm what data, calls and texts that price includes.",
+      dataAllowanceGb: enteredAllowanceGb,
+      unlimitedData: false,
+      allowanceSource: enteredAllowanceGb === null ? "unknown" : "user-entered",
+      speedCap: null,
+      tethering: "check-plan",
+      callsTexts: "check-plan",
+      ...match,
+    });
   }
-  if (destination !== "turkey") return { cost: null, title: `Check ${networkNames[network]} for ${destinationById[destination].name}`, detail: "A live roaming total is not stored for this destination yet.", caveat: "Use your network’s current checker, then select “Enter my own trip cost” for a like-for-like comparison.", comparable: false };
+
+  if (destination !== "turkey") {
+    return result({
+      cost: null,
+      title: `Check ${networkNames[network]} for ${formatDestinationName(destination)}`,
+      detail: "A live roaming total is not stored for this destination yet.",
+      caveat: "Use your network’s current checker, then enter its cost and data allowance for an allowance-matched comparison.",
+      ...unknownFacts,
+      matchReason: "The roaming cost and overseas data allowance have not both been entered.",
+    });
+  }
+
   if (scenario === "ee-current") {
-    const pass = getPasses(roamingDays, [{ days: 15, cost: 50, label: "15-day" }, { days: 7, cost: 30, label: "7-day" }, { days: 1, cost: 6, label: "24-hour" }]);
-    return { cost: pass.cost, title: "EE RoW Zone 1 pass estimate", detail: `${pass.labels.join(" + ")} covers ${roamingDays} consecutive roaming ${roamingDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance, which we have not verified. Pass timing is measured from purchase.", comparable: false };
+    const pass = getPasses(billableDays, [{ days: 15, cost: 50, label: "15-day" }, { days: 7, cost: 30, label: "7-day" }, { days: 1, cost: 6, label: "24-hour" }]);
+    const match = allowanceMatch(enteredAllowanceGb, neededDataGb, "Enter the part of your UK allowance available in Turkey before showing savings against the EE pass.");
+    return result({
+      cost: pass.cost,
+      title: "EE RoW Zone 1 pass estimate",
+      detail: `${pass.labels.join(" + ")} covers ${billableDays} consecutive roaming ${billableDays === 1 ? "day" : "days"}.`,
+      caveat: "Uses your UK allowance. Pass timing is measured from purchase, so separated roaming days can need a different pass mix.",
+      dataAllowanceGb: enteredAllowanceGb,
+      unlimitedData: false,
+      allowanceSource: enteredAllowanceGb === null ? "unknown" : "user-entered",
+      speedCap: null,
+      tethering: "check-plan",
+      callsTexts: "check-plan",
+      ...match,
+    });
   }
-  if (scenario === "o2-travel") return { cost: roamingDays * 7, title: "O2 Travel estimate", detail: `£7 × ${roamingDays} ${roamingDays === 1 ? "day" : "days"} when you use calls, texts or data.`, caveat: "O2 states unlimited minutes, texts and data, with data speed capped at 2Mbps.", comparable: true };
-  if (scenario === "three-new") return { cost: roamingDays * 8, title: "Three Go Roam Extra estimate", detail: `£8 × ${roamingDays} ${roamingDays === 1 ? "day" : "days"}.`, caveat: `For plans joined or upgraded from 18 December 2025. Up to 12GB; your roaming-days target is about ${formattedData}GB. Hotspot use is not allowed.`, comparable: neededData <= 12 };
-  if (scenario === "three-older") return { cost: roamingDays * 7, title: "Three Go Roam Extra estimate", detail: `£7 × ${roamingDays} ${roamingDays === 1 ? "day" : "days"}.`, caveat: `For most plans joined or upgraded 1 October 2021–17 December 2025. Up to 12GB; your roaming-days target is about ${formattedData}GB. Check My3.`, comparable: neededData <= 12 };
+
+  if (scenario === "o2-travel") {
+    return result({
+      cost: billableDays * 7,
+      title: "O2 Travel estimate",
+      detail: `£7 × ${billableDays} ${billableDays === 1 ? "day" : "days"} when you use calls, texts or data.`,
+      caveat: "O2 states unlimited minutes, texts and data, with data speed capped at 2Mbps.",
+      dataAllowanceGb: null,
+      unlimitedData: true,
+      allowanceSource: "published",
+      speedCap: "2Mbps",
+      tethering: "check-plan",
+      callsTexts: "included",
+      matched: true,
+      matchReason: `Published unlimited data covers the ${formattedData}GB needed for the selected UK-SIM roaming days.`,
+    });
+  }
+
+  if (scenario === "three-new" || scenario === "three-older") {
+    const isNewPlan = scenario === "three-new";
+    const match = allowanceMatch(12, neededDataGb, "");
+    return result({
+      cost: billableDays * (isNewPlan ? 8 : 7),
+      title: "Three Go Roam Extra estimate",
+      detail: `£${isNewPlan ? 8 : 7} × ${billableDays} ${billableDays === 1 ? "day" : "days"}.`,
+      caveat: isNewPlan
+        ? `For plans joined or upgraded from 18 December 2025. Up to 12GB; your selected roaming-days target is about ${formattedData}GB. Hotspot use is not allowed.`
+        : `For most plans joined or upgraded 1 October 2021–17 December 2025. Up to 12GB; your selected roaming-days target is about ${formattedData}GB. Hotspot use is not allowed; check My3.`,
+      dataAllowanceGb: 12,
+      unlimitedData: false,
+      allowanceSource: "published",
+      speedCap: null,
+      tethering: "not-allowed",
+      callsTexts: "check-plan",
+      ...match,
+    });
+  }
+
   if (scenario === "id-roam-beyond") {
-    const pass = getPasses(roamingDays, [{ days: 10, cost: 35, label: "10-day / 20GB" }, { days: 5, cost: 20, label: "5-day / 10GB" }, { days: 1, cost: 5, label: "1-day / 2GB" }]);
-    return { cost: pass.cost, title: "iD Mobile Roam Beyond estimate", detail: pass.labels.join(" + "), caveat: `Data-only passes supply up to about ${pass.covered * 2}GB; your roaming-days target is about ${formattedData}GB. They activate immediately.`, comparable: neededData <= pass.covered * 2 };
+    const pass = getPasses(billableDays, [
+      { days: 10, cost: 35, label: "10-day / 20GB", dataGb: 20 },
+      { days: 5, cost: 20, label: "5-day / 10GB", dataGb: 10 },
+      { days: 1, cost: 5, label: "1-day / 2GB", dataGb: 2 },
+    ], neededDataGb);
+    return result({
+      cost: pass.cost,
+      title: "iD Mobile Roam Beyond estimate",
+      detail: `${pass.labels.join(" + ")} supplies ${formatGb(pass.dataGb)}GB and covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`,
+      caveat: `These are data-only passes; your selected roaming-days target is about ${formattedData}GB. They activate immediately.`,
+      dataAllowanceGb: pass.dataGb,
+      unlimitedData: false,
+      allowanceSource: "published",
+      speedCap: null,
+      tethering: "check-plan",
+      callsTexts: "not-included",
+      matched: true,
+      matchReason: `${formatGb(pass.dataGb)}GB covers the ${formattedData}GB needed for the selected UK-SIM roaming days.`,
+    });
   }
-  if (scenario === "sky-passport") return { cost: roamingDays * 2, title: "Sky Roaming Passport Plus estimate", detail: `£2 × ${roamingDays} 24-hour ${roamingDays === 1 ? "period" : "periods"}.`, caveat: "Uses your UK allowance, which we have not verified; Turkey is charged as its own Passport destination.", comparable: false };
-  if (scenario === "giffgaff-metered") return { cost: neededData * 1024 * 0.2, title: "giffgaff standard data estimate", detail: `${formattedData}GB roaming-days target × 1,024MB × 20p/MB.`, caveat: "Data-only estimate; calls and texts cost extra. Check whether a Turkey travel add-on is cheaper.", comparable: true };
-  if (scenario === "smarty-metered") return { cost: neededData * 1024 * 0.1, title: "SMARTY standard data estimate", detail: `${formattedData}GB roaming-days target × 1,024MB × 10p/MB.`, caveat: "Data-only estimate; calls and texts cost extra. Requires an out-of-plan add-on balance.", comparable: true };
-  if (scenario === "tesco-payg") return { cost: neededData * 1024 * 5, title: "Tesco Mobile PAYG data estimate", detail: `${formattedData}GB roaming-days target × 1,024MB × £5/MB.`, caveat: "Illustrates the published PAYG Region 2 rate; a spend cap may stop usage. Do not rely on this for pay-monthly plans.", comparable: true };
+
+  if (scenario === "sky-passport") {
+    const match = allowanceMatch(enteredAllowanceGb, neededDataGb, "Enter the part of your UK allowance available in Turkey before showing savings against Sky’s pass.");
+    return result({
+      cost: billableDays * 2,
+      title: "Sky Roaming Passport Plus estimate",
+      detail: `£2 × ${billableDays} 24-hour ${billableDays === 1 ? "period" : "periods"}.`,
+      caveat: "Uses your UK allowance; Turkey is charged as its own Passport destination.",
+      dataAllowanceGb: enteredAllowanceGb,
+      unlimitedData: false,
+      allowanceSource: enteredAllowanceGb === null ? "unknown" : "user-entered",
+      speedCap: null,
+      tethering: "check-plan",
+      callsTexts: "check-plan",
+      ...match,
+    });
+  }
+
+  const meteredResult = (ratePerMb: number, title: string, caveat: string): RoamingResult => result({
+    cost: Math.round(neededDataGb * 1024 * ratePerMb * 100) / 100,
+    title,
+    detail: `${formattedData}GB selected roaming-days target × 1,024MB × ${ratePerMb >= 1 ? `£${ratePerMb}` : `${ratePerMb * 100}p`}/MB.`,
+    caveat,
+    dataAllowanceGb: neededDataGb,
+    unlimitedData: false,
+    allowanceSource: "metered",
+    speedCap: null,
+    tethering: "check-plan",
+    callsTexts: "extra",
+    matched: true,
+    matchReason: `The estimate prices all ${formattedData}GB needed for the selected UK-SIM roaming days.`,
+  });
+
+  if (scenario === "giffgaff-metered") return meteredResult(0.2, "giffgaff standard data estimate", "Data-only estimate; calls and texts cost extra. Check whether a Turkey travel add-on is cheaper.");
+  if (scenario === "smarty-metered") return meteredResult(0.1, "SMARTY standard data estimate", "Data-only estimate; calls and texts cost extra. Requires an out-of-plan add-on balance.");
+  if (scenario === "tesco-payg") return meteredResult(5, "Tesco Mobile PAYG data estimate", "Illustrates the published PAYG Region 2 rate; a spend cap may stop usage. Do not rely on this for pay-monthly plans.");
 
   const checkCopy: Record<Network, [string, string]> = {
     vodafone: ["Check your Vodafone plan first", "Turkey pricing is personalised by mobile number and plan."],
@@ -89,7 +332,14 @@ export function getRoamingResult(network: Network, scenario: string, roamingDays
     "tesco-mobile": ["Check your Tesco Mobile plan", "Pay-monthly roaming charges and safeguards depend on your tariff."],
     ee: ["Check your EE plan", "Your plan may include roaming."], o2: ["Check your O2 plan", "Your plan may include O2 Travel."], three: ["Check My3", "Your plan may include Go Roam."], "id-mobile": ["Check your iD plan", "Pass availability can change."], "sky-mobile": ["Check your Sky plan", "Pass availability can change."], smarty: ["Check your SMARTY account", "Charges can change."],
   };
-  return { cost: null, title: checkCopy[network][0], detail: checkCopy[network][1], caveat: "Use the network’s current checker, then enter the total as a custom cost.", comparable: false };
+  return result({
+    cost: null,
+    title: checkCopy[network][0],
+    detail: checkCopy[network][1],
+    caveat: "Use the network’s current checker, then enter the total as a custom cost.",
+    ...unknownFacts,
+    matchReason: "The roaming cost and overseas data allowance have not both been entered.",
+  });
 }
 
 export function isNetwork(value: string): value is Network { return Object.hasOwn(networkNames, value); }

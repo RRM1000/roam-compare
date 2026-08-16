@@ -1,4 +1,4 @@
-import { gbpRates, type Currency, type Plan } from "./catalog";
+import { gbpRates, type Currency, type Plan } from "./catalog.ts";
 
 export const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 2 });
 

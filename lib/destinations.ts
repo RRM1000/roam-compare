@@ -31,13 +31,29 @@ export const destinationById = Object.fromEntries(destinations.map((destination)
 
 export function isDestination(value: string): value is DestinationId { return Object.hasOwn(destinationById, value); }
 
+const klookProductUrls: Partial<Record<DestinationId, string>> = {
+  turkey: "https://www.klook.com/en-GB/activity/128551-turkey-esim-high-speed-internet-qr-code-voucher/",
+  "united-states": "https://www.klook.com/activity/108033-usa-esim-travel/",
+  spain: "https://www.klook.com/activity/163606-5g-esim-spain-vodafone-orange-movistar-yoigo/",
+  japan: "https://www.klook.com/en-GB/activity/109393-japan-esim-high-speed-internet-qr-code-voucher/",
+  "united-arab-emirates": "https://www.klook.com/en-GB/activity/123940-uae-esim-high-speed-internet-qr-code-voucher/",
+};
+
+function configuredKlookUrl(destination: DestinationId) {
+  const configured: Partial<Record<DestinationId, string | undefined>> = {
+    turkey: process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL,
+    "united-states": process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL_UNITED_STATES,
+    spain: process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL_SPAIN,
+    japan: process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL_JAPAN,
+    "united-arab-emirates": process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL_UAE,
+  };
+  return configured[destination];
+}
+
 export function getProviderUrl(provider: Provider, destination: Destination) {
-  if (destination.id === "turkey") {
-    if (provider === "Klook") return process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL ?? "https://www.klook.com/en-GB/activity/128551-turkey-esim-high-speed-internet-qr-code-voucher/";
-    if (provider === "Nomad") return "https://www.nomadesim.com/turkey-eSIM";
-  }
+  if (provider === "Klook") return configuredKlookUrl(destination.id) ?? klookProductUrls[destination.id] ?? `https://www.klook.com/en-GB/search/result/?query=${encodeURIComponent(`${destination.name} eSIM`)}`;
+  if (destination.id === "turkey" && provider === "Nomad") return "https://www.nomadesim.com/turkey-eSIM";
   if (provider === "Airalo") return `https://www.airalo.com/${destination.airaloSlug}-esim`;
   if (provider === "Saily") return `https://saily.com/esim-${destination.sailySlug}/`;
-  if (provider === "Klook") return `https://www.klook.com/en-GB/search/result/?query=${encodeURIComponent(`${destination.name} eSIM`)}`;
   return `https://www.nomadesim.com/en/${destination.id}-eSIM`;
 }
