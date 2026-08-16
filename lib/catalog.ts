@@ -1,0 +1,56 @@
+export type Usage = "light" | "everyday" | "heavy";
+export type Currency = "EUR" | "USD";
+export type Provider = "Airalo" | "Klook" | "Nomad" | "Saily";
+
+export type Plan = {
+  id: string;
+  provider: Provider;
+  name: string;
+  dataGb?: number;
+  dailyDataGb?: number;
+  unlimited?: boolean;
+  validity: number;
+  price: number | null;
+  currency?: Currency;
+  speed: string;
+  network: string;
+  note: string;
+};
+
+export const DATA_CHECKED = "15 August 2026";
+export const usagePerDay: Record<Usage, number> = { light: 0.35, everyday: 0.8, heavy: 2 };
+export const tripLengths = [...Array.from({ length: 30 }, (_, index) => index + 1), 45, 60, 90];
+export const gbpRates: Record<Currency, number> = { EUR: 0.85, USD: 0.75 };
+
+export const providerDetails: Record<Provider, { accent: string; initials: string; affiliate: boolean; url: string; summary: string }> = {
+  Airalo: { accent: "#e63f78", initials: "AI", affiliate: false, url: "https://www.airalo.com/turkey-esim/merhaba-30days-20gb/", summary: "Fixed-data and unlimited Turkey plans" },
+  Klook: { accent: "#ff5b47", initials: "KL", affiliate: true, url: process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_URL ?? "https://www.klook.com/en-GB/activity/128551-turkey-esim-high-speed-internet-qr-code-voucher/", summary: "Daily-data choices with flexible trip lengths" },
+  Nomad: { accent: "#3455db", initials: "NO", affiliate: false, url: "https://www.nomadesim.com/turkey-eSIM", summary: "Fixed-data and unlimited Turkey plans" },
+  Saily: { accent: "#6437e8", initials: "SA", affiliate: false, url: "https://saily.com/esim-turkey/", summary: "Fixed-data plans with unrestricted hotspot use" },
+};
+
+export const plans: Plan[] = [
+  { id: "airalo-1", provider: "Airalo", name: "1GB", dataGb: 1, validity: 7, price: 4, currency: "USD", speed: "4G / 5G", network: "Türk Telekom (Avea)", note: "Data only · top-ups available" },
+  { id: "airalo-2", provider: "Airalo", name: "2GB", dataGb: 2, validity: 15, price: 5.5, currency: "USD", speed: "4G / 5G", network: "Türk Telekom (Avea)", note: "Data only · top-ups available" },
+  { id: "airalo-3", provider: "Airalo", name: "3GB", dataGb: 3, validity: 30, price: 6.5, currency: "USD", speed: "4G / 5G", network: "Türk Telekom (Avea)", note: "Data only · top-ups available" },
+  { id: "airalo-5", provider: "Airalo", name: "5GB", dataGb: 5, validity: 30, price: 10, currency: "USD", speed: "4G / 5G", network: "Türk Telekom (Avea)", note: "Data only · top-ups available" },
+  { id: "airalo-10", provider: "Airalo", name: "10GB", dataGb: 10, validity: 30, price: 15.5, currency: "USD", speed: "4G / 5G", network: "Türk Telekom (Avea)", note: "Data only · top-ups available" },
+  { id: "airalo-20", provider: "Airalo", name: "20GB", dataGb: 20, validity: 30, price: 22.5, currency: "USD", speed: "4G / 5G", network: "Türk Telekom (Avea)", note: "Data only · top-ups available" },
+  { id: "airalo-unlimited", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 35, currency: "USD", speed: "4G / 5G", network: "Türk Telekom (Avea)", note: "Fair-use limits may apply" },
+  { id: "klook-1gb-daily", provider: "Klook", name: "1GB per day", dailyDataGb: 1, validity: 30, price: null, speed: "5G / 4G", network: "Türk Telekom", note: "Choose 1–30 days on Klook" },
+  { id: "klook-2gb-daily", provider: "Klook", name: "2GB per day", dailyDataGb: 2, validity: 30, price: null, speed: "5G / 4G", network: "Türk Telekom", note: "Better for video and hotspot use" },
+  { id: "klook-unlimited", provider: "Klook", name: "Unlimited daily data", unlimited: true, validity: 30, price: null, speed: "5G / 4G", network: "Türk Telekom", note: "Fair-use speed limits may apply" },
+  { id: "nomad-1", provider: "Nomad", name: "1GB", dataGb: 1, validity: 7, price: 3.46, currency: "EUR", speed: "4G / 5G", network: "Avea", note: "Hotspot supported" },
+  { id: "nomad-3", provider: "Nomad", name: "3GB", dataGb: 3, validity: 30, price: 5.19, currency: "EUR", speed: "4G / 5G", network: "Avea", note: "Hotspot supported" },
+  { id: "nomad-5", provider: "Nomad", name: "5GB", dataGb: 5, validity: 30, price: 7.79, currency: "EUR", speed: "4G / 5G", network: "Avea", note: "Sale price when checked" },
+  { id: "nomad-10", provider: "Nomad", name: "10GB", dataGb: 10, validity: 30, price: 11.25, currency: "EUR", speed: "4G / 5G", network: "Avea", note: "Hotspot supported" },
+  { id: "nomad-20", provider: "Nomad", name: "20GB", dataGb: 20, validity: 30, price: 17.31, currency: "EUR", speed: "4G / 5G", network: "Avea", note: "Hotspot supported" },
+  { id: "nomad-50", provider: "Nomad", name: "50GB", dataGb: 50, validity: 30, price: 26.84, currency: "EUR", speed: "4G / 5G", network: "Avea", note: "Hotspot supported" },
+  { id: "nomad-unlimited-5", provider: "Nomad", name: "Unlimited", unlimited: true, validity: 5, price: 14.72, currency: "EUR", speed: "4G / 5G", network: "Avea", note: "High-speed allowance resets daily" },
+  { id: "nomad-unlimited-10", provider: "Nomad", name: "Unlimited", unlimited: true, validity: 10, price: 24.24, currency: "EUR", speed: "4G / 5G", network: "Avea", note: "High-speed allowance resets daily" },
+  { id: "saily-1", provider: "Saily", name: "1GB", dataGb: 1, validity: 7, price: 3.49, currency: "EUR", speed: "3G / 4G / 5G", network: "Partner networks", note: "No hotspot restrictions" },
+  { id: "saily-3", provider: "Saily", name: "3GB", dataGb: 3, validity: 30, price: 5.99, currency: "EUR", speed: "3G / 4G / 5G", network: "Partner networks", note: "No hotspot restrictions" },
+  { id: "saily-5", provider: "Saily", name: "5GB", dataGb: 5, validity: 30, price: 8.99, currency: "EUR", speed: "3G / 4G / 5G", network: "Partner networks", note: "No hotspot restrictions" },
+  { id: "saily-10", provider: "Saily", name: "10GB", dataGb: 10, validity: 30, price: 13.99, currency: "EUR", speed: "3G / 4G / 5G", network: "Partner networks", note: "No hotspot restrictions" },
+  { id: "saily-20", provider: "Saily", name: "20GB", dataGb: 20, validity: 30, price: 20.49, currency: "EUR", speed: "3G / 4G / 5G", network: "Partner networks", note: "No hotspot restrictions" },
+];
