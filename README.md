@@ -1,6 +1,6 @@
 # RoamCompare
 
-UK-first roaming and travel-eSIM comparison site built with vinext and OpenAI Sites.
+UK-first roaming and travel-eSIM comparison site. Built with vinext and deployed as a Cloudflare Worker.
 
 ## What is implemented
 
@@ -108,4 +108,37 @@ The first variable is the Turkey URL retained for backwards compatibility. Confi
 - run `npm test` and `npm run lint`
 - replace the private `Disallow: /` robots policy only when the site is intentionally made public
 
-The Sites project binding is declared in `.openai/hosting.json`. No D1 or R2 storage is currently used.
+## Deployment
+
+The site is a Cloudflare Worker. `npm run build` emits both the bundle and a complete
+Worker config at `dist/server/wrangler.json`, so deploying is:
+
+```bash
+npm run deploy
+```
+
+Pushing to `main` does the same through `.github/workflows/deploy.yml`, after lint and
+tests pass. It needs two repository secrets:
+
+| Secret | Where to get it |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → *Edit Cloudflare Workers* template |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard → Workers & Pages → Account ID |
+
+**Environment variables split two ways, and getting this wrong fails silently.**
+
+Anything prefixed `NEXT_PUBLIC_` is inlined into the bundle at *build* time, so it must be
+set as a repository **variable** for the workflow (`NEXT_PUBLIC_SITE_URL`,
+`NEXT_PUBLIC_KLOOK_AFFILIATE_ID`, `NEXT_PUBLIC_NOMAD_AFFILIATE_URL`). Setting one only as a
+Worker secret leaves it `undefined` in the shipped code.
+
+Everything else is read at *runtime* and belongs in the Worker, set once with:
+
+```bash
+wrangler secret put SAILY_AFF_ID --config dist/server/wrangler.json
+wrangler secret put SAILY_OFFER_ID --config dist/server/wrangler.json
+```
+
+`.openai/hosting.json` remains from the earlier OpenAI Sites deployment. No D1 or R2 storage
+is currently used, and the `/_vinext/image` route is unused — nothing in the app renders an
+image through it, so the `ASSETS` and `IMAGES` bindings it would need are not declared.
