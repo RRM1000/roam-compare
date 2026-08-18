@@ -22,7 +22,7 @@ test("included roaming is comparable only after an adequate overseas allowance i
   const short = turkeyResult("ee", "included", 7, 5, 4.99);
   assert.equal(short.matched, false);
   assert.equal(short.comparable, false);
-  assert.match(short.matchReason, /does not cover/);
+  assert.match(short.matchReason, /isn.t enough for/);
 });
 
 test("custom cost alone never becomes a like-for-like comparison", () => {
@@ -77,9 +77,10 @@ test("only selected UK-SIM days are charged and partial days round up", () => {
   assert.equal(threeSelectedDays.cost, 16);
   assert.match(threeSelectedDays.detail, /2 days/);
 
+  // O2 Travel bills per 24-hour period, and both O2 branches now say so.
   const partialO2Day = turkeyResult("o2", "o2-travel", 1.2, 1);
   assert.equal(partialO2Day.cost, 14);
-  assert.match(partialO2Day.detail, /2 days/);
+  assert.match(partialO2Day.detail, /2 24-hour periods/);
 
   const noUkSimDays = turkeyResult("o2", "o2-travel", 0, 0);
   assert.equal(noUkSimDays.cost, 0);

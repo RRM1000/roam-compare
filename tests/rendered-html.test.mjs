@@ -23,12 +23,20 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.match(html, /<meta name="robots" content="[^"]*noindex[^"]*nofollow[^"]*">/i);
   assert.match(text, /Know the roaming cost before take-off\./);
   assert.match(text, /See the hotspot rules, speed caps and fair-use limits/);
-  assert.match(text, /5 priced destinations/);
+  // Counted from the plans actually in hand: 5 without the live feed (as in CI), 20 with it.
+  assert.match(text, /\d+ with eSIM prices/);
+  assert.match(text, /Roaming priced, never guessed/);
+  // Roaming coverage differs by network: EE prices all 20 destinations, the other
+  // nine price 5. The page must not flatten that into a single blanket claim.
+  assert.match(text, /On EE we price roaming for all 20 destinations/);
+  assert.doesNotMatch(text, /calculated for all 20 destinations/);
+  assert.doesNotMatch(text, /on all 10 UK networks/);
   assert.match(html, /<option value="" disabled="" selected="">Choose your network<\/option>/);
-  assert.match(html, /aria-label="UK mobile network" required=""/);
-  assert.match(text, /We will not assume a network for you\./);
+  // The network is no longer required: results must not wait on a roaming tariff.
+  assert.doesNotMatch(html, /aria-label="UK mobile network"[^>]*required/);
+  assert.match(text, /We won’t guess — roaming costs differ far too much between networks\./);
   assert.match(text, /Do you need normal calls or SMS\?/);
-  assert.match(text, /Choose your roaming tariff/);
+  assert.match(text, /Compare with your own network/);
   assert.match(text, /Which tariff or roaming option applies\?/);
   assert.match(text, /On how many trip days will you use paid UK-network roaming\?/);
   assert.match(text, /0 — eSIM\/Wi-Fi only/);
@@ -45,7 +53,11 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.match(text, /Sort by/);
   assert.match(text, /Save on this device/);
   assert.match(text, /Klook/);
-  assert.match(text, /Affiliate relationship/);
+  // The badge was removed by request; rel="sponsored" remains the machine-readable
+  // disclosure and must not be dropped with it.
+  assert.doesNotMatch(text, /Affiliate relationship/);
+  assert.match(html, /rel="sponsored noopener noreferrer"/);
+  assert.match(text, /We earn a commission if you buy through some of the provider links/);
   assert.match(html, /activity\/128551-turkey-esim/);
   assert.match(html, /rel="sponsored noopener noreferrer"/);
   const rows = (html.match(/class="plan-row(?: [^"]*)?"/g) ?? []).length;
@@ -53,14 +65,14 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.equal(rows, (html.match(/class="calls-texts-status data-only"/g) ?? []).length);
   assert.equal(rows, (html.match(/class="plan-limits"/g) ?? []).length);
   assert.match(text, /Klook prices are never scraped or guessed/);
-  assert.match(text, /Do you calculate the roaming charge\?/);
+  assert.match(text, /Do you work out what my own network would charge\?/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton|Your site is taking shape/i);
 });
 
 for (const [path, title, marker] of [
-  ["/about", "About and affiliate disclosure — RoamCompare", "Useful maths, visible assumptions."],
-  ["/privacy", "Privacy — RoamCompare", "No account. No comparison profile."],
-  ["/terms", "Terms — RoamCompare", "Compare, then verify."],
+  ["/about", "About and affiliate disclosure — RoamCompare", "What RoamCompare does"],
+  ["/privacy", "Privacy — RoamCompare", "We don’t ask who you are"],
+  ["/terms", "Terms — RoamCompare", "Check before you buy"],
 ]) {
   test(`server-renders ${path}`, async () => {
     const response = await render(path);
@@ -88,9 +100,9 @@ test("shared Japan comparison renders prices and a sourced roaming calculation",
   assert.match(html, /aria-hidden="false"/);
   assert.match(text, /Nomad/);
   assert.match(text, /10GB/);
-  assert.match(text, /US\$16\.00 provider-currency snapshot/);
+  assert.match(text, /US\$16\.00 listed when we checked/);
   assert.match(text, /SoftBank/);
-  assert.match(text, /Hotspot supported/);
+  assert.match(text, /Hotspot works/);
 });
 
 test("normal-call requirement can select the verified US voice plan", async () => {
@@ -99,8 +111,8 @@ test("normal-call requirement can select the verified US voice plan", async () =
   const text = visible(await response.text());
   assert.match(text, /Change\+ 5GB \+ 50 min\/SMS/);
   assert.match(text, /Calls &amp; texts included/);
-  assert.match(text, /This option also declares normal calls and SMS/);
-  assert.match(text, /Doesn’t meet calls\/SMS requirement/);
+  assert.match(text, /This one includes normal calls and texts/);
+  assert.match(text, /No calls or texts — you said you need them/);
   assert.match(text, /meet your calls\/SMS requirement/);
 });
 
@@ -114,7 +126,7 @@ test("shared filters and sorting are restored before recommendations are rendere
   assert.match(html, /type="checkbox" checked=""\/> 5G listed/);
   assert.match(html, /type="checkbox" checked=""\/> Hotspot allowed/);
   assert.match(text, /Airalo/);
-  assert.match(text, /Unlimited label/);
+  assert.match(text, /Unlimited — daily limits apply/);
   assert.doesNotMatch(text, /Change\+ 5GB \+ 50 min\/SMS/);
 });
 
@@ -122,15 +134,28 @@ test("unverified catalogue calls are not presented as a definite mismatch", asyn
   const response = await render("/?compare=1&destination=france&days=7&roamingDays=7&network=o2&scenario=plan-check&usage=light&calls=yes");
   assert.equal(response.status, 200);
   const text = visible(await response.text());
-  assert.match(text, /Calls\/SMS not verified/);
-  assert.doesNotMatch(text, /Doesn’t meet calls\/SMS requirement/);
+  assert.match(text, /We couldn’t confirm calls and texts/);
+  assert.doesNotMatch(text, /No calls or texts — you said you need them/);
 });
 
-test("multi-package recommendations disclose package count before checkout", async () => {
+test("no plan is ever recommended that needs buying more than once", async () => {
+  // A 90-day trip is the hardest case: most plans top out at 30 days, so this is
+  // where a multi-purchase total would have appeared if the rule ever regressed.
   const response = await render("/?compare=1&destination=turkey&days=90&roamingDays=90&network=o2&scenario=o2-travel&usage=light&calls=no");
   assert.equal(response.status, 200);
-  const text = visible(await response.text());
-  assert.match(text, /This total estimates \d+ packages; confirm they can be activated sequentially before buying\./);
+  const html = await response.text();
+  const text = visible(html);
+
+  assert.doesNotMatch(text, /assumes buying/);
+  assert.doesNotMatch(text, /estimated packs/);
+  assert.doesNotMatch(text, /activated in sequence/);
+  assert.doesNotMatch(text, /\d+ × [£€$]/, "a total must never be built from several purchases");
+
+  // Every provider stays on the page, falling back to its catalogue link when no
+  // single purchase covers the trip.
+  for (const provider of ["Airalo", "Klook", "Nomad", "Saily"]) {
+    assert.match(html, new RegExp(`<h3>${provider}</h3>`), `${provider} disappeared from the comparison`);
+  }
 });
 
 test("rejects inherited and malformed shared-link values without assuming EE", async () => {
@@ -138,11 +163,59 @@ test("rejects inherited and malformed shared-link values without assuming EE", a
   assert.equal(response.status, 200);
   const html = await response.text();
   const text = visible(html);
-  assert.match(html, /<title>RoamCompare — UK roaming vs travel eSIMs<\/title>/i);
-  assert.match(text, /Choose your network/);
-  assert.match(html, /results-section " id="results" aria-hidden="true"/);
-  assert.doesNotMatch(text, /Current EE RoW Zone 1 passes/);
+  // A compare link now shows the eSIM side on its own, so the guarantee is no
+  // longer "nothing rendered" — it is that nothing was invented from bad input.
+  assert.match(html, /<title>7 days in Turkey — RoamCompare<\/title>/i);
   assert.doesNotMatch(text, /999 days in/);
+  assert.match(text, /Choose your network/);
+  assert.doesNotMatch(text, /Current EE RoW Zone 1 passes/);
+  // No network was validly supplied, so no roaming cost may be claimed.
+  assert.doesNotMatch(html, /class="roaming-banner/);
+  assert.doesNotMatch(text, /less than requirements-matched roaming/);
+});
+
+test("\"Live price\" means one thing, and an unpriced plan never claims a checked price", async () => {
+  const response = await render("/?compare=1&destination=turkey&days=10&roamingDays=10&network=ee&scenario=ee-current&usage=everyday&calls=no");
+  const html = await response.text();
+  const text = visible(html);
+
+  // The phrase must never be reused to mean the opposite — "we have no price".
+  assert.doesNotMatch(text, /Live price only/);
+  assert.doesNotMatch(text, /Live price required/);
+
+  // Klook rows carry no price at all, so they must not show a freshness date
+  // implying we verified one. Turkey's Klook plans are price: null but not
+  // catalogueOnly, which is exactly the case that used to slip through.
+  const klook = html.match(/<h3>Klook<\/h3>[\s\S]*?<\/article>/)?.[0] ?? "";
+  assert.ok(klook, "Klook provider card should render");
+  assert.match(klook, /Price at provider/);
+  assert.doesNotMatch(klook, /Checked \d+ \w+ \d{4}/, "an unpriced plan must not claim a checked price");
+  assert.doesNotMatch(klook, /Live price/);
+});
+
+test("every destination has a landing page, not only the manually priced ones", async () => {
+  const { destinations } = await import("../lib/destinations.ts");
+  assert.equal(destinations.length, 20);
+
+  for (const destination of destinations) {
+    const response = await render(`/destinations/${destination.id}`);
+    assert.equal(response.status, 200, `/destinations/${destination.id} should not 404`);
+  }
+
+  const sitemap = await render("/sitemap.xml");
+  const xml = await sitemap.text();
+  for (const destination of destinations) {
+    assert.match(xml, new RegExp(`/destinations/${destination.id}</loc>`), `${destination.id} missing from sitemap`);
+  }
+
+  const unknown = await render("/destinations/atlantis");
+  assert.equal(unknown.status, 404, "unknown destinations must still 404");
+});
+
+test("the site serves its own icon", async () => {
+  const response = await render("/");
+  const html = await response.text();
+  assert.match(html, /<link[^>]+rel="icon"[^>]*>/i, "no favicon link in the document head");
 });
 
 for (const [slug, name] of [["spain", "Spain"], ["japan", "Japan"]]) {

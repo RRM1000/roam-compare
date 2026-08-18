@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { CALLS_CHECKED, hasPricedPlans, isPlanStale, plans, pricedDestinationIds } from "../lib/catalog.ts";
+import { DATA_CHECKED_AT, formatCheckedDate, hasPricedPlans, isPlanStale, plans, pricedDestinationIds } from "../lib/catalog.ts";
 
 test("every catalogue record declares calls, hotspot, limits and provenance", () => {
-  assert.equal(CALLS_CHECKED, "16 August 2026");
+  // One date format across the whole site, from one source.
+  assert.equal(formatCheckedDate(DATA_CHECKED_AT), "16 Aug 2026");
   assert.ok(plans.length > 45);
   assert.equal(new Set(plans.map((plan) => plan.id)).size, plans.length);
 

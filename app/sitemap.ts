@@ -1,17 +1,17 @@
 import type { MetadataRoute } from "next";
-import { pricedDestinationIds } from "@/lib/catalog";
+import { destinations } from "@/lib/destinations";
+import { getSiteOrigin } from "@/lib/site-url";
 
-const siteUrl = "https://roamcompare-uk.robert-marfleet.chatgpt.site";
-
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const siteUrl = await getSiteOrigin();
   return [
     {
       url: siteUrl,
       changeFrequency: "weekly",
       priority: 1,
     },
-    ...pricedDestinationIds.map((destination) => ({
-      url: `${siteUrl}/destinations/${destination}`,
+    ...destinations.map((destination) => ({
+      url: `${siteUrl}/destinations/${destination.id}`,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     })),

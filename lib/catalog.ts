@@ -31,10 +31,10 @@ export type Plan = {
   checkedAt: string;
   reviewAfter: string;
   catalogueOnly?: boolean;
+  /** Set on plans fetched live from a provider API rather than a manual snapshot. */
+  live?: boolean;
 };
 
-export const DATA_CHECKED = "16 August 2026";
-export const CALLS_CHECKED = "16 August 2026";
 export const DATA_CHECKED_AT = "2026-08-16";
 export const DATA_REVIEW_AFTER = "2026-08-23";
 export const FX_CHECKED_AT = "2026-08-16";
@@ -53,7 +53,7 @@ export const providerDetails: Record<Provider, { accent: string; initials: strin
   Airalo: { accent: "#a82350", initials: "AI", affiliate: false, summary: "Local, regional and global eSIM catalogues" },
   Klook: { accent: "#b33b27", initials: "KL", affiliate: true, summary: "Travel eSIM options alongside activities" },
   Nomad: { accent: "#2943aa", initials: "NO", affiliate: false, summary: "Fixed-data and unlimited travel plans" },
-  Saily: { accent: "#4b28ae", initials: "SA", affiliate: false, summary: "Travel data plans with security features" },
+  Saily: { accent: "#4b28ae", initials: "SA", affiliate: true, summary: "Travel data plans with security features" },
 };
 
 const CHECKED_AT = DATA_CHECKED_AT;
@@ -72,19 +72,19 @@ function turkeyPlan(seed: PlanSeed): Plan {
 }
 
 const airaloDefaults = {
-  speed: "4G / 5G", speedCap: "No fixed cap stated for fixed-data plans", network: "Türk Telekom (Avea)",
-  tethering: "check-plan" as const, tetheringNote: "Depends on the device, network and live plan terms",
-  fairUse: "Fixed allowance; service stops or requires a top-up when used", activation: "Check the live plan's activation policy before installation", note: "Top-ups available",
+  speed: "4G / 5G", speedCap: "No speed limit stated for this plan", network: "Türk Telekom (Avea)",
+  tethering: "check-plan" as const, tetheringNote: "Depends on your phone, the local network and the plan's own terms",
+  fairUse: "When the data runs out you'll need to top up", activation: "Check when the plan starts counting down before you install it", note: "You can top up",
 };
 const nomadDefaults = {
-  speed: "4G / 5G", speedCap: "No fixed cap stated for fixed-data plans", network: "Avea",
-  tethering: "allowed" as const, tetheringNote: "Hotspot supported; device and local network permitting",
-  fairUse: "Fixed allowance; top-up or another plan may be needed when used", activation: "Activation timing varies by plan; confirm at checkout", note: "Hotspot supported",
+  speed: "4G / 5G", speedCap: "No speed limit stated for this plan", network: "Avea",
+  tethering: "allowed" as const, tetheringNote: "Hotspot works, as long as your phone and the local network allow it",
+  fairUse: "When the data runs out you'll need to top up or buy again", activation: "Activation timing varies by plan; confirm at checkout", note: "Hotspot works",
 };
 const sailyDefaults = {
-  speed: "3G / 4G / 5G", speedCap: "No fixed cap stated for fixed-data plans", network: "Partner networks",
-  tethering: "allowed" as const, tetheringNote: "Saily states no hotspot restrictions; device/network limits can still apply",
-  fairUse: "Fixed allowance; add more data if the plan is exhausted", activation: "Check the live plan's activation policy before installation", note: "No hotspot restrictions",
+  speed: "3G / 4G / 5G", speedCap: "No speed limit stated for this plan", network: "Partner networks",
+  tethering: "allowed" as const, tetheringNote: "Saily says there are no hotspot restrictions, though your phone or the local network may still impose some",
+  fairUse: "When the data runs out you can add more", activation: "Check when the plan starts counting down before you install it", note: "No hotspot restrictions",
 };
 
 const turkeyPlans: Plan[] = [
@@ -94,18 +94,18 @@ const turkeyPlans: Plan[] = [
   turkeyPlan({ id: "turkey-airalo-5", provider: "Airalo", name: "5GB", dataGb: 5, validity: 30, price: 10, currency: "USD", ...airaloDefaults }),
   turkeyPlan({ id: "turkey-airalo-10", provider: "Airalo", name: "10GB", dataGb: 10, validity: 30, price: 15.5, currency: "USD", ...airaloDefaults }),
   turkeyPlan({ id: "turkey-airalo-20", provider: "Airalo", name: "20GB", dataGb: 20, validity: 30, price: 22.5, currency: "USD", ...airaloDefaults }),
-  turkeyPlan({ id: "turkey-airalo-unlimited", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 35, currency: "USD", ...airaloDefaults, speedCap: "High-speed data is subject to the live fair-use policy", fairUse: "Unlimited label; check the current daily high-speed allowance and throttle before buying", note: "Fair-use limits apply" }),
-  turkeyPlan({ id: "turkey-klook-1gb-daily", provider: "Klook", name: "1GB per day", dailyDataGb: 1, validity: 30, price: null, speed: "5G / 4G", speedCap: "Full-speed daily allowance, then reduced speed", network: "Türk Telekom", tethering: "allowed", tetheringNote: "Hotspot sharing is listed as supported", fairUse: "1GB high-speed data each day; reduced speed after the daily allowance", activation: "Choose 1–30 days; check when validity begins on the voucher", note: "Choose 1–30 days on Klook" }),
-  turkeyPlan({ id: "turkey-klook-2gb-daily", provider: "Klook", name: "2GB per day", dailyDataGb: 2, validity: 30, price: null, speed: "5G / 4G", speedCap: "Full-speed daily allowance, then reduced speed", network: "Türk Telekom", tethering: "allowed", tetheringNote: "Hotspot sharing is listed as supported", fairUse: "2GB high-speed data each day; reduced speed after the daily allowance", activation: "Choose 1–30 days; check when validity begins on the voucher", note: "Daily high-speed allowance" }),
-  turkeyPlan({ id: "turkey-klook-unlimited", provider: "Klook", name: "Unlimited daily data", unlimited: true, validity: 30, price: null, speed: "5G / 4G", speedCap: "1Mbps after 15GB in a day", network: "Türk Telekom", tethering: "allowed", tetheringNote: "Hotspot sharing is listed as supported", fairUse: "15GB high-speed data per day, then 1Mbps until the daily reset", activation: "Choose 1–30 days; check when validity begins on the voucher", note: "Daily fair-use throttle" }),
+  turkeyPlan({ id: "turkey-airalo-unlimited", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 35, currency: "USD", ...airaloDefaults, speedCap: "Full-speed data is subject to the provider's fair-use policy", fairUse: "Called unlimited — check the daily full-speed amount and what happens after it", note: "Fair-use limits apply" }),
+  turkeyPlan({ id: "turkey-klook-1gb-daily", provider: "Klook", name: "1GB per day", dailyDataGb: 1, validity: 30, price: null, speed: "5G / 4G", speedCap: "Full speed up to the daily amount, then slower", network: "Türk Telekom", tethering: "allowed", tetheringNote: "Hotspot sharing should work", fairUse: "1GB at full speed each day, then slower", activation: "Pick 1–30 days. Check when the countdown starts on the voucher", note: "Choose 1–30 days on Klook" }),
+  turkeyPlan({ id: "turkey-klook-2gb-daily", provider: "Klook", name: "2GB per day", dailyDataGb: 2, validity: 30, price: null, speed: "5G / 4G", speedCap: "Full speed up to the daily amount, then slower", network: "Türk Telekom", tethering: "allowed", tetheringNote: "Hotspot sharing should work", fairUse: "2GB at full speed each day, then slower", activation: "Pick 1–30 days. Check when the countdown starts on the voucher", note: "A set amount at full speed each day" }),
+  turkeyPlan({ id: "turkey-klook-unlimited", provider: "Klook", name: "Unlimited daily data", unlimited: true, validity: 30, price: null, speed: "5G / 4G", speedCap: "1Mbps once you've used 15GB in a day", network: "Türk Telekom", tethering: "allowed", tetheringNote: "Hotspot sharing should work", fairUse: "15GB at full speed a day, then 1Mbps until it resets", activation: "Pick 1–30 days. Check when the countdown starts on the voucher", note: "Slows down after a daily limit" }),
   turkeyPlan({ id: "turkey-nomad-1", provider: "Nomad", name: "1GB", dataGb: 1, validity: 7, price: 3.46, currency: "EUR", ...nomadDefaults }),
   turkeyPlan({ id: "turkey-nomad-3", provider: "Nomad", name: "3GB", dataGb: 3, validity: 30, price: 5.19, currency: "EUR", ...nomadDefaults }),
-  turkeyPlan({ id: "turkey-nomad-5", provider: "Nomad", name: "5GB", dataGb: 5, validity: 30, price: 7.79, currency: "EUR", ...nomadDefaults, note: "Sale price when checked" }),
+  turkeyPlan({ id: "turkey-nomad-5", provider: "Nomad", name: "5GB", dataGb: 5, validity: 30, price: 7.79, currency: "EUR", ...nomadDefaults, note: "On sale when we checked" }),
   turkeyPlan({ id: "turkey-nomad-10", provider: "Nomad", name: "10GB", dataGb: 10, validity: 30, price: 11.25, currency: "EUR", ...nomadDefaults }),
   turkeyPlan({ id: "turkey-nomad-20", provider: "Nomad", name: "20GB", dataGb: 20, validity: 30, price: 17.31, currency: "EUR", ...nomadDefaults }),
   turkeyPlan({ id: "turkey-nomad-50", provider: "Nomad", name: "50GB", dataGb: 50, validity: 30, price: 26.84, currency: "EUR", ...nomadDefaults }),
-  turkeyPlan({ id: "turkey-nomad-unlimited-5", provider: "Nomad", name: "Unlimited", unlimited: true, validity: 5, price: 14.72, currency: "EUR", ...nomadDefaults, speedCap: "512kbps after the plan's daily high-speed allowance", fairUse: "High-speed allowance resets daily; then service continues at up to 512kbps", note: "Daily allowance and throttle apply" }),
-  turkeyPlan({ id: "turkey-nomad-unlimited-10", provider: "Nomad", name: "Unlimited", unlimited: true, validity: 10, price: 24.24, currency: "EUR", ...nomadDefaults, speedCap: "512kbps after the plan's daily high-speed allowance", fairUse: "High-speed allowance resets daily; then service continues at up to 512kbps", note: "Daily allowance and throttle apply" }),
+  turkeyPlan({ id: "turkey-nomad-unlimited-5", provider: "Nomad", name: "Unlimited", unlimited: true, validity: 5, price: 14.72, currency: "EUR", ...nomadDefaults, speedCap: "512kbps once the day's full-speed data is used", fairUse: "The full-speed amount resets each day; after it, you stay online at up to 512kbps", note: "Full speed up to a daily limit, then slower" }),
+  turkeyPlan({ id: "turkey-nomad-unlimited-10", provider: "Nomad", name: "Unlimited", unlimited: true, validity: 10, price: 24.24, currency: "EUR", ...nomadDefaults, speedCap: "512kbps once the day's full-speed data is used", fairUse: "The full-speed amount resets each day; after it, you stay online at up to 512kbps", note: "Full speed up to a daily limit, then slower" }),
   turkeyPlan({ id: "turkey-saily-1", provider: "Saily", name: "1GB", dataGb: 1, validity: 7, price: 3.49, currency: "EUR", ...sailyDefaults }),
   turkeyPlan({ id: "turkey-saily-3", provider: "Saily", name: "3GB", dataGb: 3, validity: 30, price: 5.99, currency: "EUR", ...sailyDefaults }),
   turkeyPlan({ id: "turkey-saily-5", provider: "Saily", name: "5GB", dataGb: 5, validity: 30, price: 8.99, currency: "EUR", ...sailyDefaults }),
@@ -117,34 +117,34 @@ type DatedPlanSeed = Omit<Plan, "checkedAt" | "reviewAfter">;
 const datedPlan = (seed: DatedPlanSeed): Plan => ({ ...seed, checkedAt: CHECKED_AT, reviewAfter: REVIEW_AFTER });
 
 const fixedAiralo = {
-  speed: "Network generation not confirmed on exact plan",
-  speedCap: "No throttle disclosed before the fixed allowance is used",
+  speed: "The provider doesn't confirm 4G or 5G on this plan",
+  speedCap: "No speed limit mentioned until your data runs out",
   tethering: "allowed" as const,
-  tetheringNote: "Hotspot supported when the phone and local network allow it",
-  fairUse: "Service stops or needs a top-up after the fixed allowance",
-  activation: "Check the exact plan's activation policy before installation",
-  note: "Fixed-data plan",
+  tetheringNote: "Hotspot works, as long as your phone and the local network allow it",
+  fairUse: "When the data runs out you'll need to top up",
+  activation: "Check when the plan starts counting down before you install it",
+  note: "A set amount of data",
   callingSupport: "data-only" as const,
 };
 const fixedNomad = {
   speed: "4G / 5G where available",
-  speedCap: "No throttle disclosed before the fixed allowance is used",
+  speedCap: "No speed limit mentioned until your data runs out",
   tethering: "allowed" as const,
-  tetheringNote: "Hotspot supported; rare device or network limits can affect stability",
-  fairUse: "Buy an add-on or another plan after the fixed allowance is used",
-  activation: "Check activation timing on the exact plan",
-  note: "Fixed-data plan",
+  tetheringNote: "Hotspot works, though it can occasionally be unreliable",
+  fairUse: "When the data runs out, buy an add-on or another plan",
+  activation: "Check when the plan starts counting down",
+  note: "A set amount of data",
   callingSupport: "data-only" as const,
 };
 const fixedSaily = {
   speed: "3G / 4G / LTE / 5G where available",
-  speedCap: "No throttle disclosed before the fixed allowance is used",
+  speedCap: "No speed limit mentioned until your data runs out",
   network: "Local partner networks",
   tethering: "allowed" as const,
-  tetheringNote: "Saily advertises unrestricted hotspot sharing",
-  fairUse: "Top up after the fixed allowance is used",
-  activation: "Check the live plan's activation policy before installation",
-  note: "Fixed-data plan",
+  tetheringNote: "Saily advertises hotspot sharing with no restrictions",
+  fairUse: "When the data runs out you can top up",
+  activation: "Check when the plan starts counting down before you install it",
+  note: "A set amount of data",
   callingSupport: "data-only" as const,
 };
 
@@ -152,40 +152,40 @@ const expandedPlans: Plan[] = [
   // United States
   datedPlan({ id: "united-states-airalo-1", destination: "united-states", provider: "Airalo", name: "1GB", dataGb: 1, validity: 7, price: 4, currency: "USD", network: "T-Mobile + Verizon", sourceUrl: "https://www.airalo.com/united-states-esim", ...fixedAiralo }),
   datedPlan({ id: "united-states-airalo-10", destination: "united-states", provider: "Airalo", name: "10GB", dataGb: 10, validity: 30, price: 22.5, currency: "USD", network: "T-Mobile + Verizon", sourceUrl: "https://www.airalo.com/united-states-esim/change-in-30days-10gb", ...fixedAiralo }),
-  datedPlan({ id: "united-states-airalo-unlimited", destination: "united-states", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 34, currency: "USD", speed: "Local 4G / 5G where available", speedCap: "1Mbps after 3GB high-speed data in 24 hours", network: "T-Mobile + Verizon", tethering: "allowed", tetheringNote: "No separate tethering-device limit stated", fairUse: "3GB high-speed per 24 hours, then 1Mbps until reset", activation: "Check the exact plan's activation policy", note: "Daily fair-use throttle", callingSupport: "data-only", sourceUrl: "https://www.airalo.com/united-states-esim" }),
-  datedPlan({ id: "united-states-airalo-voice-5", destination: "united-states", provider: "Airalo", name: "Change+ 5GB + 50 min/SMS", dataGb: 5, validity: 30, price: 19, currency: "USD", speed: "Local network; generation varies", speedCap: "No throttle disclosed before the fixed allowance is used", network: "T-Mobile + Verizon", tethering: "allowed", tetheringNote: "Hotspot supported when the phone and local network allow it", fairUse: "Includes 50 minutes and 50 SMS; incoming calls use minutes and international calls are excluded", activation: "Check the exact plan's activation policy", note: "US number with limited voice and SMS", callingSupport: "calls-texts", sourceUrl: "https://www.airalo.com/united-states-esim/change-plus-30days-5gb" }),
+  datedPlan({ id: "united-states-airalo-unlimited", destination: "united-states", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 34, currency: "USD", speed: "4G or 5G where available", speedCap: "1Mbps once you've used 3GB in a day", network: "T-Mobile + Verizon", tethering: "allowed", tetheringNote: "No limit stated on how many devices can share", fairUse: "3GB at full speed each day, then 1Mbps until it resets", activation: "Check when the plan starts counting down", note: "Slows down after a daily limit", callingSupport: "data-only", sourceUrl: "https://www.airalo.com/united-states-esim" }),
+  datedPlan({ id: "united-states-airalo-voice-5", destination: "united-states", provider: "Airalo", name: "Change+ 5GB + 50 min/SMS", dataGb: 5, validity: 30, price: 19, currency: "USD", speed: "Local network; 4G or 5G varies", speedCap: "No speed limit mentioned until your data runs out", network: "T-Mobile + Verizon", tethering: "allowed", tetheringNote: "Hotspot works, as long as your phone and the local network allow it", fairUse: "Includes 50 minutes and 50 texts. Incoming calls use your minutes, and international calls aren't covered", activation: "Check when the plan starts counting down", note: "Comes with a US number, plus some minutes and texts", callingSupport: "calls-texts", sourceUrl: "https://www.airalo.com/united-states-esim/change-plus-30days-5gb" }),
   datedPlan({ id: "united-states-nomad-1", destination: "united-states", provider: "Nomad", name: "1GB", dataGb: 1, validity: 7, price: 4.32, currency: "EUR", network: "T-Mobile", sourceUrl: "https://www.nomadesim.com/united-states-eSIM", ...fixedNomad }),
   datedPlan({ id: "united-states-nomad-10", destination: "united-states", provider: "Nomad", name: "10GB", dataGb: 10, validity: 30, price: 17.29, currency: "EUR", network: "T-Mobile", sourceUrl: "https://www.nomadesim.com/united-states-eSIM", ...fixedNomad }),
   datedPlan({ id: "united-states-saily-1", destination: "united-states", provider: "Saily", name: "1GB", dataGb: 1, validity: 7, price: 3.49, currency: "EUR", sourceUrl: "https://saily.com/esim-united-states/", ...fixedSaily }),
   datedPlan({ id: "united-states-saily-10", destination: "united-states", provider: "Saily", name: "10GB", dataGb: 10, validity: 30, price: 20.49, currency: "EUR", sourceUrl: "https://saily.com/esim-united-states/", ...fixedSaily }),
-  datedPlan({ id: "united-states-klook", destination: "united-states", provider: "Klook", name: "Flexible data catalogue", validity: 30, price: null, speed: "AT&T / Verizon 5G options", speedCap: "Varies by the selected package", network: "AT&T + Verizon options", tethering: "allowed", tetheringNote: "Hotspot listed as supported", fairUse: "Unlimited options list 15GB/day at full speed, then 1Mbps", activation: "Choose the exact allowance and 1–30 day validity live", note: "Exact package price must be checked live", callingSupport: "data-only", sourceUrl: "https://www.klook.com/activity/108033-usa-esim-travel/", catalogueOnly: true }),
+  datedPlan({ id: "united-states-klook", destination: "united-states", provider: "Klook", name: "Flexible data catalogue", validity: 30, price: null, speed: "AT&T / Verizon 5G options", speedCap: "Depends which package you choose", network: "AT&T + Verizon options", tethering: "allowed", tetheringNote: "Hotspot should work", fairUse: "Unlimited options give 15GB a day at full speed, then 1Mbps", activation: "Pick your allowance and 1–30 days on the provider's site", note: "Price is shown on the provider's own site", callingSupport: "data-only", sourceUrl: "https://www.klook.com/activity/108033-usa-esim-travel/", catalogueOnly: true }),
 
   // Spain
   datedPlan({ id: "spain-airalo-1", destination: "spain", provider: "Airalo", name: "1GB", dataGb: 1, validity: 7, price: 4, currency: "USD", network: "Orange", sourceUrl: "https://www.airalo.com/spain-esim", ...fixedAiralo }),
-  datedPlan({ id: "spain-airalo-10", destination: "spain", provider: "Airalo", name: "10GB", dataGb: 10, validity: 30, price: 14, currency: "USD", network: "Orange", sourceUrl: "https://www.airalo.com/spain-esim", ...fixedAiralo, note: "Mainland Spain and Balearic Islands; verify Canary Islands" }),
+  datedPlan({ id: "spain-airalo-10", destination: "spain", provider: "Airalo", name: "10GB", dataGb: 10, validity: 30, price: 14, currency: "USD", network: "Orange", sourceUrl: "https://www.airalo.com/spain-esim", ...fixedAiralo, note: "Covers mainland Spain and the Balearics — check separately for the Canaries" }),
   datedPlan({ id: "spain-nomad-1", destination: "spain", provider: "Nomad", name: "1GB", dataGb: 1, validity: 7, price: 3.46, currency: "EUR", network: "Orange + Movistar", sourceUrl: "https://www.nomadesim.com/spain-eSIM", ...fixedNomad }),
   datedPlan({ id: "spain-nomad-10", destination: "spain", provider: "Nomad", name: "10GB", dataGb: 10, validity: 30, price: 12.1, currency: "EUR", network: "Orange + Movistar", sourceUrl: "https://www.nomadesim.com/spain-eSIM", ...fixedNomad }),
   datedPlan({ id: "spain-saily-1", destination: "spain", provider: "Saily", name: "1GB", dataGb: 1, validity: 7, price: 3.49, currency: "EUR", sourceUrl: "https://saily.com/esim-spain/", ...fixedSaily }),
   datedPlan({ id: "spain-saily-10", destination: "spain", provider: "Saily", name: "10GB", dataGb: 10, validity: 30, price: 13.99, currency: "EUR", sourceUrl: "https://saily.com/esim-spain/", ...fixedSaily }),
-  datedPlan({ id: "spain-klook", destination: "spain", provider: "Klook", name: "Flexible data catalogue", validity: 30, price: null, speed: "Movistar 5G / Vodafone 4G LTE", speedCap: "Varies by the selected package", network: "Movistar + Vodafone ES options", tethering: "allowed", tetheringNote: "Hotspot listed as supported", fairUse: "Unlimited options list 15GB/day at full speed, then 1Mbps", activation: "Choose the exact allowance and 1–30 day validity live", note: "Exact package price must be checked live", callingSupport: "data-only", sourceUrl: "https://www.klook.com/activity/163606-5g-esim-spain-vodafone-orange-movistar-yoigo/", catalogueOnly: true }),
+  datedPlan({ id: "spain-klook", destination: "spain", provider: "Klook", name: "Flexible data catalogue", validity: 30, price: null, speed: "Movistar 5G / Vodafone 4G LTE", speedCap: "Depends which package you choose", network: "Movistar + Vodafone ES options", tethering: "allowed", tetheringNote: "Hotspot should work", fairUse: "Unlimited options give 15GB a day at full speed, then 1Mbps", activation: "Pick your allowance and 1–30 days on the provider's site", note: "Price is shown on the provider's own site", callingSupport: "data-only", sourceUrl: "https://www.klook.com/activity/163606-5g-esim-spain-vodafone-orange-movistar-yoigo/", catalogueOnly: true }),
 
   // Japan
   datedPlan({ id: "japan-airalo-20", destination: "japan", provider: "Airalo", name: "20GB", dataGb: 20, validity: 30, price: 25, currency: "USD", network: "SoftBank + KDDI", sourceUrl: "https://www.airalo.com/japan-esim/moshi-moshi-30days-20gb", ...fixedAiralo }),
-  datedPlan({ id: "japan-airalo-unlimited", destination: "japan", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 34.5, currency: "USD", speed: "Network generation not confirmed on exact plan", speedCap: "1Mbps after 3GB high-speed data in 24 hours", network: "SoftBank + KDDI", tethering: "allowed", tetheringNote: "No separate tethering cap stated", fairUse: "3GB high-speed per 24 hours, then 1Mbps until reset", activation: "Check the exact plan's activation policy", note: "Daily fair-use throttle", callingSupport: "data-only", sourceUrl: "https://www.airalo.com/japan-esim/moshi-moshi-10days-unlimited" }),
+  datedPlan({ id: "japan-airalo-unlimited", destination: "japan", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 34.5, currency: "USD", speed: "The provider doesn't confirm 4G or 5G on this plan", speedCap: "1Mbps once you've used 3GB in a day", network: "SoftBank + KDDI", tethering: "allowed", tetheringNote: "No separate limit on hotspot use", fairUse: "3GB at full speed each day, then 1Mbps until it resets", activation: "Check when the plan starts counting down", note: "Slows down after a daily limit", callingSupport: "data-only", sourceUrl: "https://www.airalo.com/japan-esim/moshi-moshi-10days-unlimited" }),
   datedPlan({ id: "japan-nomad-1", destination: "japan", provider: "Nomad", name: "1GB", dataGb: 1, validity: 7, price: 4, currency: "USD", network: "KDDI au + SoftBank", sourceUrl: "https://www.nomadesim.com/japan-eSIM", ...fixedNomad }),
   datedPlan({ id: "japan-nomad-10", destination: "japan", provider: "Nomad", name: "10GB", dataGb: 10, validity: 30, price: 16, currency: "USD", network: "KDDI au + SoftBank", sourceUrl: "https://www.nomadesim.com/japan-eSIM", ...fixedNomad }),
   datedPlan({ id: "japan-saily-1", destination: "japan", provider: "Saily", name: "1GB", dataGb: 1, validity: 7, price: 3.49, currency: "EUR", sourceUrl: "https://saily.com/esim-japan/", ...fixedSaily }),
   datedPlan({ id: "japan-saily-10", destination: "japan", provider: "Saily", name: "10GB", dataGb: 10, validity: 30, price: 15.99, currency: "EUR", sourceUrl: "https://saily.com/esim-japan/", ...fixedSaily }),
-  datedPlan({ id: "japan-klook", destination: "japan", provider: "Klook", name: "Flexible data catalogue", validity: 30, price: null, speed: "SoftBank 5G / Docomo 4G LTE options", speedCap: "Varies by the selected package", network: "SoftBank + Docomo options", tethering: "allowed", tetheringNote: "Hotspot listed as supported", fairUse: "Unlimited options list 10GB/day at full speed, then 128kbps", activation: "Choose the exact allowance and 1–30 day validity live", note: "Exact package price must be checked live", callingSupport: "data-only", sourceUrl: "https://www.klook.com/en-GB/activity/109393-japan-esim-high-speed-internet-qr-code-voucher/", catalogueOnly: true }),
+  datedPlan({ id: "japan-klook", destination: "japan", provider: "Klook", name: "Flexible data catalogue", validity: 30, price: null, speed: "SoftBank 5G / Docomo 4G LTE options", speedCap: "Depends which package you choose", network: "SoftBank + Docomo options", tethering: "allowed", tetheringNote: "Hotspot should work", fairUse: "Unlimited options give 10GB a day at full speed, then 128kbps", activation: "Pick your allowance and 1–30 days on the provider's site", note: "Price is shown on the provider's own site", callingSupport: "data-only", sourceUrl: "https://www.klook.com/en-GB/activity/109393-japan-esim-high-speed-internet-qr-code-voucher/", catalogueOnly: true }),
 
   // United Arab Emirates
   datedPlan({ id: "united-arab-emirates-airalo-20", destination: "united-arab-emirates", provider: "Airalo", name: "20GB", dataGb: 20, validity: 30, price: 34, currency: "USD", network: "Etisalat", sourceUrl: "https://www.airalo.com/united-arab-emirates-esim/burj-mobile-30days-20gb", ...fixedAiralo }),
-  datedPlan({ id: "united-arab-emirates-airalo-unlimited", destination: "united-arab-emirates", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 35, currency: "USD", speed: "Network generation not confirmed on exact plan", speedCap: "1Mbps after 3GB high-speed data in 24 hours", network: "Etisalat", tethering: "allowed", tetheringNote: "No separate tethering cap stated", fairUse: "3GB high-speed per 24 hours, then 1Mbps until reset", activation: "Check the exact plan's activation policy", note: "Daily fair-use throttle", callingSupport: "data-only", sourceUrl: "https://www.airalo.com/united-arab-emirates-esim/burj-mobile-10days-unlimited" }),
+  datedPlan({ id: "united-arab-emirates-airalo-unlimited", destination: "united-arab-emirates", provider: "Airalo", name: "Unlimited", unlimited: true, validity: 10, price: 35, currency: "USD", speed: "The provider doesn't confirm 4G or 5G on this plan", speedCap: "1Mbps once you've used 3GB in a day", network: "Etisalat", tethering: "allowed", tetheringNote: "No separate limit on hotspot use", fairUse: "3GB at full speed each day, then 1Mbps until it resets", activation: "Check when the plan starts counting down", note: "Slows down after a daily limit", callingSupport: "data-only", sourceUrl: "https://www.airalo.com/united-arab-emirates-esim/burj-mobile-10days-unlimited" }),
   datedPlan({ id: "united-arab-emirates-nomad-1", destination: "united-arab-emirates", provider: "Nomad", name: "1GB", dataGb: 1, validity: 7, price: 4, currency: "USD", network: "du", sourceUrl: "https://www.nomadesim.com/united-arab-emirates-eSIM/10gb-30day", ...fixedNomad }),
   datedPlan({ id: "united-arab-emirates-nomad-10", destination: "united-arab-emirates", provider: "Nomad", name: "10GB", dataGb: 10, validity: 30, price: 18.5, currency: "USD", network: "du", sourceUrl: "https://www.nomadesim.com/united-arab-emirates-eSIM/10gb-30day", ...fixedNomad }),
-  datedPlan({ id: "united-arab-emirates-saily-1", destination: "united-arab-emirates", provider: "Saily", name: "1GB", dataGb: 1, validity: 7, price: 7.99, currency: "EUR", sourceUrl: "https://saily.com/esim-united-arab-emirates/", ...fixedSaily, activation: "Buy and install before entering the UAE" }),
-  datedPlan({ id: "united-arab-emirates-saily-10", destination: "united-arab-emirates", provider: "Saily", name: "10GB", dataGb: 10, validity: 30, price: 17.99, currency: "EUR", sourceUrl: "https://saily.com/esim-united-arab-emirates/", ...fixedSaily, activation: "Buy and install before entering the UAE" }),
-  datedPlan({ id: "united-arab-emirates-klook", destination: "united-arab-emirates", provider: "Klook", name: "Flexible data catalogue", validity: 30, price: null, speed: "Etisalat 5G options", speedCap: "Varies by the selected package", network: "Etisalat", tethering: "allowed", tetheringNote: "Hotspot listed as supported", fairUse: "Unlimited options list 15GB/day at full speed, then 1Mbps", activation: "Choose the exact allowance and 1–30 day validity live", note: "Exact package price must be checked live", callingSupport: "data-only", sourceUrl: "https://www.klook.com/en-GB/activity/123940-uae-esim-high-speed-internet-qr-code-voucher/", catalogueOnly: true }),
+  datedPlan({ id: "united-arab-emirates-saily-1", destination: "united-arab-emirates", provider: "Saily", name: "1GB", dataGb: 1, validity: 7, price: 7.99, currency: "EUR", sourceUrl: "https://saily.com/esim-united-arab-emirates/", ...fixedSaily, activation: "Buy and install this before you arrive in the UAE" }),
+  datedPlan({ id: "united-arab-emirates-saily-10", destination: "united-arab-emirates", provider: "Saily", name: "10GB", dataGb: 10, validity: 30, price: 17.99, currency: "EUR", sourceUrl: "https://saily.com/esim-united-arab-emirates/", ...fixedSaily, activation: "Buy and install this before you arrive in the UAE" }),
+  datedPlan({ id: "united-arab-emirates-klook", destination: "united-arab-emirates", provider: "Klook", name: "Flexible data catalogue", validity: 30, price: null, speed: "Etisalat 5G options", speedCap: "Depends which package you choose", network: "Etisalat", tethering: "allowed", tetheringNote: "Hotspot should work", fairUse: "Unlimited options give 15GB a day at full speed, then 1Mbps", activation: "Pick your allowance and 1–30 days on the provider's site", note: "Price is shown on the provider's own site", callingSupport: "data-only", sourceUrl: "https://www.klook.com/en-GB/activity/123940-uae-esim-high-speed-internet-qr-code-voucher/", catalogueOnly: true }),
 ];
 
 export const plans: Plan[] = [...turkeyPlans, ...expandedPlans];
@@ -196,6 +196,8 @@ export function hasPricedPlans(destination: DestinationId) {
 }
 
 export function isPlanStale(plan: Plan, now = new Date()) {
+  // Live API plans are fetched per request, so the manual review window does not apply.
+  if (plan.live) return false;
   return isReviewDateDue(plan.reviewAfter, now);
 }
 

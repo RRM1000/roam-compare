@@ -1,0 +1,81 @@
+import { pricedDestinationIds } from "./catalog";
+import { destinations } from "./destinations";
+import { networkNames } from "./roaming";
+
+export type FaqEntry = { question: string; answer: string };
+
+/**
+ * The FAQ, as plain strings, so the visible accordion and the FAQPage structured
+ * data are generated from one source.
+ *
+ * Google requires structured data to match what the page actually shows. Keeping
+ * two copies would drift the moment either is edited, and a mismatch is treated
+ * as spam rather than as a mistake.
+ */
+export function getFaq(): FaqEntry[] {
+  const destinationCount = destinations.length;
+  const networkCount = Object.keys(networkNames).length;
+  const pricedCount = pricedDestinationIds.length;
+
+  return [
+    {
+      question: "Do you work out what my own network would charge?",
+      answer:
+        `On EE, for all ${destinationCount} destinations. On the other nine networks, for Turkey, the United States, Spain, Japan and the UAE. ` +
+        "A few combinations depend on your individual account — Vodafone and VOXI for Turkey, Vodafone and Sky for Japan — and there we send you to your network’s own checker rather than invent a number. " +
+        "We’re working through the remaining networks zone by zone. Pick the tariff that applies to you and we work out the daily fees, the cheapest combination of passes, or the per-megabyte rate from your network’s published charges. " +
+        "We only claim a saving when roaming would actually cover your whole trip and everything else you asked for.",
+    },
+    {
+      question: "Are these prices live?",
+      answer:
+        "Saily’s are — they come from Saily’s own feed in pounds, refreshed at least every three hours, and are marked “Live price”. " +
+        `Airalo and Nomad prices are checked by hand, show the date we checked, and drop out of the ranking after seven days. ` +
+        "Klook never shows a price here, because we cannot read one reliably; that link takes you to their own page.",
+    },
+    {
+      question: "Why does one provider show several plans?",
+      answer:
+        "Because more than one can fit your trip — a bigger allowance, a longer validity, or unlimited data. " +
+        "We hide the ones that cost more without giving you more, and you can show those again at any time. Pin up to three to compare side by side.",
+    },
+    {
+      question: "Where do I find hotspot and speed limits?",
+      answer:
+        "Open “Hotspot, speed & other limits” on any plan. It covers whether you can tether, what happens when you hit a speed cap, " +
+        "what the fair-use rules are, when the plan starts counting down, and which local network you will be on. " +
+        "If it says “check plan”, the provider’s own wording was not clear enough for us to promise you either way.",
+    },
+    {
+      question: "Can I make normal calls on these?",
+      answer:
+        "Usually not. Most travel eSIMs give you data only — WhatsApp and FaceTime work, but your phone number does not. " +
+        "If you need real calls and texts, answer “Yes” in the form and we will only recommend a plan that we have confirmed includes them.",
+    },
+    {
+      question: "Will an eSIM work on my phone?",
+      answer:
+        "Search for your exact model and we will check it against manufacturer guidance. Two things we cannot check for you: " +
+        "whether your phone is locked to a UK network, and which regional version you own — some models sold in certain countries have no eSIM at all. Confirm both before buying.",
+    },
+    {
+      question: "How many destinations do you cover?",
+      answer:
+        `${destinationCount} destinations and all ${networkCount} UK networks. ` +
+        `Saily prices every destination live; ${pricedCount} of them also carry hand-checked prices from Airalo and Nomad.`,
+    },
+  ];
+}
+
+/** FAQPage structured data, built from the same entries the page renders. */
+export function getFaqJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: getFaq().map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer },
+    })),
+  };
+}
