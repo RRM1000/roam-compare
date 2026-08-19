@@ -35,6 +35,8 @@ export type InitialComparison = {
   usage: Usage;
   callsNeed: CallsNeed;
   roamingAllowance: string;
+  /** A shared link named a roaming tariff that does not apply to its destination. */
+  scenarioDropped?: boolean;
   sortMode: SortMode;
   unlimitedOnly: boolean;
   fiveGOnly: boolean;
@@ -168,6 +170,7 @@ export default function CompareExperience({ initial = defaultComparison, destina
   const [pinStatus, setPinStatus] = useState("");
   const [showAllPlans, setShowAllPlans] = useState(false);
   const [showAllDestinations, setShowAllDestinations] = useState(false);
+  const [allowanceNeedsChecking, setAllowanceNeedsChecking] = useState(false);
   const resultsHeadingRef = useRef<HTMLHeadingElement>(null);
   const compareHeadingRef = useRef<HTMLHeadingElement>(null);
   const savedToggleRef = useRef<HTMLButtonElement>(null);
@@ -322,9 +325,12 @@ export default function CompareExperience({ initial = defaultComparison, destina
 
   function updateDestination(nextDestination: DestinationId) {
     setDestination(nextDestination);
+    // Tariffs are destination-specific, so they genuinely have to go. The
+    // allowance describes the reader's own contract, so it stays — flagged,
+    // because some plans meter different zones differently.
     setScenario("");
     setCustomCost("");
-    setRoamingAllowance("");
+    setAllowanceNeedsChecking(roamingAllowance.trim() !== "");
     setPinnedIds([]);
     setPinStatus("");
     setShowAllPlans(false);
@@ -499,12 +505,12 @@ export default function CompareExperience({ initial = defaultComparison, destina
 
 
           <div className="roaming-panel" id="roaming-panel">
-            <div className="roaming-panel-head"><div><strong>Compare with your own network</strong><p>Optional. Tell us who you&rsquo;re with and we&rsquo;ll work out what roaming would cost for this trip.</p></div>{roaming && <span className="roaming-panel-done">Added</span>}</div>
+            <div className="roaming-panel-head"><div><strong>Compare with your own network</strong><p>{initial.scenarioDropped && !scenario ? `This link’s roaming tariff doesn’t apply to ${activeDestination.name}, so we couldn’t restore it — pick the one that fits and the comparison will update.` : "Optional. Tell us who you’re with and we’ll work out what roaming would cost for this trip."}</p></div>{roaming && <span className="roaming-panel-done">Added</span>}</div>
             <div className="field-grid"><label className="field"><span>Your UK network</span><select value={network} onChange={(event) => updateNetwork(event.target.value as Network | "")} aria-label="UK mobile network"><option value="" disabled>Choose your network</option>{Object.entries(networkNames).map(([key, name]) => <option value={key} key={key}>{name}</option>)}</select><small className="field-help">We won’t guess — roaming costs differ far too much between networks.</small></label>
                   <label className="field"><span>On how many trip days will you use paid UK-network roaming?</span><select value={roamingDays} onChange={(event) => updateRoamingDays(Number(event.target.value))} aria-label="UK roaming days">{Array.from({ length: days + 1 }, (_, index) => index).map((length) => <option value={length} key={length}>{length === 0 ? "0 — eSIM/Wi-Fi only" : `${length} ${length === 1 ? "day" : "days"}`}</option>)}</select><small className="field-help">Usually your whole trip. Choose 0 if you’ll rely entirely on an eSIM or Wi-Fi.</small></label>
                   <label className="field"><span>Which tariff or roaming option applies?</span><select value={scenario} onChange={(event) => updateScenario(event.target.value)} aria-label="Roaming plan situation" disabled={!network}><option value="" disabled>{network ? "Choose your tariff or entitlement" : "Choose a network first"}</option>{network && getScenarioOptions(network, destination).map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}</select><small className="field-help">When you took out your plan changes what you pay. Pick the closest match.</small></label>
                   {scenario === "custom" && <label className="field"><span>Total roaming cost for this trip (£)</span><input inputMode="decimal" min="0" step="0.01" type="number" value={customCost} onChange={(event) => setCustomCost(event.target.value)} placeholder="For example, 35" required /></label>}
-                  <label className="field"><span>Data available through your UK plan abroad (GB)</span><input inputMode="decimal" min="0" step="0.1" type="number" value={roamingAllowance} onChange={(event) => setRoamingAllowance(event.target.value)} placeholder="For example, 12" /><small className="field-help">Only needed for passes that use your normal UK data. Leave blank if you’re not sure.</small></label>
+                  <label className="field"><span>Data available through your UK plan abroad (GB)</span><input inputMode="decimal" min="0" step="0.1" type="number" value={roamingAllowance} onChange={(event) => { setRoamingAllowance(event.target.value); setAllowanceNeedsChecking(false); }} placeholder="For example, 12" /><small className={`field-help${allowanceNeedsChecking ? " needs-checking" : ""}`}>{allowanceNeedsChecking ? `Still using ${roamingAllowance}GB — check that applies in ${activeDestination.name}.` : "Only needed for passes that use your normal UK data. Leave blank if you’re not sure."}</small></label>
                 </div>
           </div>
           <button className={`compatibility-trigger ${compatibility}`} id="compatibility-trigger" type="button" aria-expanded={showCompatibility} aria-controls="compatibility-panel" onClick={() => setShowCompatibility((shown) => !shown)}><span><i aria-hidden="true" />{compatibility === "ready" ? `${selectedDeviceName} looks eSIM-ready` : compatibility === "check" ? "Check this phone’s exact version" : compatibility === "blocked" ? "Compatibility needs attention" : "Will an eSIM work on your phone?"}</span><b aria-hidden="true">{showCompatibility ? "−" : "+"}</b></button>

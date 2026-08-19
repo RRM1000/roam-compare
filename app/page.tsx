@@ -42,7 +42,7 @@ function resolveComparison(params: SearchParams): InitialComparison {
   const fiveGOnly = first(params.fiveG) === "1";
   const tetheringOnly = first(params.tethering) === "1";
 
-  return { destination, days, roamingDays, network, scenario, usage, callsNeed, roamingAllowance, sortMode, unlimitedOnly, fiveGOnly, tetheringOnly, compared: first(params.compare) === "1" };
+  return { destination, days, roamingDays, network, scenario, usage, callsNeed, roamingAllowance, scenarioDropped: requestedScenario !== "" && scenario === "", sortMode, unlimitedOnly, fiveGOnly, tetheringOnly, compared: first(params.compare) === "1" };
 }
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {

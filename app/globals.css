@@ -500,3 +500,6 @@ footer .brand { color:var(--ink); }
 .rail-more:hover { border-color:var(--lime); color:var(--lime); }
 
 /* Multi-pack totals are a modelling assumption, not normal buying advice. */
+
+/* A value kept across a destination change, which the reader should re-check. */
+.field-help.needs-checking { color:#8a5d00; font-weight:750; }
