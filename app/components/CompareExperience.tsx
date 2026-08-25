@@ -47,6 +47,9 @@ export type InitialComparison = {
 type PlanMatch = ReturnType<typeof getPlanMatch>;
 type SavedComparison = { label: string; url: string; savedAt: string };
 
+/** Rows drawn per provider before the "show more" toggle. */
+const PROVIDER_ROW_CAP = 4;
+
 const defaultComparison: InitialComparison = {
   destination: "turkey",
   days: 7,
@@ -278,13 +281,20 @@ export default function CompareExperience({ initial = defaultComparison, destina
         .sort(compareMatches);
       const rankable = matches.filter((plan) => plan.gbpTotal !== null && !plan.catalogueOnly && !isPlanStale(plan) && (callsNeed !== "yes" || plan.callingSupport === "calls-texts"));
       const { shown, dominated } = partitionDominated(matches);
-      return { provider, matches: showAllPlans ? matches : shown, dominatedCount: dominated.length, dominatedIds: new Set(dominated.map((plan) => plan.id)), bestPrice: Math.min(...rankable.map((plan) => plan.gbpTotal!), Infinity) };
+      // Providers with a deep catalogue (Airalo lists ten plans for a single week)
+      // would otherwise bury the others. Counts and the best-value pick below read
+      // the full list, so the cap only affects how many rows are drawn.
+      const visible = showAllPlans ? matches : shown.slice(0, PROVIDER_ROW_CAP);
+      return { provider, matches: visible, allMatches: matches, hiddenCount: matches.length - visible.length, dominatedCount: dominated.length, dominatedIds: new Set(dominated.map((plan) => plan.id)), bestPrice: Math.min(...rankable.map((plan) => plan.gbpTotal!), Infinity) };
     }).filter((group) => group.matches.length > 0).sort((a, b) => a.bestPrice - b.bestPrice || a.provider.localeCompare(b.provider));
   }, [callsNeed, comparisonPlans, days, fiveGOnly, neededData, showAllPlans, sortMode, tetheringOnly, unlimitedOnly]);
 
   const dominatedCount = groupedPlans.reduce((total, group) => total + group.dominatedCount, 0);
+  const hiddenCount = groupedPlans.reduce((total, group) => total + group.hiddenCount, 0);
 
-  const allMatches = groupedPlans.flatMap((group) => group.matches.map((plan) => ({ provider: group.provider, plan })));
+  // Reads every match, not just the visible ones, so the row cap can never change
+  // which plan is recommended or how many the toolbar reports.
+  const allMatches = groupedPlans.flatMap((group) => group.allMatches.map((plan) => ({ provider: group.provider, plan })));
   const suggestionCount = allMatches.length;
   const pricedPlanCount = allMatches.filter(({ plan }) => !plan.catalogueOnly).length;
   const handoffCount = suggestionCount - pricedPlanCount;
@@ -525,8 +535,8 @@ export default function CompareExperience({ initial = defaultComparison, destina
           {bestPricedPlan && <div className="decision-card"><div><span className="decision-label">Best value for this trip</span><h3>{bestPricedPlan.provider} · {bestPricedPlan.plan.name}</h3><p>{callsNeed === "yes" ? "This one includes normal calls and texts — check how many are included before you buy." : "Enough data for your whole trip at the lowest total we found. Check the limits below; the price at checkout can differ."}</p></div><div className="decision-price"><small>Estimated trip total</small><strong>≈ {money.format(bestPricedPlan.plan.gbpTotal!)}</strong>{canCompareSavings && roaming?.cost !== null && roaming.cost - bestPricedPlan.plan.gbpTotal! > 0.5 && <span>About {money.format(roaming.cost - bestPricedPlan.plan.gbpTotal!)} less than roaming that meets everything you asked for</span>}</div>{compatibility === "blocked" ? <span className="decision-blocked">Resolve compatibility first</span> : <a href={getPlanUrl(bestPricedPlan.plan, activeDestination)} target="_blank" rel={isAffiliateProvider(bestPricedPlan.provider) ? "sponsored noopener noreferrer" : "noopener noreferrer"}>See this plan <span aria-hidden="true">↗</span></a>}</div>}
 
           {callsNeed === "yes" && !bestPricedPlan && <aside className="need-warning"><strong>None of the plans we can price include normal calls and texts.</strong><p>Data-only eSIMs can still run WhatsApp, FaceTime and similar apps. Do not treat them as a replacement for a mobile number.</p></aside>}
-          <div className="plan-controls" aria-label="Sort and filter plans"><label>Sort by <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)}><option value="price">Estimated total</option><option value="data">Data allowance</option><option value="validity">Validity</option></select></label><div><label><input type="checkbox" checked={unlimitedOnly} onChange={(event) => setUnlimitedOnly(event.target.checked)} /> Unlimited only</label><label><input type="checkbox" checked={fiveGOnly} onChange={(event) => setFiveGOnly(event.target.checked)} /> 5G listed</label><label><input type="checkbox" checked={tetheringOnly} onChange={(event) => setTetheringOnly(event.target.checked)} /> Hotspot allowed</label></div>{(dominatedCount > 0 || showAllPlans) && <button className="show-all-toggle" type="button" aria-pressed={showAllPlans} onClick={() => setShowAllPlans((shown) => !shown)}>{showAllPlans ? "Hide plans that cost more for the same data" : `Show ${dominatedCount} more that cost more for the same data`}</button>}</div>
-          <div className="results-toolbar"><p><strong>{pricedPlanCount === 0 ? `No single eSIM covers a ${days}-day trip` : callsNeed === "yes" ? `${requirementMatchCount} meet your calls/SMS requirement · ${pricedPlanCount} big enough for this trip` : `${pricedPlanCount} ${pricedPlanCount === 1 ? "plan" : "plans"} big enough for this trip`}</strong>{handoffCount > 0 ? ` · ${handoffCount} provider ${handoffCount === 1 ? "catalogue" : "catalogues"} to check yourself` : ""} across {groupedPlans.length} providers{dominatedCount > 0 && !showAllPlans ? `, with ${dominatedCount} hidden` : ""}</p><span>{pricedDestination ? "Ranked by estimated trip total. Plans without a current price can’t be ranked and appear last. Commission never changes the order." : "No stored prices — we’ll send you to the provider"}</span></div>
+          <div className="plan-controls" aria-label="Sort and filter plans"><label>Sort by <select value={sortMode} onChange={(event) => setSortMode(event.target.value as SortMode)}><option value="price">Estimated total</option><option value="data">Data allowance</option><option value="validity">Validity</option></select></label><div><label><input type="checkbox" checked={unlimitedOnly} onChange={(event) => setUnlimitedOnly(event.target.checked)} /> Unlimited only</label><label><input type="checkbox" checked={fiveGOnly} onChange={(event) => setFiveGOnly(event.target.checked)} /> 5G listed</label><label><input type="checkbox" checked={tetheringOnly} onChange={(event) => setTetheringOnly(event.target.checked)} /> Hotspot allowed</label></div>{(hiddenCount > 0 || showAllPlans) && <button className="show-all-toggle" type="button" aria-pressed={showAllPlans} onClick={() => setShowAllPlans((shown) => !shown)}>{showAllPlans ? "Show fewer plans" : hiddenCount === dominatedCount ? `Show ${dominatedCount} more that cost more for the same data` : `Show ${hiddenCount} more ${hiddenCount === 1 ? "plan" : "plans"}`}</button>}</div>
+          <div className="results-toolbar"><p><strong>{pricedPlanCount === 0 ? `No single eSIM covers a ${days}-day trip` : callsNeed === "yes" ? `${requirementMatchCount} meet your calls/SMS requirement · ${pricedPlanCount} big enough for this trip` : `${pricedPlanCount} ${pricedPlanCount === 1 ? "plan" : "plans"} big enough for this trip`}</strong>{handoffCount > 0 ? ` · ${handoffCount} provider ${handoffCount === 1 ? "catalogue" : "catalogues"} to check yourself` : ""} across {groupedPlans.length} providers{hiddenCount > 0 && !showAllPlans ? `, with ${hiddenCount} hidden` : ""}</p><span>{pricedDestination ? "Ranked by estimated trip total. Plans without a current price can’t be ranked and appear last. Commission never changes the order." : "No stored prices — we’ll send you to the provider"}</span></div>
 
           {pinnedPlans.length > 0 && <section className="pinned-comparison" id="pinned-comparison" aria-labelledby="pinned-title">
             <div><h3 id="pinned-title">Side-by-side shortlist</h3><span>{pinnedPlans.length}/3 pinned</span></div>

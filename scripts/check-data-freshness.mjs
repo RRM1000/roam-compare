@@ -89,6 +89,15 @@ function sourceIntegrityErrors(groups, now) {
   } catch {
     errors.push(`GBP conversion assumptions: invalid evidence URL ${FX_EVIDENCE.url}`);
   }
+  // A source refreshed today alongside one that expired last week means no date
+  // exists where the whole dataset is simultaneously valid. Worth naming
+  // explicitly, because the per-source DUE lines do not make it obvious.
+  const newestChecked = [...groups.map((plan) => plan.checkedAt), ...Object.values(esimSources).map((source) => source.checkedAt), FX_EVIDENCE.checkedAt].sort().at(-1);
+  const earliestReview = [...groups.map((plan) => plan.reviewAfter), ...Object.values(esimSources).map((source) => source.reviewAfter), ROAMING_REVIEW_AFTER, FX_EVIDENCE.reviewAfter].sort()[0];
+  if (newestChecked > earliestReview) {
+    errors.push(`sources disagree: newest checkedAt is ${newestChecked} but the earliest reviewAfter is ${earliestReview}, so no date has every source fresh at once`);
+  }
+
   for (const destination of pricedDestinationIds) {
     const hasFreshPricedPlan = plans.some((plan) => plan.destination === destination && plan.price !== null && !reviewIsDue(plan.reviewAfter, now));
     if (!hasFreshPricedPlan) errors.push(`${destination}: no fresh priced plan is available`);
