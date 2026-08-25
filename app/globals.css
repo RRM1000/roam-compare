@@ -311,6 +311,11 @@ h2 { font-family:Georgia,"Times New Roman",serif; font-size:clamp(35px,4.5vw,58p
 .price-block strong { font-family:Georgia,"Times New Roman",serif; font-size:27px; font-weight:500; letter-spacing:-.04em; white-space:nowrap; }
 .price-block small { color:#075f57; font-size:0.875rem; font-weight:850; }
 .price-block small.negative { color:#8a3526; }
+/* The saving against roaming appears on most rows, so it reads as a figure
+   rather than a sentence — twelve copies of the same clause was noise. The
+   full wording stays in the title attribute and on the decision card. */
+.price-block small.versus-roaming { align-items:baseline; display:flex; gap:6px; justify-content:flex-end; white-space:nowrap; }
+.price-block small.versus-roaming>span { color:var(--muted); font-size:0.8125rem; font-weight:500; letter-spacing:.02em; }
 .deal-button { background:var(--forest); color:var(--white); gap:24px; min-width:145px; padding:14px 17px; }
 .deal-button:hover { background:var(--teal); transform:translateY(-1px); }
 .deal-button.disabled { background:#a7aaa6; cursor:not-allowed; justify-content:center; }

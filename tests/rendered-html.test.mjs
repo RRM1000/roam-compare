@@ -247,3 +247,26 @@ test("private launch controls block crawlers and expose launch-ready routes", as
   assert.match(xml, /\/destinations\/japan<\/loc>/);
   assert.match(xml, /\/destinations\/united-arab-emirates<\/loc>/);
 });
+
+test("the saving against roaming is stated once in prose, not on every row", async () => {
+  const response = await render("/?compare=1&destination=turkey&days=7&roamingDays=7&network=ee&scenario=ee-current&usage=everyday&calls=no&allowance=10");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const text = visible(html);
+
+  // The full clause belongs on the decision card and nowhere else; it used to
+  // repeat on every priced row, which buried the rows' own numbers. Tags are
+  // stripped first so the title attributes below are not counted as prose.
+  const onScreen = text.replace(/<[^>]*>/g, " ");
+  const prose = onScreen.match(/less than roaming that meets everything you asked for/g) ?? [];
+  assert.equal(prose.length, 1, `expected one prose saving, found ${prose.length}`);
+
+  // Rows carry the same figure in a compact labelled form instead.
+  const figures = html.match(/class="versus-roaming"/g) ?? [];
+  assert.ok(figures.length > 1, "expected the compact saving on several rows");
+  assert.match(onScreen, /vs roaming/);
+
+  // The long wording stays available as the title, so nothing is lost to
+  // anyone reading the row on its own.
+  assert.match(html, /title="About £[\d.,]+ less than roaming that meets everything you asked for"/);
+});
