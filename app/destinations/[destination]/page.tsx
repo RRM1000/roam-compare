@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CompareExperience, { type InitialComparison } from "@/app/components/CompareExperience";
 import { destinationById, destinations, isDestination } from "@/lib/destinations";
+import { fetchNomadPlans } from "@/lib/nomad-live";
 import { fetchSailyPlans } from "@/lib/saily-live";
 import { getSiteOrigin } from "@/lib/site-url";
 
@@ -46,7 +47,8 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
     tetheringOnly: false,
     compared: false,
   };
-  const [livePlans, origin] = [await fetchSailyPlans(), await getSiteOrigin()];
+  const [[saily, nomad], origin] = [await Promise.all([fetchSailyPlans(), fetchNomadPlans()]), await getSiteOrigin()];
+  const livePlans = [...(saily ?? []), ...(nomad ?? [])];
   const destination = destinationById[requested];
   const breadcrumbs = {
     "@context": "https://schema.org",
@@ -59,7 +61,7 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
-      <CompareExperience initial={initial} livePlans={livePlans ?? undefined} destinationLanding />
+      <CompareExperience initial={initial} livePlans={livePlans.length ? livePlans : undefined} destinationLanding />
     </>
   );
 }

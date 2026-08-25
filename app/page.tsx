@@ -3,6 +3,7 @@ import CompareExperience, { type CallsNeed, type InitialComparison, type SortMod
 import { tripLengths, type Usage } from "@/lib/catalog";
 import { destinationById, isDestination, type DestinationId } from "@/lib/destinations";
 import { getScenarioOptions, isNetwork, type Network } from "@/lib/roaming";
+import { fetchNomadPlans } from "@/lib/nomad-live";
 import { fetchSailyPlans } from "@/lib/saily-live";
 import { getFaqJsonLd } from "@/lib/faq";
 import { getSiteOrigin } from "@/lib/site-url";
@@ -63,9 +64,11 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 }
 
 export default async function HomePage({ searchParams }: PageProps) {
-  const sailyPlans = fetchSailyPlans();
+  // Both feeds start before the params are resolved, so they overlap.
+  const feeds = Promise.all([fetchSailyPlans(), fetchNomadPlans()]);
   const initial = resolveComparison((await searchParams) ?? {});
-  const [livePlans, origin] = [await sailyPlans, await getSiteOrigin()];
+  const [[saily, nomad], origin] = [await feeds, await getSiteOrigin()];
+  const livePlans = [...(saily ?? []), ...(nomad ?? [])];
   // Built from lib/faq.ts, the same source the visible accordion renders from.
   const structuredData = [
     getFaqJsonLd(),
@@ -74,7 +77,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <CompareExperience initial={initial} livePlans={livePlans ?? undefined} />
+      <CompareExperience initial={initial} livePlans={livePlans.length ? livePlans : undefined} />
     </>
   );
 }

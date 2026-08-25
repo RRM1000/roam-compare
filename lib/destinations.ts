@@ -122,7 +122,17 @@ function nomadProductUrl(destination: Destination) {
  * so when the approved link arrives, add its host here — one line, and every
  * Nomad link on the site becomes a tracking link.
  */
-const NOMAD_TRACKING_HOSTS = ["nomadesim.com"];
+const NOMAD_TRACKING_HOSTS = [
+  "nomadesim.com",
+  // Nomad runs its programme through Impact, which issues click URLs on its
+  // own domains rather than the advertiser's. These are Impact's standard
+  // click hosts; add the one your dashboard actually issues if it differs.
+  "pxf.io",
+  "sjv.io",
+  "ojrq.net",
+  "7eer.net",
+  "evyy.net",
+];
 
 /**
  * Returns the configured Nomad tracking URL, or undefined when none is set or
@@ -144,7 +154,11 @@ export function getConfiguredNomadUrl(destination: DestinationId) {
 
   try {
     const url = new URL(value);
-    const allowedHost = NOMAD_TRACKING_HOSTS.some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`));
+    // Impact also issues per-account click domains of the form imp.i123456.net,
+    // which no fixed list can enumerate.
+    const allowedHost =
+      NOMAD_TRACKING_HOSTS.some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`))
+      || /^imp\.i\d+\.net$/.test(url.hostname);
     if (url.protocol !== "https:" || !allowedHost || url.username || url.password) return undefined;
     return url.toString();
   } catch {

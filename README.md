@@ -53,6 +53,31 @@ the Cloudflare Workers runtime (verified against workerd) and from `curl` with a
 a plain `node` script cannot smoke-test it. `npm test` therefore exercises the response mapper against a
 captured fixture rather than the network.
 
+## Nomad live pricing
+
+Nomad's affiliate programme runs through Impact, which publishes the full product
+catalogue with prices and a ready-made tracking URL per item. `lib/nomad-live.ts` reads
+catalog `29881` from the Impact partner API, giving live prices for all 20 destinations
+and removing Nomad from the manual snapshot burden.
+
+```text
+IMPACT_ACCOUNT_SID
+IMPACT_AUTH_TOKEN
+```
+
+Both are required together and are **server-only**. Without them Nomad falls back to the
+dated snapshots in `lib/catalog.ts`.
+
+Two things worth knowing. The catalogue is **USD only** — `Currency`, `CurrencyCode` and
+`currency` query parameters were all tested and ignored — so Nomad prices are converted at
+the rounded reference rate and labelled as estimates, unlike Saily's real GBP.
+
+And the destination is read from each item's **tracking URL**, not its name. Product names
+arrive in at least six shapes (`Local Turkey - 30 Days - 10 GB`, `Local Jersey - 3 GB - 30
+Days` with the order reversed, `Anguilla_10GB_30Day`, `Gabon 3 GB 30 Days`, `Nomad -
+Pakistan- 30 Days - 5 GB`), so parsing a country from them is fragile. Every tracking URL
+carries the real landing page in its `u` parameter, which is consistent.
+
 ## Nomad affiliate links
 
 Nomad (a LotusFlare brand) is pre-wired but dormant. With no environment variable set, Nomad links
