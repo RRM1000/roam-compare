@@ -49,8 +49,8 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.equal((html.match(/<option value="(?:turkey|united-states|spain|france|italy|greece|portugal|germany|netherlands|ireland|cyprus|united-arab-emirates|thailand|japan|australia|canada|mexico|morocco|egypt|indonesia)"/g) ?? []).length, 20);
   assert.match(text, /Will an eSIM work on your phone\?/);
   assert.match(text, /Hotspot, speed &amp; other limits/);
-  assert.match(text, /Speed cap \/ throttle/);
-  assert.match(text, /Fair use \/ exhaustion/);
+  assert.match(text, /Speed limit/);
+  assert.match(text, /When the data runs out/);
   assert.match(text, /Pin to compare/);
   assert.match(text, /Sort by/);
   assert.match(text, /Save on this device/);
@@ -192,7 +192,7 @@ test("\"Live price\" means one thing, and an unpriced plan never claims a checke
   // catalogueOnly, which is exactly the case that used to slip through.
   const klook = html.match(/<h3>Klook<\/h3>[\s\S]*?<\/article>/)?.[0] ?? "";
   assert.ok(klook, "Klook provider card should render");
-  assert.match(klook, /Price at provider/);
+  assert.match(klook, /Price on their site/);
   assert.doesNotMatch(klook, /Checked \d+ \w+ \d{4}/, "an unpriced plan must not claim a checked price");
   assert.doesNotMatch(klook, /Live price/);
 });

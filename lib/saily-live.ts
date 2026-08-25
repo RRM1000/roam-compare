@@ -143,7 +143,7 @@ export function mapSailyPlans(items: unknown, checkedAt: string): Plan[] {
       unlimited && throttle && highSpeed !== null
         ? `${throttle} once you've used ${highSpeed}${highSpeedUnit}${resetInterval ? ` in a ${resetInterval}` : ""}`
         : unlimited
-          ? "Full-speed data is subject to the provider's fair-use policy"
+          ? "Called unlimited, but a daily fair-use limit applies"
           : "No speed limit mentioned until your data runs out";
 
     const fairUse =

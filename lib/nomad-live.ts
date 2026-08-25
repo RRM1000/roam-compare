@@ -136,7 +136,7 @@ export function mapNomadItems(items: unknown, checkedAt: string): Plan[] {
       currency: "USD",
       speed: "4G or 5G where available",
       speedCap: unlimited
-        ? "Full-speed data is subject to the provider's fair-use policy"
+        ? "Called unlimited, but a daily fair-use limit applies"
         : "No speed limit mentioned until your data runs out",
       network: "Local partner networks",
       tethering: "allowed",
