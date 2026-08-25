@@ -99,14 +99,14 @@ export const networkNames: Record<Network, string> = {
 type ScenarioOption = { value: string; label: string };
 const common: ScenarioOption[] = [{ value: "included", label: "Roaming is included in my plan" }, { value: "custom", label: "Enter my own trip cost" }];
 export const scenarioOptions: Record<Network, Array<{ value: string; label: string }>> = {
-  ee: [{ value: "ee-current", label: "EE RoW Zone 1 passes" }, ...common],
+  ee: [{ value: "ee-current", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
   o2: [{ value: "o2-travel", label: "O2 Travel — £7 on days used" }, { value: "included", label: "O2 Travel is included in my plan" }, { value: "custom", label: "Enter my own trip cost" }],
   vodafone: [{ value: "vodafone-check", label: "I need to check my Vodafone plan" }, { value: "included", label: "Turkey is included in my plan" }, { value: "custom", label: "Enter my own trip cost" }],
   three: [{ value: "plan-check", label: "Check your Go Roam rate in My3" }, ...common],
-  "id-mobile": [{ value: "id-roam-beyond", label: "Roam Beyond data add-ons" }, ...common],
+  "id-mobile": [{ value: "id-roam-beyond", label: "iD Roam Beyond pass — £5/1d, £20/5d, £35/10d" }, ...common],
   "sky-mobile": [{ value: "sky-passport", label: "Roaming Passport Plus — £2/24 hours" }, ...common],
   giffgaff: [{ value: "giffgaff-check", label: "Check my Turkey travel add-on" }, ...common],
-  smarty: [{ value: "smarty-metered", label: "Standard Band 1 data — 10p/MB" }, ...common],
+  smarty: [{ value: "smarty-metered", label: "SMARTY standard data — 10p/MB" }, ...common],
   voxi: [{ value: "voxi-check", label: "Check Global Roaming Extra in My VOXI" }, ...common],
   "tesco-mobile": [{ value: "tesco-check", label: "Check whether I’m PAYG or pay-monthly" }, { value: "tesco-payg", label: "Pay as you go data — £5/MB" }, ...common],
 };
@@ -147,31 +147,31 @@ const destinationScenarioOptions: Partial<Record<DestinationId, Partial<Record<N
     ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
   },
   "thailand": {
-    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
   },
   "australia": {
-    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
   },
   "canada": {
-    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
   },
   "mexico": {
-    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
   },
   "indonesia": {
-    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
   },
   "morocco": {
-    ee: [{ value: "ee-row2", label: "EE RoW Zone 2 passes" }, ...common],
+    ee: [{ value: "ee-row2", label: "EE roaming pass — £8/24h, £40/7d, £60/15d" }, ...common],
   },
   "egypt": {
-    ee: [{ value: "ee-row2", label: "EE RoW Zone 2 passes" }, ...common],
+    ee: [{ value: "ee-row2", label: "EE roaming pass — £8/24h, £40/7d, £60/15d" }, ...common],
   },
 
   spain: {
     ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
     o2: [{ value: "o2-europe", label: "O2 Europe Zone — included, up to 25GB" }, ...common],
-    vodafone: [{ value: "vodafone-europe-pass", label: "Vodafone Europe pass — £16/8d or £21/15d" }, { value: "vodafone-europe-day", label: "Vodafone Zone B — £2.75/day" }, ...common],
+    vodafone: [{ value: "vodafone-europe-pass", label: "Vodafone Europe pass — £16/8d or £21/15d" }, { value: "vodafone-europe-day", label: "Vodafone daily charge — £2.75/day" }, ...common],
     three: [{ value: "three-europe-pass", label: "Three Go Roam pass — 3, 7 or 14 days" }, ...common],
     "id-mobile": [{ value: "id-europe", label: "iD Roam Free — up to 30GB" }, ...common],
     "sky-mobile": [{ value: "sky-passport", label: "Sky Passport Plus — £2/24h" }, ...common],
@@ -181,11 +181,11 @@ const destinationScenarioOptions: Partial<Record<DestinationId, Partial<Record<N
     "tesco-mobile": [{ value: "tesco-europe", label: "Tesco Home From Home — UK allowance" }, ...common],
   },
   "united-states": {
-    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
     o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
     vodafone: [{ value: "plan-check", label: "Check the US in Vodafone’s charge checker" }, ...common],
-    three: [{ value: "three-world-pass", label: "Three Go Roam World pass" }, ...common],
-    "id-mobile": [{ value: "id-roam-beyond", label: "iD Roam Beyond data passes" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
+    "id-mobile": [{ value: "id-roam-beyond", label: "iD Roam Beyond pass — £5/1d, £20/5d, £35/10d" }, ...common],
     "sky-mobile": [{ value: "sky-passport", label: "Sky Passport Plus — £2/24h" }, ...common],
     giffgaff: [{ value: "giffgaff-check", label: "Check giffgaff travel add-on in app" }, ...common],
     smarty: [{ value: "smarty-metered-us", label: "SMARTY USA — 10p/MB" }, ...common],
@@ -193,11 +193,11 @@ const destinationScenarioOptions: Partial<Record<DestinationId, Partial<Record<N
     "tesco-mobile": [{ value: "tesco-metered-us", label: "Tesco USA — 1p/MB" }, ...common],
   },
   japan: {
-    ee: [{ value: "ee-row3", label: "EE RoW Zone 3 — £8/24h, 500MB" }, ...common],
+    ee: [{ value: "ee-row3", label: "EE daily pass — £8/24h, includes 500MB" }, ...common],
     o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
     vodafone: [{ value: "plan-check", label: "Check Japan in Vodafone’s live checker" }, ...common],
-    three: [{ value: "three-extra-pass", label: "Three Go Roam Extra pass" }, ...common],
-    "id-mobile": [{ value: "id-roam-beyond", label: "iD Roam Beyond data passes" }, ...common],
+    three: [{ value: "three-extra-pass", label: "Three Go Roam Extra pass — 3, 5, 7 or 14 days" }, ...common],
+    "id-mobile": [{ value: "id-roam-beyond", label: "iD Roam Beyond pass — £5/1d, £20/5d, £35/10d" }, ...common],
     "sky-mobile": [{ value: "plan-check", label: "Sky does not currently list Japan" }, ...common],
     giffgaff: [{ value: "giffgaff-check", label: "Check giffgaff travel add-on in app" }, ...common],
     smarty: [{ value: "plan-check", label: "Check your SMARTY out-of-plan rate" }, ...common],
@@ -205,7 +205,7 @@ const destinationScenarioOptions: Partial<Record<DestinationId, Partial<Record<N
     "tesco-mobile": [{ value: "tesco-metered-world", label: "Tesco Japan — £5/MB" }, ...common],
   },
   "united-arab-emirates": {
-    ee: [{ value: "ee-row1", label: "EE RoW Zone 1 passes" }, ...common],
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
     o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
     vodafone: [{ value: "plan-check", label: "Check the UAE in Vodafone’s charge checker" }, ...common],
     three: [{ value: "three-extra-pass", label: "Three Go Roam Extra pass" }, ...common],
@@ -435,16 +435,16 @@ export function getRoamingResult(
     }
     if (scenario === "ee-row1") {
       const pass = getPasses(billableDays, [{ days: 15, cost: 50, label: "15-day" }, { days: 7, cost: 30, label: "7-day" }, { days: 1, cost: 6, label: "24-hour" }]);
-      return ukAllowanceResult({ cost: pass.cost, title: "EE RoW Zone 1 pass estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance, up to a 50GB fair-use ceiling. Full Works and some older plans may already cover this zone.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
+      return ukAllowanceResult({ cost: pass.cost, title: "EE rest-of-world Zone 1 pass estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance, up to a 50GB fair-use ceiling. Full Works and some older plans may already cover this zone.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
     }
     if (scenario === "ee-row2") {
       const pass = getPasses(billableDays, [{ days: 15, cost: 60, label: "15-day" }, { days: 7, cost: 40, label: "7-day" }, { days: 1, cost: 8, label: "24-hour" }]);
-      return ukAllowanceResult({ cost: pass.cost, title: "EE RoW Zone 2 pass estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance, up to a 50GB fair-use ceiling. Passes run from the moment you buy them, so roaming days spread apart may need a different combination.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
+      return ukAllowanceResult({ cost: pass.cost, title: "EE rest-of-world Zone 2 pass estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance, up to a 50GB fair-use ceiling. Passes run from the moment you buy them, so roaming days spread apart may need a different combination.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
     }
     if (scenario === "ee-row3") {
       const allowance = billableDays * 0.5;
       const match = allowanceMatch(allowance, neededDataGb, "");
-      return finish({ cost: billableDays * 8, title: "EE RoW Zone 3 pass estimate", detail: `£8 × ${billableDays} 24-hour ${billableDays === 1 ? "period" : "periods"}, each including 500MB.`, caveat: "Includes unlimited minutes and texts. Data is 500MB per day, not one pot for the whole trip.", dataAllowanceGb: allowance, unlimitedData: false, allowanceSource: "published", speedCap: "Your EE plan’s UK speed cap", tethering: "allowed", callsTexts: "included", ...match });
+      return finish({ cost: billableDays * 8, title: "EE rest-of-world Zone 3 pass estimate", detail: `£8 × ${billableDays} 24-hour ${billableDays === 1 ? "period" : "periods"}, each including 500MB.`, caveat: "Includes unlimited minutes and texts. Data is 500MB per day, not one pot for the whole trip.", dataAllowanceGb: allowance, unlimitedData: false, allowanceSource: "published", speedCap: "Your EE plan’s UK speed cap", tethering: "allowed", callsTexts: "included", ...match });
     }
     if (scenario === "o2-europe") {
       return ukAllowanceResult({ cost: 0, title: "O2 Europe Zone estimate", detail: "Eligible Pay Monthly plans use your normal UK allowance, with nothing extra to pay.", caveat: "Data is capped at 25GB. Calls and texts within the Europe Zone and back to the UK are included.", capGb: 25, tethering: "allowed", callsTexts: "included" });
@@ -511,7 +511,7 @@ export function getRoamingResult(
 
   if (scenario === "ee-current") {
     const pass = getPasses(billableDays, [{ days: 15, cost: 50, label: "15-day" }, { days: 7, cost: 30, label: "7-day" }, { days: 1, cost: 6, label: "24-hour" }]);
-    return ukAllowanceResult({ cost: pass.cost, title: "EE RoW Zone 1 pass estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance, up to a 50GB fair-use ceiling. Passes run from the moment you buy them, so roaming days spread apart may need a different combination.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
+    return ukAllowanceResult({ cost: pass.cost, title: "EE rest-of-world Zone 1 pass estimate", detail: `${pass.labels.join(" + ")} covers ${billableDays} roaming ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance, up to a 50GB fair-use ceiling. Passes run from the moment you buy them, so roaming days spread apart may need a different combination.", capGb: 50, tethering: "allowed", callsTexts: "included", speedCap: "Your EE plan’s UK speed cap" });
   }
 
   if (scenario === "o2-travel") {

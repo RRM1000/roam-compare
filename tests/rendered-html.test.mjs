@@ -37,7 +37,7 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.match(text, /We won’t guess — roaming costs differ far too much between networks\./);
   assert.match(text, /Do you need normal calls or SMS\?/);
   assert.match(text, /Compare with your own network/);
-  assert.match(text, /Which tariff or roaming option applies\?/);
+  assert.match(text, /How does your plan charge for roaming here\?/);
   // The roaming question is a yes/no; the exact day count is behind a link.
   assert.match(text, /Will you use paid roaming on your UK network\?/);
   assert.match(text, /Only some days\?/);

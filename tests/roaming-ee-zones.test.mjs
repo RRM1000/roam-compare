@@ -26,9 +26,9 @@ const eeZones = {
 
 const expectedTitle = {
   eu: "EE Europe roaming estimate",
-  row1: "EE RoW Zone 1 pass estimate",
-  row2: "EE RoW Zone 2 pass estimate",
-  row3: "EE RoW Zone 3 pass estimate",
+  row1: "EE rest-of-world Zone 1 pass estimate",
+  row2: "EE rest-of-world Zone 2 pass estimate",
+  row3: "EE rest-of-world Zone 3 pass estimate",
 };
 
 function eeResult(destination, days, neededGb = 6, allowance = "10") {
