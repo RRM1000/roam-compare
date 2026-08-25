@@ -105,8 +105,10 @@ test("published metered rates price the complete selected data target", () => {
     assert.equal(actual.comparable, comparable);
     assert.equal(actual.callsTexts, "extra");
     assert.match(actual.evidence.url, /^https:\/\//);
-    assert.equal(actual.evidence.checkedAt, "2026-08-16");
-    assert.equal(actual.evidence.reviewAfter, "2026-08-23");
+    // Sources carry their own review windows now, so assert coherence rather
+    // than a fixed date that every recheck would have to update.
+    assert.match(actual.evidence.checkedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(actual.evidence.reviewAfter >= actual.evidence.checkedAt);
   }
 });
 
@@ -115,7 +117,7 @@ test("unpublished roaming remains unpriced and links to official guidance", () =
   assert.equal(skyJapan.cost, null);
   assert.equal(skyJapan.comparable, false);
   assert.match(`${skyJapan.detail} ${skyJapan.caveat}`, /does not currently list Japan/i);
-  assert.equal(skyJapan.evidence.url, "https://www.sky.com/help/articles/sky-mobile-roaming");
+  assert.equal(skyJapan.evidence.url, "https://www.sky.com/shop/mobile/roaming");
 
   const giffgaffUs = result("giffgaff", "giffgaff-check", 7, 5, "united-states");
   assert.equal(giffgaffUs.cost, null);

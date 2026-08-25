@@ -24,46 +24,75 @@ export type RoamingResult = {
   evidence: RoamingEvidence;
 };
 
-export const ROAMING_CHECKED_AT = "2026-08-16";
-export const ROAMING_REVIEW_AFTER = "2026-08-23";
+/**
+ * Roaming sources carry their own review dates rather than sharing one.
+ *
+ * A single date for all 22 forced an all-or-nothing choice: either claim
+ * everything was rechecked, or leave sources that had been rechecked looking
+ * stale. Per-source dates mean the freshness check names exactly which
+ * operator pages still need reading, and the source register on each result
+ * shows the date for the page it actually links to.
+ */
+const CHECKED_2026_08_25 = { checkedAt: "2026-08-25", reviewAfter: "2026-09-01" } as const;
+/** Rechecked on 16 August, and not confirmed since — see the notes on each. */
+const UNCONFIRMED = { checkedAt: "2026-08-16", reviewAfter: "2026-08-23" } as const;
 
-function evidence(label: string, url: string): RoamingEvidence {
-  return { label, url, checkedAt: ROAMING_CHECKED_AT, reviewAfter: ROAMING_REVIEW_AFTER };
+function evidence(label: string, url: string, dates: { checkedAt: string; reviewAfter: string }): RoamingEvidence {
+  return { label, url, checkedAt: dates.checkedAt, reviewAfter: dates.reviewAfter };
 }
 
 export const networkRoamingEvidence: Record<Network, RoamingEvidence> = {
-  ee: evidence("EE mobile price guide", "https://ee.co.uk/content/dam/help/terms-and-conditions/price-plans/mobile/pay-monthly-price-plans/ee-mobile-plan-price-guide-04082026.pdf"),
-  o2: evidence("O2 roaming guidance", "https://www.o2.co.uk/help/international-and-network/using-your-phone-abroad/roaming"),
-  vodafone: evidence("Vodafone global roaming", "https://www.vodafone.co.uk/mobile/global-roaming"),
-  three: evidence("Three Go Roam guidance", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad/go-roam"),
-  "id-mobile": evidence("iD Mobile roaming guidance", "https://www.idmobile.co.uk/help-and-support/roaming"),
-  "sky-mobile": evidence("Sky Mobile roaming guidance", "https://www.sky.com/help/articles/sky-mobile-roaming"),
-  giffgaff: evidence("giffgaff roaming checker", "https://www.giffgaff.com/roaming"),
-  smarty: evidence("SMARTY roaming guidance", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international"),
-  voxi: evidence("VOXI roaming guidance", "https://www.voxi.co.uk/help/roaming-international/how-to-use-voxi-plan-abroad"),
-  "tesco-mobile": evidence("Tesco Mobile roaming checker", "https://www.tescomobile.com/roaming"),
+  ee: evidence("EE mobile price guide", "https://ee.co.uk/content/dam/help/terms-and-conditions/price-plans/mobile/pay-monthly-price-plans/ee-mobile-plan-price-guide-04082026.pdf", CHECKED_2026_08_25),
+  o2: evidence("O2 Europe Zone roaming", "https://www.o2.co.uk/eu-roaming", CHECKED_2026_08_25),
+  // Backs the Zone C/D daily rates, which Vodafone no longer publishes as a rate.
+  vodafone: evidence("Vodafone global roaming", "https://www.vodafone.co.uk/mobile/global-roaming", UNCONFIRMED),
+  // The 12GB fair-use limit here was reconfirmed; the per-day rates were not.
+  three: evidence("Three Go Roam guidance", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad/go-roam", UNCONFIRMED),
+  "id-mobile": evidence("iD Mobile roaming guidance", "https://www.idmobile.co.uk/help-and-support/roaming", CHECKED_2026_08_25),
+  "sky-mobile": evidence("Sky Roaming Passport Plus", "https://www.sky.com/shop/mobile/roaming", CHECKED_2026_08_25),
+  giffgaff: evidence("giffgaff roaming checker", "https://www.giffgaff.com/roaming", CHECKED_2026_08_25),
+  smarty: evidence("SMARTY roaming guidance", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international", CHECKED_2026_08_25),
+  voxi: evidence("VOXI roaming guidance", "https://www.voxi.co.uk/help/roaming-international/how-to-use-voxi-plan-abroad", CHECKED_2026_08_25),
+  "tesco-mobile": evidence("Tesco Mobile roaming checker", "https://www.tescomobile.com/roaming", CHECKED_2026_08_25),
 };
 
 export const scenarioRoamingEvidence: Record<string, RoamingEvidence> = {
-  "o2-travel": evidence("O2 Travel", "https://www.o2.co.uk/international/o2-travel"),
-  "three-europe-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad"),
-  "three-world-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad"),
-  "three-extra-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad"),
-  "id-europe": evidence("iD Mobile EU fair-use policy", "https://www.idmobile.co.uk/help-and-support/eu-roaming/fair-usage-policy"),
-  "id-roam-beyond": evidence("iD Mobile Roam Beyond", "https://www.idmobile.co.uk/help-and-support/roaming"),
-  "giffgaff-europe": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu"),
-  "giffgaff-europe-overage": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu"),
-  "giffgaff-metered": evidence("giffgaff Zone A price sheet", "https://static.giffgaff.com/documents/roaming/row-zone-a/v1/roaming-row-zone-a.pdf"),
-  "smarty-europe": evidence("SMARTY roaming in Spain", "https://smarty.co.uk/roaming/europe/spain/"),
-  "smarty-metered-us": evidence("SMARTY roaming in the USA", "https://smarty.co.uk/roaming/international/united-states-of-america/"),
-  "smarty-metered-world": evidence("SMARTY worldwide roaming guidance", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international"),
-  "voxi-europe": evidence("VOXI European Roaming Pass", "https://www.voxi.co.uk/help/roaming-international/does-voxi-have-european-roaming"),
-  "voxi-global": evidence("VOXI Global Roaming Extra", "https://www.voxi.co.uk/help/roaming-international/what-are-global-roaming-extras"),
-  "voxi-metered": evidence("VOXI standard roaming charges", "https://www.voxi.co.uk/charges"),
-  "tesco-europe": evidence("Tesco Mobile Home From Home", "https://www.tescomobile.com/why-tesco-mobile/awards-and-reviews/home-from-home"),
-  "tesco-metered-us": evidence("Tesco Mobile roaming checker", "https://www.tescomobile.com/roaming"),
-  "tesco-metered-world": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go"),
+  // Confirmed on the pages that actually quote them: the passes on the global
+  // roaming page, and the £2.75 day rate on the Extras page.
+  "vodafone-europe-pass": evidence("Vodafone roaming Extras", "https://www.vodafone.co.uk/mobile/extras", CHECKED_2026_08_25),
+  "vodafone-europe-day": evidence("Vodafone roaming Extras", "https://www.vodafone.co.uk/mobile/extras", CHECKED_2026_08_25),
+  "o2-travel": evidence("O2 Travel", "https://www.o2.co.uk/international/o2-travel", CHECKED_2026_08_25),
+  "three-europe-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
+  "three-world-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
+  "three-extra-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
+  "id-europe": evidence("iD Mobile EU fair-use policy", "https://www.idmobile.co.uk/help-and-support/eu-roaming/fair-usage-policy", CHECKED_2026_08_25),
+  "id-roam-beyond": evidence("iD Mobile Roam Beyond", "https://www.idmobile.co.uk/help-and-support/roaming", CHECKED_2026_08_25),
+  "giffgaff-europe": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_08_25),
+  "giffgaff-europe-overage": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_08_25),
+  // The Zone A sheet is a scanned PDF with no extractable text, and giffgaff now
+  // sells country-specific travel add-ons rather than quoting a Zone A rate, so
+  // the 20p/MB figure could not be reconfirmed.
+  "giffgaff-metered": evidence("giffgaff Zone A price sheet", "https://static.giffgaff.com/documents/roaming/row-zone-a/v1/roaming-row-zone-a.pdf", UNCONFIRMED),
+  "smarty-europe": evidence("SMARTY roaming in Spain", "https://smarty.co.uk/roaming/europe/spain/", CHECKED_2026_08_25),
+  "smarty-metered-us": evidence("SMARTY roaming in the USA", "https://smarty.co.uk/roaming/international/united-states-of-america/", CHECKED_2026_08_25),
+  // The 12GB EU limit on this page was reconfirmed; the £1/MB worldwide rate was not.
+  "smarty-metered-world": evidence("SMARTY worldwide roaming guidance", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international", UNCONFIRMED),
+  "voxi-europe": evidence("VOXI European Roaming Pass", "https://www.voxi.co.uk/help/roaming-international/does-voxi-have-european-roaming", CHECKED_2026_08_25),
+  "voxi-global": evidence("VOXI Global Roaming Extra", "https://www.voxi.co.uk/help/roaming-international/what-are-global-roaming-extras", CHECKED_2026_08_25),
+  "voxi-metered": evidence("VOXI standard roaming charges", "https://www.voxi.co.uk/charges", CHECKED_2026_08_25),
+  "tesco-europe": evidence("Tesco Mobile Home From Home", "https://www.tescomobile.com/why-tesco-mobile/awards-and-reviews/home-from-home", CHECKED_2026_08_25),
+  "tesco-metered-us": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go", CHECKED_2026_08_25),
+  "tesco-metered-world": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go", CHECKED_2026_08_25),
 };
+
+/**
+ * The oldest dates across every roaming source. The site shows one "UK roaming
+ * rules" status line, and it should reflect the least fresh source rather than
+ * the most, so a single unread operator page cannot hide behind the rest.
+ */
+const allRoamingSources = [...Object.values(networkRoamingEvidence), ...Object.values(scenarioRoamingEvidence)];
+export const ROAMING_CHECKED_AT = allRoamingSources.map((source) => source.checkedAt).sort()[0];
+export const ROAMING_REVIEW_AFTER = allRoamingSources.map((source) => source.reviewAfter).sort()[0];
 
 export function getRoamingEvidence(network: Network, scenario: string) {
   return scenarioRoamingEvidence[scenario] ?? networkRoamingEvidence[network];
@@ -458,7 +487,7 @@ export function getRoamingResult(
       const pass = getPasses(billableDays, offers);
       return ukAllowanceResult({ cost: pass.cost, title: `Three Go Roam ${scenario === "three-world-pass" ? "World" : "Extra"} pass estimate`, detail: `${pass.labels.join(" + ")} covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "Uses your UK allowance, with up to 12GB abroad. Hotspot use isn't allowed.", capGb: 12, tethering: "not-allowed", callsTexts: "included" });
     }
-    if (scenario === "id-europe") return ukAllowanceResult({ cost: 0, title: "iD Mobile Roam Free estimate", detail: "Uses your normal UK allowance at no extra charge on eligible contracts.", caveat: "We assume a cautious 30GB fair-use ceiling. iD sometimes offers more than this — check your account.", capGb: 30, tethering: "allowed", callsTexts: "included" });
+    if (scenario === "id-europe") return ukAllowanceResult({ cost: 0, title: "iD Mobile Roam Free estimate", detail: "Uses your normal UK allowance at no extra charge on eligible contracts.", caveat: "iD publishes a 30GB roaming fair-use limit for customers who joined on or after 21 June 2023. On a plan smaller than that, your own allowance is the limit.", capGb: 30, tethering: "allowed", callsTexts: "included" });
     if (scenario === "id-roam-beyond") {
       const pass = getPasses(billableDays, [{ days: 10, cost: 35, label: "10-day / 20GB", dataGb: 20 }, { days: 5, cost: 20, label: "5-day / 10GB", dataGb: 10 }, { days: 1, cost: 5, label: "1-day / 2GB", dataGb: 2 }], neededDataGb);
       return finish({ cost: pass.cost, title: "iD Mobile Roam Beyond estimate", detail: `${pass.labels.join(" + ")} supplies ${formatGb(pass.dataGb)}GB and covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "Data-only passes start straight away and won't renew themselves. Ordinary calls and texts cost extra.", dataAllowanceGb: pass.dataGb, unlimitedData: false, allowanceSource: "published", speedCap: "No published cap; 5G on selected networks", tethering: "allowed", callsTexts: "not-included", matched: true, matchReason: `${formatGb(pass.dataGb)}GB covers the ${formattedData}GB you'll use on the days you're roaming.` });

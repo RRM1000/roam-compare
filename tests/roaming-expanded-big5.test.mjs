@@ -4,16 +4,18 @@ import assert from "node:assert/strict";
 import {
   getRoamingResult,
   getScenarioOptions,
+  networkRoamingEvidence,
   ROAMING_CHECKED_AT,
+  ROAMING_REVIEW_AFTER,
+  scenarioRoamingEvidence,
 } from "../lib/roaming.ts";
-
-const CHECKED_AT = "2026-08-16";
 
 const officialSources = {
   ee: "https://ee.co.uk/content/dam/help/terms-and-conditions/price-plans/mobile/pay-monthly-price-plans/ee-mobile-plan-price-guide-04082026.pdf",
-  o2: "https://www.o2.co.uk/help/international-and-network/using-your-phone-abroad/roaming",
+  o2: "https://www.o2.co.uk/eu-roaming",
   o2Travel: "https://www.o2.co.uk/international/o2-travel",
   vodafone: "https://www.vodafone.co.uk/mobile/global-roaming",
+  vodafoneExtras: "https://www.vodafone.co.uk/mobile/extras",
   three: "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad/go-roam",
   threePasses: "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad",
   id: "https://www.idmobile.co.uk/help-and-support/roaming",
@@ -33,7 +35,10 @@ function assertFacts(actual, expected, context) {
     assert.deepEqual(actual[field], value, `${context}: ${field}`);
   }
 
-  assert.equal(actual.evidence.checkedAt, CHECKED_AT, `${context}: evidence date`);
+  // Sources carry their own review windows, so assert the window is coherent
+  // rather than pinning a date that every recheck would have to update.
+  assert.match(actual.evidence.checkedAt, /^\d{4}-\d{2}-\d{2}$/, `${context}: evidence checkedAt`);
+  assert.ok(actual.evidence.reviewAfter >= actual.evidence.checkedAt, `${context}: evidence window`);
   assert.equal(actual.evidence.url, expected.source, `${context}: official source`);
   assert.match(actual.evidence.url, /^https:\/\//, `${context}: HTTPS evidence URL`);
 
@@ -113,7 +118,7 @@ test("Spain results use the published Europe charges and fair-use limits", () =>
       context: "Vodafone Spain eight-day pass",
       actual: roaming("vodafone", "vodafone-europe-pass", 8, 5, "spain", 10),
       fields: { cost: 16, dataAllowanceGb: 10, allowanceSource: "user-entered", tethering: "allowed", callsTexts: "included", matched: true, comparable: true },
-      source: officialSources.vodafone,
+      source: officialSources.vodafoneExtras,
       copy: /Zone B|8-day|UK allowance/i,
     },
     {
@@ -268,8 +273,9 @@ test("UAE results use Zone 1, O2 Travel, Zone D, Go Roam Extra and iD metered ra
   for (const { actual, context, ...expected } of cases) assertFacts(actual, expected, context);
 });
 
-test("all expanded results carry the shared evidence snapshot date", () => {
-  assert.equal(ROAMING_CHECKED_AT, CHECKED_AT);
+test("every result carries the review window of the source it links to", () => {
+  const sources = [...Object.values(networkRoamingEvidence), ...Object.values(scenarioRoamingEvidence)];
+  const byUrl = new Map(sources.map((source) => [`${source.label}|${source.url}`, source]));
 
   for (const [destination, network, scenario] of [
     ["spain", "ee", "ee-europe-new"],
@@ -278,7 +284,14 @@ test("all expanded results carry the shared evidence snapshot date", () => {
     ["united-arab-emirates", "id-mobile", "id-metered-world"],
   ]) {
     const result = roaming(network, scenario, 1, 0.001, destination, 1);
-    assert.equal(result.evidence.checkedAt, CHECKED_AT);
-    assert.equal(result.evidence.reviewAfter, "2026-08-23");
+    const source = byUrl.get(`${result.evidence.label}|${result.evidence.url}`);
+    assert.ok(source, `${destination}/${scenario}: evidence is not a registered source`);
+    assert.equal(result.evidence.checkedAt, source.checkedAt);
+    assert.equal(result.evidence.reviewAfter, source.reviewAfter);
   }
+
+  // The headline dates must report the least fresh source, so one unread
+  // operator page cannot hide behind the ones that were rechecked.
+  assert.equal(ROAMING_CHECKED_AT, sources.map((s) => s.checkedAt).sort()[0]);
+  assert.equal(ROAMING_REVIEW_AFTER, sources.map((s) => s.reviewAfter).sort()[0]);
 });
