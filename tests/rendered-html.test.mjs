@@ -38,8 +38,10 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.match(text, /Do you need normal calls or SMS\?/);
   assert.match(text, /Compare with your own network/);
   assert.match(text, /Which tariff or roaming option applies\?/);
-  assert.match(text, /On how many trip days will you use paid UK-network roaming\?/);
-  assert.match(text, /0 — eSIM\/Wi-Fi only/);
+  // The roaming question is a yes/no; the exact day count is behind a link.
+  assert.match(text, /Will you use paid roaming on your UK network\?/);
+  assert.match(text, /Only some days\?/);
+  assert.match(text, /eSIM or Wi-Fi only/);
   assert.match(text, /Data available through your UK plan abroad \(GB\)/);
   assert.match(html, /<option value="45">/);
   assert.match(html, /<option value="60">/);

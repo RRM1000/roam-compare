@@ -93,6 +93,23 @@ h2 { font-family:Georgia,"Times New Roman",serif; font-size:clamp(35px,4.5vw,58p
 .usage-options input:focus-visible+span { outline:3px solid var(--lime); outline-offset:3px; }
 .usage-options strong { font-size:0.9375rem; }
 .usage-options small { color:var(--muted); font-size:0.875rem; line-height:1.35; }
+/* The roaming question is a yes/no for almost everyone, so it borrows the usage
+   cards rather than a long day-count select. The exact count stays available
+   behind "Only some days?" for the rare traveller who needs it. */
+.roaming-days-field { border:0; margin:0; padding:0; }
+.roaming-days-options { display:grid; gap:9px; grid-template-columns:repeat(2,1fr); }
+.roaming-days-options label { cursor:pointer; }
+.roaming-days-options input { height:1px; opacity:0; position:absolute; width:1px; }
+.roaming-days-options span { background:#f8f6f0; border:1px solid var(--control-border); border-radius:13px; display:flex; flex-direction:column; gap:5px; min-height:64px; padding:12px 11px; transition:background .2s ease,border-color .2s ease,box-shadow .2s ease; }
+.roaming-days-options label:hover span { background:#f1eee7; }
+.roaming-days-options input:checked+span { background:#e8f0ed; border-color:var(--teal); box-shadow:inset 0 0 0 1px var(--teal); }
+.roaming-days-options input:focus-visible+span { outline:3px solid var(--lime); outline-offset:3px; }
+.roaming-days-options strong { font-size:0.9375rem; }
+.roaming-days-options small { color:var(--muted); font-size:0.875rem; line-height:1.35; }
+.roaming-days-partial { background:none; border:0; color:var(--teal); cursor:pointer; font-size:0.875rem; font-weight:650; margin-top:9px; padding:6px 0; text-decoration:underline; text-underline-offset:3px; }
+.roaming-days-partial:hover { color:var(--forest); }
+.roaming-days-exact { display:block; margin-top:11px; }
+.roaming-days-exact>span { display:block; font-size:0.875rem; font-weight:650; margin-bottom:6px; }
 .calls-need { border:0; margin:0 0 20px; padding:0; }
 .calls-need>legend { display:block; font-size:0.9375rem; font-weight:850; margin-bottom:8px; }
 .calls-need>div { display:grid; gap:8px; grid-template-columns:repeat(3,1fr); }
