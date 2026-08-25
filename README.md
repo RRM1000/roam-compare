@@ -4,7 +4,9 @@ UK-first roaming and travel-eSIM comparison site. Built with vinext and deployed
 
 ## What is implemented
 
-- allowance-matched, official-source UK roaming estimates for Turkey, the United States, Spain, Japan and the UAE
+- allowance-matched UK roaming estimates for 52 network-and-destination combinations, every one traceable to a
+  charge the operator publishes — all 20 destinations on EE, and 32 combinations across the other nine networks.
+  Where an operator no longer publishes a rate, the site hands off to their own checker instead of quoting a number.
 - live Saily prices in GBP for all 20 destinations, fetched per request from the Saily partners API
 - dated manual eSIM price snapshots for Turkey, the United States, Spain, Japan and the UAE
 - live provider handoffs for the remaining Airalo, Klook and Nomad catalogues without guessed prices

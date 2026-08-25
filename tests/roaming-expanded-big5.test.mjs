@@ -52,25 +52,25 @@ test("the expanded Big Five options expose a conservative primary scenario for a
     ["spain", "ee", "ee-europe-new", ["included", "custom"]],
     ["spain", "o2", "o2-europe", ["included", "custom"]],
     ["spain", "vodafone", "vodafone-europe-pass", ["vodafone-europe-day", "included", "custom"]],
-    ["spain", "three", "three-europe-new", ["three-europe-older", "three-europe-pass", "included", "custom"]],
+    ["spain", "three", "three-europe-pass", ["included", "custom"]],
     ["spain", "id-mobile", "id-europe", ["included", "custom"]],
 
     ["united-states", "ee", "ee-row1", ["included", "custom"]],
     ["united-states", "o2", "o2-travel", ["included", "custom"]],
-    ["united-states", "vodafone", "vodafone-world-new", ["vodafone-world-older", "included", "custom"]],
-    ["united-states", "three", "three-world-new", ["three-world-older", "three-world-pass", "included", "custom"]],
+    ["united-states", "vodafone", "plan-check", ["included", "custom"]],
+    ["united-states", "three", "three-world-pass", ["included", "custom"]],
     ["united-states", "id-mobile", "id-roam-beyond", ["included", "custom"]],
 
     ["japan", "ee", "ee-row3", ["included", "custom"]],
     ["japan", "o2", "o2-travel", ["included", "custom"]],
     ["japan", "vodafone", "plan-check", ["included", "custom"]],
-    ["japan", "three", "three-extra-new", ["three-extra-older", "three-extra-pass", "included", "custom"]],
+    ["japan", "three", "three-extra-pass", ["included", "custom"]],
     ["japan", "id-mobile", "id-roam-beyond", ["included", "custom"]],
 
     ["united-arab-emirates", "ee", "ee-row1", ["included", "custom"]],
     ["united-arab-emirates", "o2", "o2-travel", ["included", "custom"]],
-    ["united-arab-emirates", "vodafone", "vodafone-world-new", ["vodafone-world-older", "included", "custom"]],
-    ["united-arab-emirates", "three", "three-extra-new", ["three-extra-older", "three-extra-pass", "included", "custom"]],
+    ["united-arab-emirates", "vodafone", "plan-check", ["included", "custom"]],
+    ["united-arab-emirates", "three", "three-extra-pass", ["included", "custom"]],
     ["united-arab-emirates", "id-mobile", "id-metered-world", ["included", "custom"]],
   ];
 
@@ -88,12 +88,10 @@ test("scenario labels disclose the plan-date, zone, pass and metered-price disti
     getScenarioOptions(network, destination).find(({ value }) => value === scenario)?.label ?? "";
 
   assert.match(label("ee", "spain", "ee-europe-new"), /7 Jul 2021/i);
-  assert.match(label("vodafone", "united-states", "vodafone-world-new"), /Zone C.*£8\/day/i);
-  assert.match(label("vodafone", "united-arab-emirates", "vodafone-world-new"), /Zone D.*£8\/day/i);
   assert.match(label("vodafone", "japan", "plan-check"), /live checker/i);
-  assert.match(label("three", "spain", "three-europe-new"), /18 Dec 2025/i);
+  assert.match(label("three", "spain", "three-europe-pass"), /3, 7 or 14 days/i);
   assert.match(label("three", "united-states", "three-world-pass"), /Go Roam World pass/i);
-  assert.match(label("three", "united-states", "three-world-older"), /£5\/day/i);
+  assert.match(label("vodafone", "united-states", "plan-check"), /charge checker/i);
   assert.match(label("three", "japan", "three-extra-pass"), /Go Roam Extra pass/i);
   assert.match(label("id-mobile", "united-arab-emirates", "id-metered-world"), /£9\.60\/MB/i);
 });
@@ -157,25 +155,20 @@ test("United States results distinguish allowance passes, daily charges, speed c
       copy: /£7|24 hours|2Mbps/i,
     },
     {
-      context: "Vodafone US newer plan",
-      actual: roaming("vodafone", "vodafone-world-new", 4, 5, "united-states", 10),
-      fields: { cost: 32, dataAllowanceGb: 10, allowanceSource: "user-entered", tethering: "allowed", callsTexts: "included", matched: true, comparable: true },
+      // Vodafone stopped publishing a Zone C day rate, so this hands off
+      // instead of quoting one.
+      context: "Vodafone US, no published rate",
+      actual: roaming("vodafone", "plan-check", 4, 5, "united-states", 10),
+      fields: { cost: null, dataAllowanceGb: null, allowanceSource: "unknown", tethering: "check-plan", callsTexts: "check-plan", matched: null, comparable: false },
       source: officialSources.vodafone,
-      copy: /Zone C|£8|11 August 2021|newer plan/i,
+      copy: /check|checker|account/i,
     },
     {
-      context: "Three US newer plan",
-      actual: roaming("three", "three-world-new", 3, 5, "united-states", 20),
-      fields: { cost: 24, dataAllowanceGb: 12, allowanceSource: "user-entered", tethering: "not-allowed", callsTexts: "included", matched: true, comparable: true },
-      source: officialSources.three,
+      context: "Three US Go Roam World pass",
+      actual: roaming("three", "three-world-pass", 3, 5, "united-states", 20),
+      fields: { cost: 12.5, dataAllowanceGb: 12, allowanceSource: "user-entered", tethering: "not-allowed", callsTexts: "included", matched: true, comparable: true },
+      source: officialSources.threePasses,
       copy: /Go Roam World|18 December 2025|£8/i,
-    },
-    {
-      context: "Three US October 2021 to December 2025 plan",
-      actual: roaming("three", "three-world-older", 3, 5, "united-states", 20),
-      fields: { cost: 15, dataAllowanceGb: 12, allowanceSource: "user-entered", tethering: "not-allowed", callsTexts: "included", matched: true, comparable: true },
-      source: officialSources.three,
-      copy: /Go Roam World|£5/i,
     },
     {
       context: "iD US Roam Beyond",
@@ -248,18 +241,18 @@ test("UAE results use Zone 1, O2 Travel, Zone D, Go Roam Extra and iD metered ra
       copy: /£7|24 hours|2Mbps/i,
     },
     {
-      context: "Vodafone UAE newer plan",
-      actual: roaming("vodafone", "vodafone-world-new", 2, 5, "united-arab-emirates", 10),
-      fields: { cost: 16, dataAllowanceGb: 10, allowanceSource: "user-entered", tethering: "allowed", callsTexts: "included", matched: true, comparable: true },
+      context: "Vodafone UAE, no published rate",
+      actual: roaming("vodafone", "plan-check", 2, 5, "united-arab-emirates", 10),
+      fields: { cost: null, dataAllowanceGb: null, allowanceSource: "unknown", tethering: "check-plan", callsTexts: "check-plan", matched: null, comparable: false },
       source: officialSources.vodafone,
-      copy: /Zone D|£8|11 August 2021|newer plan/i,
+      copy: /check|checker|account/i,
     },
     {
-      context: "Three UAE newer plan",
-      actual: roaming("three", "three-extra-new", 2, 5, "united-arab-emirates", 20),
-      fields: { cost: 16, dataAllowanceGb: 12, allowanceSource: "user-entered", tethering: "not-allowed", callsTexts: "included", matched: true, comparable: true },
-      source: officialSources.three,
-      copy: /Go Roam Extra|18 December 2025|£8/i,
+      context: "Three UAE Around World Extra pass",
+      actual: roaming("three", "three-extra-pass", 2, 5, "united-arab-emirates", 20),
+      fields: { cost: 17.5, dataAllowanceGb: 12, allowanceSource: "user-entered", tethering: "not-allowed", callsTexts: "included", matched: true, comparable: true },
+      source: officialSources.threePasses,
+      copy: /Go Roam Extra|pass/i,
     },
     {
       context: "iD UAE metered data",

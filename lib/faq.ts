@@ -1,6 +1,6 @@
 import { pricedDestinationIds } from "./catalog";
 import { destinations } from "./destinations";
-import { networkNames } from "./roaming";
+import { networkNames, pricedRoamingCoverage } from "./roaming";
 
 export type FaqEntry = { question: string; answer: string };
 
@@ -16,14 +16,15 @@ export function getFaq(): FaqEntry[] {
   const destinationCount = destinations.length;
   const networkCount = Object.keys(networkNames).length;
   const pricedCount = pricedDestinationIds.length;
+  const coverage = pricedRoamingCoverage();
 
   return [
     {
       question: "Do you work out what my own network would charge?",
       answer:
-        `On EE, for all ${destinationCount} destinations. On the other nine networks, for Turkey, the United States, Spain, Japan and the UAE. ` +
-        "A few combinations depend on your individual account — Vodafone and VOXI for Turkey, Vodafone and Sky for Japan — and there we send you to your network’s own checker rather than invent a number. " +
-        "We’re working through the remaining networks zone by zone. Pick the tariff that applies to you and we work out the daily fees, the cheapest combination of passes, or the per-megabyte rate from your network’s published charges. " +
+        `On EE, for all ${destinationCount} destinations. Across the other nine networks, for ${coverage.others} more network-and-destination combinations. ` +
+        "Everywhere else we send you to your network’s own checker rather than invent a number — usually because the network has stopped publishing a rate, or prices it against your individual account. " +
+        "Pick the tariff that applies to you and we work out the daily fees, the cheapest combination of passes, or the per-megabyte rate from your network’s published charges. " +
         "We only claim a saving when roaming would actually cover your whole trip and everything else you asked for.",
     },
     {

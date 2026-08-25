@@ -18,7 +18,7 @@ test("the remaining five networks expose destination-specific, qualified scenari
     ["united-states", "voxi", "voxi-global"],
     ["united-states", "tesco-mobile", "tesco-metered-us"],
     ["japan", "sky-mobile", "plan-check"],
-    ["japan", "smarty", "smarty-metered-world"],
+    ["japan", "smarty", "plan-check"],
     ["united-arab-emirates", "voxi", "voxi-metered"],
     ["united-arab-emirates", "tesco-mobile", "tesco-metered-world"],
   ];
@@ -91,8 +91,6 @@ test("giffgaff EU overage charges only data above the entered inclusive allowanc
 test("published metered rates price the complete selected data target", () => {
   const cases = [
     ["tesco-mobile", "tesco-metered-us", "united-states", 10.24, false],
-    ["giffgaff", "giffgaff-metered", "japan", 204.8, true],
-    ["smarty", "smarty-metered-world", "japan", 1024, false],
     ["voxi", "voxi-metered", "united-arab-emirates", 122.88, true],
     ["tesco-mobile", "tesco-metered-world", "united-arab-emirates", 5120, false],
   ];

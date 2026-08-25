@@ -9,9 +9,11 @@ import { getSiteOrigin } from "@/lib/site-url";
 type DestinationPageProps = { params: Promise<{ destination: string }> };
 
 /**
- * Every destination gets a permanent page. The roaming calculation covers all
- * of them for all ten UK networks, and the live eSIM feed prices all of them,
- * so gating on the manual snapshot list would 404 pages that have real content.
+ * Every destination gets a permanent page. The live eSIM feed prices all of
+ * them, and EE roaming is priced for all of them, so gating on the manual
+ * snapshot list would 404 pages that have real content. The other nine networks
+ * price a subset — see pricedRoamingCoverage in lib/roaming.ts — and hand off to
+ * the network's own checker elsewhere, which is still a page worth serving.
  * Keeping the set fixed also stops URLs appearing and disappearing with feed
  * availability, which search engines treat far worse than a thin page.
  */
