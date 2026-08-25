@@ -55,7 +55,8 @@ export const gbpRates: Record<Currency, number> = { GBP: 1, EUR: 0.86, USD: 0.73
 export const providerDetails: Record<Provider, { accent: string; initials: string; affiliate: boolean; summary: string }> = {
   Airalo: { accent: "#a82350", initials: "AI", affiliate: false, summary: "Plans for one country, a region, or worldwide" },
   Klook: { accent: "#b33b27", initials: "KL", affiliate: true, summary: "Travel eSIM options alongside activities" },
-  Nomad: { accent: "#2943aa", initials: "NO", affiliate: false, summary: "Set data amounts, plus unlimited plans" },
+  // Approved through Impact in August 2026; the catalogue feed returns click URLs.
+  Nomad: { accent: "#2943aa", initials: "NO", affiliate: true, summary: "Set data amounts, plus unlimited plans" },
   Saily: { accent: "#4b28ae", initials: "SA", affiliate: true, summary: "Travel data plans with security features" },
 };
 

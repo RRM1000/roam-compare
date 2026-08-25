@@ -37,7 +37,7 @@ export function getFaq(): FaqEntry[] {
     {
       question: "Why does one provider show several plans?",
       answer:
-        "Because more than one can fit your trip — a bigger allowance, a longer validity, or unlimited data. " +
+        "Because more than one can fit your trip — a bigger allowance, a longer run before it expires, or unlimited data. " +
         "We hide the ones that cost more without giving you more, and you can show those again at any time. Pin up to three to compare side by side.",
     },
     {

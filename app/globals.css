@@ -452,7 +452,8 @@ footer .brand { color:var(--ink); }
   .steps li { gap:9px; grid-template-columns:38px 1fr; }
   .steps p { grid-column:2; }
   footer { align-items:flex-start; flex-direction:column; padding:31px 22px; }
-  .info-header .nav-actions a:nth-child(2),.info-header .nav-actions a:nth-child(3) { display:none; }
+  .info-header .nav-shell { align-items:flex-start; flex-direction:column; gap:6px; padding:20px 22px; }
+  .info-header .nav-actions { column-gap:20px; flex-wrap:wrap; row-gap:0; }
   .info-article { padding:82px 22px 100px; }
   .info-article h1 { font-size:clamp(48px,14vw,68px); }
   .info-body section { gap:14px; grid-template-columns:1fr; padding:34px 0; }

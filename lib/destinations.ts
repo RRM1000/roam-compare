@@ -183,6 +183,34 @@ export function hasNomadTracking(destination: DestinationId = "turkey") {
  * came from. Monetising a citation would undermine the reason it is shown, so
  * these deliberately bypass the tracked URLs that `getProviderUrl` builds.
  */
+/**
+ * Whether a link we are about to emit is one we could earn on.
+ *
+ * Decided from the URL itself rather than from the provider, because a provider
+ * can become an affiliate without anyone editing a flag here: Nomad's Impact
+ * feed began returning ready-made click URLs the moment the programme was
+ * approved, and those went out for a while marked only "noopener noreferrer".
+ * Reading the URL means a tracking link cannot ship undisclosed again.
+ */
+const CLICK_HOSTS = ["go.saily.site", "pxf.io", "sjv.io", "ojrq.net", "7eer.net", "evyy.net"];
+
+export function isTrackedUrl(value: string | undefined) {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:") return false;
+    const onClickHost =
+      CLICK_HOSTS.some((host) => url.hostname === host || url.hostname.endsWith(`.${host}`)) ||
+      /^imp\.i\d+\.net$/.test(url.hostname);
+    if (onClickHost) return true;
+    // Klook attributes on a query parameter rather than a distinct host.
+    const isKlook = url.hostname === "klook.com" || url.hostname.endsWith(".klook.com");
+    return isKlook && url.searchParams.has("aid");
+  } catch {
+    return false;
+  }
+}
+
 export function getProviderSourceUrl(provider: Provider, destination: Destination) {
   if (provider === "Klook") return klookProductUrls[destination.id] ?? `https://www.klook.com/en-GB/search/result/?query=${encodeURIComponent(`${destination.name} eSIM`)}`;
   if (provider === "Nomad") return nomadProductUrl(destination);
