@@ -11,11 +11,19 @@ function plan(id) {
 }
 
 test("fixed-data matching buys enough packs for both duration and data", () => {
-  const match = getPlanMatch(plan("turkey-airalo-1"), 20, 5);
-  assert.equal(match.packs, 5);
-  assert.equal(match.suppliedData, 5);
-  assert.equal(match.nativeTotal, 20);
-  assert.equal(match.gbpTotal, 15);
+  // Duration drives: 20 days needs seven 3-day packs, more than the five that 5GB needs.
+  const byDuration = getPlanMatch(plan("turkey-airalo-1gb-3d"), 20, 5);
+  assert.equal(byDuration.packs, 7);
+  assert.equal(byDuration.suppliedData, 7);
+  assert.equal(byDuration.nativeTotal, 24.5);
+  // Airalo prices in GBP, so the total needs no conversion.
+  assert.equal(byDuration.gbpTotal, 24.5);
+
+  // Data drives: one 30-day pack covers the trip, but 12GB needs three of them.
+  const byData = getPlanMatch(plan("turkey-airalo-5gb-30d"), 20, 12);
+  assert.equal(byData.packs, 3);
+  assert.equal(byData.suppliedData, 15);
+  assert.equal(byData.nativeTotal, 24);
 });
 
 test("daily and unlimited plans account for trips longer than one validity period", () => {
@@ -24,10 +32,10 @@ test("daily and unlimited plans account for trips longer than one validity perio
   assert.equal(daily.suppliedData, 45);
   assert.equal(daily.gbpTotal, null);
 
-  const unlimited = getPlanMatch(plan("japan-airalo-unlimited"), 21, 42);
+  const unlimited = getPlanMatch(plan("japan-airalo-unlimited-10d"), 21, 42);
   assert.equal(unlimited.packs, 3);
   assert.equal(unlimited.suppliedData, Number.POSITIVE_INFINITY);
-  assert.equal(unlimited.nativeTotal, 103.5);
+  assert.equal(unlimited.nativeTotal, 79.5);
 });
 
 test("live catalogue handoffs never acquire an invented total", () => {

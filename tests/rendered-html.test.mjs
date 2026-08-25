@@ -105,11 +105,13 @@ test("shared Japan comparison renders prices and a sourced roaming calculation",
   assert.match(text, /Hotspot works/);
 });
 
-test("normal-call requirement can select the verified US voice plan", async () => {
+test("normal-call requirement can select a verified US voice plan", async () => {
   const response = await render("/?compare=1&destination=united-states&days=7&roamingDays=7&network=ee&scenario=ee-row1&usage=light&calls=yes&allowance=10");
   assert.equal(response.status, 200);
   const text = visible(await response.text());
-  assert.match(text, /Change\+ 5GB \+ 50 min\/SMS/);
+  // Airalo sells a range of calls/texts plans; the cheapest that covers a light
+  // 7-day trip should win. Matched by shape so a repricing does not break this.
+  assert.match(text, /\dGB \+ \d+ min\/SMS/);
   assert.match(text, /Calls &amp; texts included/);
   assert.match(text, /This one includes normal calls and texts/);
   assert.match(text, /No calls or texts — you said you need them/);
@@ -127,7 +129,7 @@ test("shared filters and sorting are restored before recommendations are rendere
   assert.match(html, /type="checkbox" checked=""\/> Hotspot allowed/);
   assert.match(text, /Airalo/);
   assert.match(text, /Unlimited — daily limits apply/);
-  assert.doesNotMatch(text, /Change\+ 5GB \+ 50 min\/SMS/);
+  assert.doesNotMatch(text, /5GB \+ 50 min\/SMS/);
 });
 
 test("unverified catalogue calls are not presented as a definite mismatch", async () => {

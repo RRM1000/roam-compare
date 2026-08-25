@@ -5,7 +5,10 @@ import { DATA_CHECKED_AT, formatCheckedDate, hasPricedPlans, isPlanStale, plans,
 
 test("every catalogue record declares calls, hotspot, limits and provenance", () => {
   // One date format across the whole site, from one source.
-  assert.equal(formatCheckedDate(DATA_CHECKED_AT), "16 Aug 2026");
+  // Derived from the constant so a price refresh does not break the formatter test.
+  const [year, month, day] = DATA_CHECKED_AT.split("-").map(Number);
+  const expected = `${day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][month - 1]} ${year}`;
+  assert.equal(formatCheckedDate(DATA_CHECKED_AT), expected);
   assert.ok(plans.length > 45);
   assert.equal(new Set(plans.map((plan) => plan.id)).size, plans.length);
 
@@ -40,6 +43,10 @@ test("five destinations have manual prices and stale snapshots cannot rank", () 
   assert.ok(pricedDestinationIds.every((destination) => hasPricedPlans(destination)));
   const plan = plans.find((candidate) => candidate.price !== null);
   assert.ok(plan);
-  assert.equal(isPlanStale(plan, new Date("2026-08-23T12:00:00Z")), false);
-  assert.equal(isPlanStale(plan, new Date("2026-08-24T00:00:00Z")), true);
+  // Anchored to the plan's own window rather than fixed dates, which drift on refresh.
+  const lastFreshDay = new Date(`${plan.reviewAfter}T12:00:00Z`);
+  const firstStaleDay = new Date(`${plan.reviewAfter}T12:00:00Z`);
+  firstStaleDay.setUTCDate(firstStaleDay.getUTCDate() + 1);
+  assert.equal(isPlanStale(plan, lastFreshDay), false);
+  assert.equal(isPlanStale(plan, firstStaleDay), true);
 });
