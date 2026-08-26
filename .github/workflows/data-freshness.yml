@@ -1,0 +1,108 @@
+name: Data freshness
+
+# Prices and roaming charges go stale on a seven-day timer, which is a data
+# problem rather than a code one. Running it here instead of in `npm test`
+# keeps the verify workflow answering "does this change work?" rather than
+# turning red every week because nobody rechecked Airalo.
+on:
+  schedule:
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.13.0
+          cache: npm
+      - run: npm ci
+
+      - name: Check data freshness
+        id: check
+        run: |
+          set +e
+          npm run data:check > freshness.txt 2>&1
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+          cat freshness.txt
+
+      - name: Open or update the review issue
+        if: steps.check.outputs.status != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const report = fs.readFileSync("freshness.txt", "utf8").slice(0, 60000);
+            const title = "Data review due";
+            const body = [
+              "`npm run data:check` reports sources past their review date.",
+              "",
+              "Refresh them against the provider's own page and update `checkedAt`",
+              "and `reviewAfter`. Do not move the dates without rechecking — the",
+              "date is a claim that someone looked that day.",
+              "",
+              "```",
+              report.trim(),
+              "```",
+              "",
+              `_Last checked: ${new Date().toISOString().slice(0, 10)}_`,
+            ].join("\n");
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "data-freshness",
+            });
+
+            if (open.length > 0) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open[0].number,
+                body,
+              });
+              core.notice(`Updated issue #${open[0].number}`);
+            } else {
+              const { data: created } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ["data-freshness"],
+              });
+              core.notice(`Opened issue #${created.number}`);
+            }
+
+      - name: Close the review issue once everything is fresh
+        if: steps.check.outputs.status == '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "data-freshness",
+            });
+            for (const issue of open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: "Every source is inside its review window again. Closing.",
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: "closed",
+              });
+            }

@@ -44,9 +44,14 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
-    server: isCodexSeatbeltSandbox
-      ? { watch: { useFsEvents: false, usePolling: true } }
-      : undefined,
+    server: {
+      // Bind every interface, not just the IPv6 loopback Vite defaults to.
+      // Chrome resolves `localhost` to 127.0.0.1, so a ::1-only bind refuses the
+      // connection and the dev server looks dead. Note this also exposes the dev
+      // server on the local network, which is the usual `--host` trade-off.
+      host: true,
+      ...(isCodexSeatbeltSandbox ? { watch: { useFsEvents: false, usePolling: true } } : {}),
+    },
     plugins: [
       vinext(),
       sites(),

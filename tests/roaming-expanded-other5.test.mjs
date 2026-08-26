@@ -18,7 +18,7 @@ test("the remaining five networks expose destination-specific, qualified scenari
     ["united-states", "voxi", "voxi-global"],
     ["united-states", "tesco-mobile", "tesco-metered-us"],
     ["japan", "sky-mobile", "plan-check"],
-    ["japan", "smarty", "smarty-metered-world"],
+    ["japan", "smarty", "plan-check"],
     ["united-arab-emirates", "voxi", "voxi-metered"],
     ["united-arab-emirates", "tesco-mobile", "tesco-metered-world"],
   ];
@@ -91,8 +91,6 @@ test("giffgaff EU overage charges only data above the entered inclusive allowanc
 test("published metered rates price the complete selected data target", () => {
   const cases = [
     ["tesco-mobile", "tesco-metered-us", "united-states", 10.24, false],
-    ["giffgaff", "giffgaff-metered", "japan", 204.8, true],
-    ["smarty", "smarty-metered-world", "japan", 1024, false],
     ["voxi", "voxi-metered", "united-arab-emirates", 122.88, true],
     ["tesco-mobile", "tesco-metered-world", "united-arab-emirates", 5120, false],
   ];
@@ -105,8 +103,10 @@ test("published metered rates price the complete selected data target", () => {
     assert.equal(actual.comparable, comparable);
     assert.equal(actual.callsTexts, "extra");
     assert.match(actual.evidence.url, /^https:\/\//);
-    assert.equal(actual.evidence.checkedAt, "2026-08-16");
-    assert.equal(actual.evidence.reviewAfter, "2026-08-23");
+    // Sources carry their own review windows now, so assert coherence rather
+    // than a fixed date that every recheck would have to update.
+    assert.match(actual.evidence.checkedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(actual.evidence.reviewAfter >= actual.evidence.checkedAt);
   }
 });
 
@@ -115,7 +115,7 @@ test("unpublished roaming remains unpriced and links to official guidance", () =
   assert.equal(skyJapan.cost, null);
   assert.equal(skyJapan.comparable, false);
   assert.match(`${skyJapan.detail} ${skyJapan.caveat}`, /does not currently list Japan/i);
-  assert.equal(skyJapan.evidence.url, "https://www.sky.com/help/articles/sky-mobile-roaming");
+  assert.equal(skyJapan.evidence.url, "https://www.sky.com/shop/mobile/roaming");
 
   const giffgaffUs = result("giffgaff", "giffgaff-check", 7, 5, "united-states");
   assert.equal(giffgaffUs.cost, null);

@@ -22,7 +22,7 @@ test("included roaming is comparable only after an adequate overseas allowance i
   const short = turkeyResult("ee", "included", 7, 5, 4.99);
   assert.equal(short.matched, false);
   assert.equal(short.comparable, false);
-  assert.match(short.matchReason, /does not cover/);
+  assert.match(short.matchReason, /isn.t enough for/);
 });
 
 test("custom cost alone never becomes a like-for-like comparison", () => {
@@ -73,13 +73,14 @@ test("EE and Sky use the user-entered UK allowance to decide equivalence", () =>
 });
 
 test("only selected UK-SIM days are charged and partial days round up", () => {
-  const threeSelectedDays = turkeyResult("three", "three-new", 2, 1);
-  assert.equal(threeSelectedDays.cost, 16);
-  assert.match(threeSelectedDays.detail, /2 days/);
+  const skySelectedDays = turkeyResult("sky-mobile", "sky-passport", 2, 1);
+  assert.equal(skySelectedDays.cost, 4);
+  assert.match(skySelectedDays.detail, /2 activated 24-hour periods/);
 
+  // O2 Travel bills per 24-hour period, and both O2 branches now say so.
   const partialO2Day = turkeyResult("o2", "o2-travel", 1.2, 1);
   assert.equal(partialO2Day.cost, 14);
-  assert.match(partialO2Day.detail, /2 days/);
+  assert.match(partialO2Day.detail, /2 24-hour periods/);
 
   const noUkSimDays = turkeyResult("o2", "o2-travel", 0, 0);
   assert.equal(noUkSimDays.cost, 0);
@@ -88,6 +89,10 @@ test("only selected UK-SIM days are charged and partial days round up", () => {
 });
 
 test("O2 and Three expose published limits and enforce Three's 12GB ceiling", () => {
+  // Three no longer publishes a per-day Go Roam rate, so its ceiling is now
+  // exercised through a pass, on a destination where a pass is offered.
+  const usResult = (scenario, roamingDays, neededData, allowance) =>
+    getRoamingResult("three", scenario, roamingDays, "", neededData, "united-states", allowance);
   const o2 = turkeyResult("o2", "o2-travel", 7, 50);
   assert.equal(o2.unlimitedData, true);
   assert.equal(o2.speedCap, "2Mbps");
@@ -95,13 +100,13 @@ test("O2 and Three expose published limits and enforce Three's 12GB ceiling", ()
   assert.equal(o2.matched, true);
   assert.equal(o2.comparable, true);
 
-  const exactThreeLimit = turkeyResult("three", "three-new", 7, 12);
+  const exactThreeLimit = usResult("three-world-pass", 7, 12, "20");
   assert.equal(exactThreeLimit.dataAllowanceGb, 12);
   assert.equal(exactThreeLimit.tethering, "not-allowed");
   assert.equal(exactThreeLimit.matched, true);
   assert.equal(exactThreeLimit.comparable, true);
 
-  const overThreeLimit = turkeyResult("three", "three-older", 7, 12.01);
+  const overThreeLimit = usResult("three-world-pass", 7, 12.01, "20");
   assert.equal(overThreeLimit.matched, false);
   assert.equal(overThreeLimit.comparable, false);
 });

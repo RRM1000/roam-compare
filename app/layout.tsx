@@ -1,19 +1,17 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
+import { getSiteOrigin } from "@/lib/site-url";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  const socialImage = `${protocol}://${host}/og-premium.png`;
+  const origin = await getSiteOrigin();
+  const socialImage = `${origin}/og-premium.jpg`;
 
   return {
-    metadataBase: new URL(`${protocol}://${host}`),
+    metadataBase: new URL(origin),
     title: "RoamCompare — UK roaming vs travel eSIMs",
     description: "Compare UK roaming with travel eSIMs across 20 destinations, including dated prices, hotspot rules, speed caps and fair-use limits.",
     robots: { index: false, follow: false, nocache: true },
-    alternates: { canonical: `${protocol}://${host}/` },
+    alternates: { canonical: `${origin}/` },
     openGraph: {
       title: "RoamCompare — Know your roaming cost before take-off",
       description: "Compare UK roaming and travel eSIMs with visible hotspot rules, speed caps and fair-use limits.",

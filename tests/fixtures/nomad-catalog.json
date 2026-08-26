@@ -1,0 +1,42 @@
+[
+  {
+    "Name": "Anguilla_10GB_30Day",
+    "Url": "https://lotusflareinc.pxf.io/c/1111111/2222222/34279?prodsku=6968385e-9c42-42e1-9390-20d27406e48b&u=https%3A%2F%2Fwww.nomadesim.com%2Fanguilla-eSIM%3Futm_source%3Dimpact%26utm_medium%3Dweb&intsrc=APIG_29881",
+    "CurrentPrice": "34.00",
+    "Currency": "USD",
+    "CatalogItemId": "6968385e-9c42-42e1-9390-20d27406e48b",
+    "StockAvailability": "InStock"
+  },
+  {
+    "Name": "Local Jersey - 3 GB - 30 Days",
+    "Url": "https://lotusflareinc.pxf.io/c/1111111/2222222/34279?prodsku=a4e46eaf-450e-4214-9869-feababc6c2e6&u=https%3A%2F%2Fwww.nomadesim.com%2Fjersey-eSIM%3Futm_source%3Dimpact%26utm_medium%3Dweb&intsrc=APIG_29881",
+    "CurrentPrice": "15.00",
+    "Currency": "USD",
+    "CatalogItemId": "a4e46eaf-450e-4214-9869-feababc6c2e6",
+    "StockAvailability": "InStock"
+  },
+  {
+    "Name": "Regional SG-MY-TH  - 7 Days - 1 GB",
+    "Url": "https://lotusflareinc.pxf.io/c/1111111/2222222/34279?prodsku=b6fc710b-b299-4a50-b013-b83e5b5d8609&u=https%3A%2F%2Fwww.nomadesim.com%2Fsg-my-th-eSIM%3Futm_source%3Dimpact%26utm_medium%3Dweb&intsrc=APIG_29881",
+    "CurrentPrice": "4.00",
+    "Currency": "USD",
+    "CatalogItemId": "b6fc710b-b299-4a50-b013-b83e5b5d8609",
+    "StockAvailability": "InStock"
+  },
+  {
+    "Name": "Local France - 30 Days - 3 GB",
+    "Url": "https://lotusflareinc.pxf.io/c/1111111/2222222/34279?prodsku=d3c82b2c-3f35-40a2-8080-93ccd444be96&u=https%3A%2F%2Fwww.nomadesim.com%2Ffrance-eSIM%3Futm_source%3Dimpact%26utm_medium%3Dweb&intsrc=APIG_29881",
+    "CurrentPrice": "6.00",
+    "Currency": "USD",
+    "CatalogItemId": "d3c82b2c-3f35-40a2-8080-93ccd444be96",
+    "StockAvailability": "InStock"
+  },
+  {
+    "Name": "Local Turkey - 10 Days -Unlimited",
+    "Url": "https://lotusflareinc.pxf.io/c/1111111/2222222/34279?prodsku=b3fcaba9-6e0b-4790-9229-8476d2aa9638&u=https%3A%2F%2Fwww.nomadesim.com%2Fturkey-eSIM%3Futm_source%3Dimpact%26utm_medium%3Dweb&intsrc=APIG_29881",
+    "CurrentPrice": "28.00",
+    "Currency": "USD",
+    "CatalogItemId": "b3fcaba9-6e0b-4790-9229-8476d2aa9638",
+    "StockAvailability": "InStock"
+  }
+]

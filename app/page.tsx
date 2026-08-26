@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import CompareExperience, { type CallsNeed, type InitialComparison, type SortMode } from "@/app/components/CompareExperience";
 import { tripLengths, type Usage } from "@/lib/catalog";
 import { destinationById, isDestination, type DestinationId } from "@/lib/destinations";
 import { getScenarioOptions, isNetwork, type Network } from "@/lib/roaming";
+import { fetchNomadPlans } from "@/lib/nomad-live";
+import { fetchSailyPlans } from "@/lib/saily-live";
+import { getFaqJsonLd } from "@/lib/faq";
+import { getSiteOrigin } from "@/lib/site-url";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 type PageProps = { searchParams?: Promise<SearchParams> };
@@ -40,7 +43,7 @@ function resolveComparison(params: SearchParams): InitialComparison {
   const fiveGOnly = first(params.fiveG) === "1";
   const tetheringOnly = first(params.tethering) === "1";
 
-  return { destination, days, roamingDays, network, scenario, usage, callsNeed, roamingAllowance, sortMode, unlimitedOnly, fiveGOnly, tetheringOnly, compared: first(params.compare) === "1" && network !== "" && scenario !== "" };
+  return { destination, days, roamingDays, network, scenario, usage, callsNeed, roamingAllowance, scenarioDropped: requestedScenario !== "" && scenario === "", sortMode, unlimitedOnly, fiveGOnly, tetheringOnly, compared: first(params.compare) === "1" };
 }
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
@@ -49,20 +52,32 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   const destination = destinationById[initial.destination];
   const title = `${initial.days} ${initial.days === 1 ? "day" : "days"} in ${destination.name} — RoamCompare`;
   const description = `Compare ${destination.name} roaming for a UK mobile with travel eSIM options sized for a ${initial.days}-day trip.`;
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  const socialImage = `${protocol}://${host}/og-premium.png`;
+  const origin = await getSiteOrigin();
+  const socialImage = `${origin}/og-premium.jpg`;
   return {
     title,
     description,
     openGraph: { title, description, type: "website", images: [{ url: socialImage, width: 1536, height: 1024, alt: "RoamCompare — know the roaming cost before take-off" }] },
     twitter: { card: "summary_large_image", title, description, images: [socialImage] },
-    alternates: { canonical: `${protocol}://${host}/` },
+    alternates: { canonical: `${origin}/` },
   };
 }
 
 export default async function HomePage({ searchParams }: PageProps) {
+  // Both feeds start before the params are resolved, so they overlap.
+  const feeds = Promise.all([fetchSailyPlans(), fetchNomadPlans()]);
   const initial = resolveComparison((await searchParams) ?? {});
-  return <CompareExperience initial={initial} />;
+  const [[saily, nomad], origin] = [await feeds, await getSiteOrigin()];
+  const livePlans = [...(saily ?? []), ...(nomad ?? [])];
+  // Built from lib/faq.ts, the same source the visible accordion renders from.
+  const structuredData = [
+    getFaqJsonLd(),
+    { "@context": "https://schema.org", "@type": "Organization", name: "RoamCompare", url: origin, description: "Compares UK mobile roaming charges with travel eSIMs." },
+  ];
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+      <CompareExperience initial={initial} livePlans={livePlans.length ? livePlans : undefined} />
+    </>
+  );
 }

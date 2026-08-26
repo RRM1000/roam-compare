@@ -1,0 +1,51 @@
+name: Deploy RoamCompare
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Cloudflare rejects overlapping deploys of the same Worker, and a queued run
+# deploying older code after a newer one would silently roll the site back.
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22.13.0
+          cache: npm
+      - run: npm ci
+
+      # Never deploy something that would not have passed review. `npm test`
+      # builds first, so this also proves the build works before we ship it.
+      - run: npm run lint
+      - run: npm test
+        env:
+          # Anything NEXT_PUBLIC_* is inlined at build time, so it has to exist
+          # here rather than as a Worker secret.
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_KLOOK_AFFILIATE_ID: ${{ vars.NEXT_PUBLIC_KLOOK_AFFILIATE_ID }}
+          NEXT_PUBLIC_NOMAD_AFFILIATE_URL: ${{ vars.NEXT_PUBLIC_NOMAD_AFFILIATE_URL }}
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # The build emits a complete Worker config; deploy exactly that.
+          command: deploy --config dist/server/wrangler.json
+        env:
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_KLOOK_AFFILIATE_ID: ${{ vars.NEXT_PUBLIC_KLOOK_AFFILIATE_ID }}
+          NEXT_PUBLIC_NOMAD_AFFILIATE_URL: ${{ vars.NEXT_PUBLIC_NOMAD_AFFILIATE_URL }}
