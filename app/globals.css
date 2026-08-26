@@ -340,6 +340,8 @@ h2 { font-family:Georgia,"Times New Roman",serif; font-size:clamp(35px,4.5vw,58p
 /* The row's route to the shortlist it just joined — the table renders above
    the groups, behind the reader, and the heading's own button is off-screen. */
 .shortlist-jump { font-size:0.8125rem; margin-top:7px; }
+.roaming-caution { background:#faf4e4; border-left:3px solid #b8860b; border-radius:0 9px 9px 0; color:#5a4a1a; font-size:0.875rem; line-height:1.5; margin:13px 0 0; padding:10px 14px; }
+.roaming-caution strong { font-weight:850; }
 .deal-button { background:var(--forest); color:var(--white); gap:24px; min-width:145px; padding:14px 17px; }
 .deal-button:hover { background:var(--teal); transform:translateY(-1px); }
 .deal-button.disabled { background:#a7aaa6; cursor:not-allowed; justify-content:center; }
