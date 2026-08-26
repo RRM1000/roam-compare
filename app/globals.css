@@ -333,6 +333,10 @@ h2 { font-family:Georgia,"Times New Roman",serif; font-size:clamp(35px,4.5vw,58p
    full wording stays in the title attribute and on the decision card. */
 .price-block small.versus-roaming { align-items:baseline; display:flex; gap:6px; justify-content:flex-end; white-space:nowrap; }
 .price-block small.versus-roaming>span { color:var(--muted); font-size:0.8125rem; font-weight:500; letter-spacing:.02em; }
+/* The length is what separates two rows from the same provider — Nomad lists
+   Unlimited at 15 and 30 days — so it sits in the heading rather than among
+   the grey facts, where it read as one more attribute. */
+.plan-duration { color:var(--muted); font-weight:500; white-space:nowrap; }
 .deal-button { background:var(--forest); color:var(--white); gap:24px; min-width:145px; padding:14px 17px; }
 .deal-button:hover { background:var(--teal); transform:translateY(-1px); }
 .deal-button.disabled { background:#a7aaa6; cursor:not-allowed; justify-content:center; }
