@@ -37,12 +37,12 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.match(text, /We won’t guess — roaming costs differ far too much between networks\./);
   assert.match(text, /Do you need normal calls or SMS\?/);
   assert.match(text, /Compare with your own network/);
-  assert.match(text, /How does your plan charge for roaming here\?/);
-  // The roaming question is a yes/no; the exact day count is behind a link.
-  assert.match(text, /Will you use paid roaming on your UK network\?/);
-  assert.match(text, /Only some days\?/);
-  assert.match(text, /eSIM or Wi-Fi only/);
-  assert.match(text, /Data available through your UK plan abroad \(GB\)/);
+  // Until a network is chosen, only the network select shows — a tariff select
+  // reading "Choose a network first", pre-answered roaming cards and an
+  // allowance box were noise inside a panel labelled optional.
+  assert.doesNotMatch(text, /How does your plan charge for roaming here\?/);
+  assert.doesNotMatch(text, /Will you use paid roaming on your UK network\?/);
+  assert.doesNotMatch(text, /How much data does your plan give you abroad\?/);
   assert.match(html, /<option value="45">/);
   assert.match(html, /<option value="60">/);
   assert.match(html, /<option value="90">/);
@@ -105,6 +105,17 @@ test("shared Japan comparison renders prices and a sourced roaming calculation",
   assert.match(text, /US\$16\.00 listed when we checked/);
   assert.match(text, /SoftBank/);
   assert.match(text, /Hotspot works/);
+});
+
+test("choosing a network reveals the roaming questions, in charging terms", async () => {
+  const response = await render("/?compare=1&destination=turkey&days=7&roamingDays=7&network=ee&usage=everyday&allowance=10");
+  assert.equal(response.status, 200);
+  const text = visible(await response.text());
+  assert.match(text, /Will you use paid roaming on your UK network\?/);
+  assert.match(text, /Only some days\?/);
+  assert.match(text, /eSIM or Wi-Fi only/);
+  assert.match(text, /How does your plan charge for roaming here\?/);
+  assert.match(text, /How much data does your plan give you abroad\? \(GB\)/);
 });
 
 test("normal-call requirement can select a verified US voice plan", async () => {
