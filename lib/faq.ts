@@ -38,12 +38,12 @@ export function getFaq(): FaqEntry[] {
       question: "Why does one provider show several plans?",
       answer:
         "Because more than one can fit your trip — a bigger allowance, a longer run before it expires, or unlimited data. " +
-        "We hide the ones that cost more without giving you more, and you can show those again at any time. Pin up to three to compare side by side.",
+        "We show each provider’s best few for your trip and tuck the rest — including any that cost more without giving you more — behind one “show more” button. Pin up to three to compare side by side.",
     },
     {
       question: "Where do I find hotspot and speed limits?",
       answer:
-        "Open “Hotspot, speed & other limits” on any plan. It covers whether you can tether, what happens when you hit a speed cap, " +
+        "Open “Hotspot, speed & other limits” on any plan. It covers whether you can use the phone as a hotspot, what happens when you hit a speed cap, " +
         "what the fair-use rules are, when the plan starts counting down, and which local network you will be on. " +
         "If it says “check plan”, the provider’s own wording was not clear enough for us to promise you either way.",
     },
@@ -62,8 +62,8 @@ export function getFaq(): FaqEntry[] {
     {
       question: "How many destinations do you cover?",
       answer:
-        `${destinationCount} destinations and all ${networkCount} UK networks. ` +
-        `Saily prices every destination live; ${pricedCount} of them also carry hand-checked prices from Airalo and Nomad.`,
+        `${destinationCount} destinations — ${destinations.map((destination) => destination.name).join(", ")} — and all ${networkCount} UK networks. ` +
+        `Saily and Nomad price every destination live; ${pricedCount} of them also carry hand-checked Airalo prices.`,
     },
   ];
 }
