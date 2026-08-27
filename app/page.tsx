@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@/app/components/Analytics";
 import CompareExperience, { type CallsNeed, type InitialComparison, type SortMode } from "@/app/components/CompareExperience";
 import { tripLengths, type Usage } from "@/lib/catalog";
 import { destinationById, isDestination, type DestinationId } from "@/lib/destinations";
@@ -76,6 +77,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   ];
   return (
     <>
+      <Analytics />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <CompareExperience initial={initial} livePlans={livePlans.length ? livePlans : undefined} />
     </>

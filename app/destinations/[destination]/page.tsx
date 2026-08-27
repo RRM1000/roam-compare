@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Analytics } from "@/app/components/Analytics";
 import CompareExperience, { type InitialComparison } from "@/app/components/CompareExperience";
 import { destinationById, destinations, isDestination } from "@/lib/destinations";
 import { fetchNomadPlans } from "@/lib/nomad-live";
@@ -62,6 +63,7 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
   };
   return (
     <>
+      <Analytics />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
       <CompareExperience initial={initial} livePlans={livePlans.length ? livePlans : undefined} destinationLanding />
     </>

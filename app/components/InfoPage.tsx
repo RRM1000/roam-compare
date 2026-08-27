@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { Analytics } from "@/app/components/Analytics";
 
 /**
  * `updated` is required rather than defaulted, so editing a page forces the date
@@ -9,6 +10,7 @@ import Link from "next/link";
 export function InfoPage({ eyebrow, title, intro, updated, children }: { eyebrow: string; title: string; intro: string; updated: string; children: ReactNode }) {
   return (
     <div className="info-page">
+      <Analytics />
       <a className="skip-link" href="#main-content">Skip to content</a>
       <header className="info-header"><nav className="nav-shell" aria-label="Main navigation">
         <Link className="brand" href="/" aria-label="RoamCompare home"><span className="brand-mark" aria-hidden="true">RC</span><span>RoamCompare</span></Link>
