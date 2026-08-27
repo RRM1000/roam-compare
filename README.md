@@ -132,11 +132,13 @@ Done:
 - `SAILY_AFF_ID`, `SAILY_OFFER_ID`, `IMPACT_ACCOUNT_SID` and `IMPACT_AUTH_TOKEN` are set as Worker secrets; both live feeds confirmed working in production
 - `npm test` and `npm run lint` pass, and `npm run data:check` passes outright — no unconfirmed source left
 - a daily scheduled workflow rechecks freshness and opens an issue if anything falls overdue
+- domain connected: `NEXT_PUBLIC_SITE_URL=https://roamcompare.co.uk`, canonicals and the sitemap confirmed pointing at it
+- Klook approved the domain: `NEXT_PUBLIC_KLOOK_AFFILIATE_ID=132809`
+- Google Analytics, gated behind Consent Mode defaulted to denied (see the Analytics component in `app/layout.tsx`) — a stopgap until a consent banner exists
 
 Still open:
-- a domain, and `NEXT_PUBLIC_SITE_URL` set to it as a repository variable so canonicals and the sitemap stop pointing at the `.workers.dev` URL
-- the approved Klook tracking URL — the affiliate programme requires a live domain before issuing one
 - a monitored contact address, published somewhere on the site
+- a real consent banner, so Analytics can move past the denied-by-default stopgap
 - replace the private `Disallow: /` robots policy only when the site is intentionally made public
 
 ## Deployment
