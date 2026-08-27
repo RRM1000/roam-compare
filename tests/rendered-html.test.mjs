@@ -239,7 +239,15 @@ for (const [slug, name] of [["spain", "Spain"], ["japan", "Japan"]]) {
     assert.equal(response.status, 200);
     const html = await response.text();
     assert.match(html, new RegExp(`<title>${name} eSIM and UK roaming comparison — RoamCompare<\\/title>`, "i"));
-    assert.match(html, new RegExp(`rel="canonical" href="http:\\/\\/localhost:3000\\/destinations\\/${slug}"`, "i"));
+    // The origin is whatever NEXT_PUBLIC_SITE_URL resolves to — localhost in a
+    // plain checkout, the real domain once it's configured for deploy. Reading
+    // it from the response rather than hardcoding either keeps this passing in
+    // both, and still catches a canonical that's missing or points elsewhere.
+    const origin = html.match(/rel="canonical" href="(https?:\/\/[^/"]+)/)?.[1];
+    assert.ok(origin, "no canonical link in the document head");
+    const escapedOrigin = origin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    assert.match(html, new RegExp(`rel="canonical" href="${escapedOrigin}\\/destinations\\/${slug}"`, "i"));
+    assert.match(html, new RegExp(`property="og:url" content="${escapedOrigin}\\/destinations\\/${slug}"`, "i"));
     assert.match(visible(html), new RegExp(`UK → ${name} · roaming vs eSIM`));
     assert.match(visible(html), new RegExp(`Compare eSIMs for ${name}\\.`));
     assert.doesNotMatch(html, /og-premium\.png|og\.png/);
