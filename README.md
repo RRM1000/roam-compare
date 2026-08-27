@@ -128,11 +128,15 @@ The first variable is the Turkey URL retained for backwards compatibility. Confi
 
 ## Before public launch
 
-- configure the approved Klook tracking URLs
-- set `SAILY_AFF_ID` and `SAILY_OFFER_ID` as deployment variables and confirm a live click is attributed
-- add the public operator identity and monitored contact address
-- refresh every manual price snapshot and roaming source
-- run `npm test` and `npm run lint`
+Done:
+- `SAILY_AFF_ID`, `SAILY_OFFER_ID`, `IMPACT_ACCOUNT_SID` and `IMPACT_AUTH_TOKEN` are set as Worker secrets; both live feeds confirmed working in production
+- `npm test` and `npm run lint` pass, and `npm run data:check` passes outright — no unconfirmed source left
+- a daily scheduled workflow rechecks freshness and opens an issue if anything falls overdue
+
+Still open:
+- a domain, and `NEXT_PUBLIC_SITE_URL` set to it as a repository variable so canonicals and the sitemap stop pointing at the `.workers.dev` URL
+- the approved Klook tracking URL — the affiliate programme requires a live domain before issuing one
+- a monitored contact address, published somewhere on the site
 - replace the private `Disallow: /` robots policy only when the site is intentionally made public
 
 ## Deployment
