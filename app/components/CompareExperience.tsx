@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import DeviceCompatibilityChecker from "@/app/components/DeviceCompatibilityChecker";
 import {
   DATA_CHECKED_AT,
@@ -21,7 +21,7 @@ import {
 } from "@/lib/catalog";
 import { getPlanMatch, money, nativeMoney, partitionDominated, withProviderHandoffs } from "@/lib/comparison";
 import { getFaq } from "@/lib/faq";
-import { destinationById, destinations, getProviderSourceUrl, getProviderUrl, hasNomadTracking, isTrackedUrl, type Destination, type DestinationId } from "@/lib/destinations";
+import { destinationById, destinations, getPlanUrl, getProviderSourceUrl, isTrackedUrl, type Destination, type DestinationId } from "@/lib/destinations";
 import { getEsimDevice, getEsimReadiness, type LockStatus } from "@/lib/esim-devices";
 import { getRoamingResult, getScenarioOptions, networkNames, pricedRoamingCoverage, ROAMING_CHECKED_AT, ROAMING_REVIEW_AFTER, type Network } from "@/lib/roaming";
 
@@ -130,14 +130,6 @@ function callsLabel(plan: Pick<Plan, "callingSupport">) {
   return "Calls & texts: check the plan";
 }
 
-function getPlanUrl(plan: Plan, destination: Destination) {
-  if (plan.provider === "Klook") return getProviderUrl("Klook", destination);
-  // Nomad plans carry a catalogue sourceUrl, which would otherwise win over a
-  // configured tracking link and send the click through unattributed.
-  if (plan.provider === "Nomad" && hasNomadTracking(destination.id)) return getProviderUrl("Nomad", destination);
-  return plan.checkoutUrl ?? plan.sourceUrl ?? getProviderUrl(plan.provider, destination);
-}
-
 /**
  * Live provider plans replace the manual snapshots for the same provider and
  * destination. Snapshots stay in place for any destination the live feed does not
@@ -149,7 +141,7 @@ function mergePlans(livePlans: Plan[] | undefined) {
   return [...plans.filter((plan) => !replaced.has(`${plan.provider}|${plan.destination}`)), ...livePlans];
 }
 
-export default function CompareExperience({ initial = defaultComparison, destinationLanding = false, livePlans }: { initial?: InitialComparison; destinationLanding?: boolean; livePlans?: Plan[] }) {
+export default function CompareExperience({ initial = defaultComparison, destinationLanding = false, livePlans, guide }: { initial?: InitialComparison; destinationLanding?: boolean; livePlans?: Plan[]; guide?: ReactNode }) {
   const [destination, setDestination] = useState<DestinationId>(initial.destination);
   const [days, setDays] = useState(initial.days);
   const [roamingDays, setRoamingDays] = useState(initial.roamingDays);
@@ -484,7 +476,7 @@ export default function CompareExperience({ initial = defaultComparison, destina
       <a className="skip-link" href="#compare">Skip to comparison</a>
       <header className="site-header"><nav className="nav-shell" aria-label="Main navigation">
         <a className="brand" href="#top" aria-label="RoamCompare home"><span className="brand-mark" aria-hidden="true">RC</span><span>RoamCompare</span></a>
-        <div className="nav-actions"><span className="nav-note">Built for UK travellers</span><a className="nav-data" href="#methodology">Our data</a><a href="#faq">FAQ</a><a className="nav-about" href="/about">About</a><a className="nav-cta" href="#compare">Compare</a></div>
+        <div className="nav-actions"><span className="nav-note">Built for UK travellers</span>{guide && <a href="#guide">Guide</a>}<a className="nav-data" href="#methodology">Our data</a><a href="#faq">FAQ</a><a className="nav-about" href="/about">About</a><a className="nav-cta" href="#compare">Compare</a></div>
       </nav></header>
 
       <main className="home-page" id="main-content">
@@ -601,6 +593,8 @@ export default function CompareExperience({ initial = defaultComparison, destina
           <div className="post-results-guidance"><aside className="travel-alert"><span aria-hidden="true">!</span><div><strong>Buy and install before you fly</strong><p>{destination === "turkey" || destination === "united-arab-emirates" ? `You may not be able to reach the provider’s website once you are in ${activeDestination.name}. Buy, install on reliable Wi-Fi and save the QR or manual setup details before departure.` : `Install your ${activeDestination.name} eSIM on reliable Wi-Fi before departure and save its QR code or manual setup details.`}</p></div></aside><aside className={`calling-guide ${callsNeed === "yes" ? "check-plan" : "data-only"}`}><span aria-hidden="true">☎</span><div><small>Calls and texts</small><strong>{callsNeed === "yes" ? "Normal calls and SMS are part of your requirement" : "Most travel plans here are data-only"}</strong><p>App calls use mobile data. “Data only” means no phone number, calls or SMS are included; a separate UK line or a verified voice plan is needed. <a href="#methodology">Sources checked {formatCheckedDate(DATA_CHECKED_AT)}</a>.</p></div></aside></div>
           <p className="results-disclaimer">Plans marked “Live price” come straight from the provider’s own feed. Saily’s are real pounds; Nomad’s are US dollars we convert. Hand-checked prices were last confirmed on {formatCheckedDate(DATA_CHECKED_AT)} in the currency shown, and stop being ranked after seven days. Where we convert a price we use rounded rates (€1 ≈ £{gbpRates.EUR}, $1 ≈ £{gbpRates.USD}), so treat those totals as close estimates rather than the figure you will pay. Klook prices are never scraped or guessed. Commission never changes the order. We only show a saving when roaming covers your whole trip and everything else you ticked. We can’t confirm 5G roaming on any network, so ticking “5G listed” hides savings entirely. Always confirm coverage, price, hotspot rules, speed caps, fair use, calls/texts and activation at checkout.</p>
         </section>
+
+        {guide}
 
         <section className="methodology-section" id="methodology"><div className="methodology-intro"><p className="eyebrow">Where the numbers come from</p><h2>How we work this out.</h2><p>{liveDestinationCount > 0 ? `On EE we price roaming for all ${destinations.length} destinations. Across the other nine networks we price ${pricedRoamingCoverage().others} more network-and-destination combinations from published charges; everywhere else we send you to your network's own checker instead of guessing. Saily and Nomad send us their prices directly, covering ${liveDestinationCount} destinations. Airalo prices are checked by hand for ${pricedDestinationIds.length} of them and stop being ranked a week after we last looked. Klook never shows a price here — we send you to their own page instead of guessing one.` : `On EE we price roaming for all ${destinations.length} destinations. Across the other nine networks we price ${pricedRoamingCoverage().others} more network-and-destination combinations from published charges, and send you to your network's own checker elsewhere. ${pricedDestinationIds.length} destinations have prices we checked by hand; for the other ${destinations.length - pricedDestinationIds.length} we send you to the provider rather than show a number we cannot stand behind.`}</p><div className="data-status"><span><i className={roamingReviewDue ? "stale" : "fresh"} />UK roaming rules <strong>{formatCheckedDate(ROAMING_CHECKED_AT)} · {roamingReviewDue ? "review overdue" : `review by ${formatCheckedDate(ROAMING_REVIEW_AFTER)}`}</strong></span><span><i className={dataReviewDue ? "stale" : "fresh"} />Hand-checked prices &amp; calls/texts labels <strong>{formatCheckedDate(DATA_CHECKED_AT)} · {dataReviewDue ? "review overdue" : `review by ${formatCheckedDate(DATA_REVIEW_AFTER)}`}</strong></span><span><i className={fxReviewDue ? "stale" : "fresh"} />Exchange rates (rounded) <strong>{formatCheckedDate(FX_EVIDENCE.checkedAt)} · {fxReviewDue ? "review overdue" : `review by ${formatCheckedDate(FX_EVIDENCE.reviewAfter)}`}</strong></span><span><i className="manual" />Price refresh rule <strong>7 days, then removed from ranking</strong></span><span><i className={liveDestinationCount > 0 ? "fresh" : "manual"} />Live prices from Saily and Nomad <strong>{liveDestinationCount > 0 ? `working · ${liveDestinationCount} destinations` : "not answering — showing hand-checked prices"}</strong></span></div></div><details className="source-register"><summary>Sources for {activeDestination.name} <span>Every price’s paper trail</span></summary><div className="source-grid">{currentSources.length > 0 ? currentSources.map((plan) => <a href={plan.sourceUrl} target="_blank" rel="noopener noreferrer" key={plan.sourceUrl}><span>Where we checked</span><strong>{plan.provider} {activeDestination.name}</strong><small>{plan.note} · checked {formatCheckedDate(plan.checkedAt)} · review by {formatCheckedDate(plan.reviewAfter)}</small></a>) : (Object.keys(providerDetails) as Provider[]).map((provider) => <a href={getProviderSourceUrl(provider, activeDestination)} target="_blank" rel="noopener noreferrer" key={provider}><span>Where to check</span><strong>{provider} {activeDestination.name}</strong><small>Price and exact limits are shown on their site</small></a>)}{roaming && <a href={roaming.evidence.url} target="_blank" rel="noopener noreferrer"><span>UK roaming</span><strong>{roaming.evidence.label}</strong><small>Checked {formatCheckedDate(roaming.evidence.checkedAt)} · review by {formatCheckedDate(roaming.evidence.reviewAfter)}</small></a>}<a href={FX_EVIDENCE.url} target="_blank" rel="noopener noreferrer"><span>Currency method</span><strong>{FX_EVIDENCE.label}</strong><small>Rounded comparison assumptions · checked {formatCheckedDate(FX_EVIDENCE.checkedAt)} · review by {formatCheckedDate(FX_EVIDENCE.reviewAfter)}</small></a></div></details></section>
 

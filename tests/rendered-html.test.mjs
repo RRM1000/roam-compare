@@ -254,6 +254,75 @@ for (const [slug, name] of [["spain", "Spain"], ["japan", "Japan"]]) {
   });
 }
 
+test("the Turkey page carries its written guide, structured data and disclosed affiliate links", async () => {
+  const response = await render("/destinations/turkey");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const text = visible(html);
+
+  // Metadata comes from the guide, not the generic destination template.
+  assert.match(html, /<title>Turkey eSIM vs UK roaming: what it costs from the UK \(2026\) — RoamCompare<\/title>/);
+  assert.match(html, /<meta name="description" content="Turkey is outside every UK network/);
+  assert.match(html, /property="og:locale" content="en_GB"/);
+
+  // The guide is server-rendered into the HTML, under the comparison and above the methodology.
+  assert.match(html, /<section class="guide-section" id="guide"/);
+  assert.ok(html.indexOf('id="results"') < html.indexOf('id="guide"'));
+  assert.ok(html.indexOf('id="guide"') < html.indexOf('id="methodology"'));
+  assert.match(html, /<a href="#guide">Guide<\/a>/);
+  assert.match(text, /Short answer: buy a Turkey eSIM before you fly/);
+  assert.match(text, /Go Roam Around the World Extra/);
+  assert.match(text, /You cannot buy most travel eSIMs once you are in Turkey/);
+  assert.match(text, /7 days · plan for 6GB/);
+  assert.match(text, /14 days · plan for 12GB/);
+
+  // Every UK network gets a row, each linking to a network page with a check date.
+  for (const name of ["EE", "O2", "Vodafone", "Three", "iD Mobile", "Sky Mobile", "giffgaff", "SMARTY", "VOXI", "Tesco Mobile"]) {
+    assert.match(html, new RegExp(`<th scope="row">${name}</th>`), `${name} has no row in the network table`);
+  }
+  assert.match(html, /country=Turkey&amp;plan=paym/);
+  assert.match(text, /checked \d+ \w+ \d{4}/);
+
+  // Structured data: breadcrumbs, the guide's FAQ and an Article, all in one block.
+  const jsonLd = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/)?.[1];
+  assert.ok(jsonLd, "no JSON-LD on the page");
+  const parsed = JSON.parse(jsonLd);
+  const types = parsed.map((item) => item["@type"]);
+  assert.deepEqual(types, ["BreadcrumbList", "FAQPage", "Article"]);
+  const faq = parsed.find((item) => item["@type"] === "FAQPage");
+  for (const entry of faq.mainEntity) {
+    assert.match(text, new RegExp(entry.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `FAQ "${entry.name}" is in the structured data but not on the page`);
+  }
+  const article = parsed.find((item) => item["@type"] === "Article");
+  assert.equal(article.inLanguage, "en-GB");
+  assert.match(article.mainEntityOfPage, /\/destinations\/turkey$/);
+
+  // Provider links in the guide are the same tracked links the comparison uses,
+  // and are disclosed. Airalo, which is not an affiliate, stays undisclosed.
+  const guideHtml = html.slice(html.indexOf('id="guide"'), html.indexOf('id="methodology"'));
+  assert.match(guideHtml, /href="https:\/\/www\.klook\.com\/[^"]*activity\/128551-turkey-esim[^"]*" target="_blank" rel="sponsored noopener noreferrer"/);
+  assert.match(guideHtml, /href="https:\/\/www\.airalo\.com\/turkey-esim" target="_blank" rel="noopener noreferrer"/);
+  assert.doesNotMatch(guideHtml, /airalo\.com[^"]*" target="_blank" rel="sponsored/);
+
+  // Sources are listed with dates, and internal links reach other destinations.
+  assert.match(html, /id="source-three-turkey"/);
+  assert.match(text, /Sources for this guide/);
+  assert.match(html, /href="\/destinations\/greece"/);
+
+  // The sitemap carries the guide's date and a higher priority for it.
+  const sitemap = await (await render("/sitemap.xml")).text();
+  assert.match(sitemap, /<loc>[^<]*\/destinations\/turkey<\/loc>\s*<lastmod>2026-09-10/);
+});
+
+test("a destination without a guide keeps the generic page and no FAQ markup", async () => {
+  const response = await render("/destinations/greece");
+  const html = await response.text();
+  assert.match(html, /<title>Greece eSIM and UK roaming comparison — RoamCompare<\/title>/);
+  assert.doesNotMatch(html, /id="guide"/);
+  assert.doesNotMatch(html, /"FAQPage"/);
+  assert.doesNotMatch(html, /<a href="#guide">/);
+});
+
 test("private launch controls block crawlers and expose launch-ready routes", async () => {
   const robots = await render("/robots.txt");
   assert.equal(robots.status, 200);

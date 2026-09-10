@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { destinations } from "@/lib/destinations";
+import { getGuide } from "@/lib/guides";
 import { getSiteOrigin } from "@/lib/site-url";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -10,11 +11,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 1,
     },
-    ...destinations.map((destination) => ({
-      url: `${siteUrl}/destinations/${destination.id}`,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    })),
+    ...destinations.map((destination) => {
+      const guide = getGuide(destination.id);
+      return {
+        url: `${siteUrl}/destinations/${destination.id}`,
+        changeFrequency: "weekly" as const,
+        // A written guide is the page search engines should reach first.
+        priority: guide ? 0.9 : 0.8,
+        ...(guide ? { lastModified: guide.updatedAt } : {}),
+      };
+    }),
     {
       url: `${siteUrl}/about`,
       changeFrequency: "monthly",

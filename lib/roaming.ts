@@ -65,6 +65,10 @@ export const scenarioRoamingEvidence: Record<string, RoamingEvidence> = {
   "three-europe-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
   "three-world-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
   "three-extra-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
+  // Turkey is a Go Roam Around the World Extra destination on Three's own page
+  // for it, with the same pass prices as Japan and the UAE. Kept as its own
+  // entry so the Turkey result links to the page that names Turkey.
+  "three-extra-pass-turkey": evidence("Three roaming abroad: Turkey", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad?country=Turkey&plan=paym", { checkedAt: "2026-09-10", reviewAfter: "2026-10-10" }),
   "id-europe": evidence("iD Mobile EU fair-use policy", "https://www.idmobile.co.uk/help-and-support/eu-roaming/fair-usage-policy", CHECKED_2026_08_25),
   "id-roam-beyond": evidence("iD Mobile Roam Beyond", "https://www.idmobile.co.uk/help-and-support/roaming", CHECKED_2026_08_25),
   "giffgaff-europe": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_08_25),
@@ -102,7 +106,7 @@ export const scenarioOptions: Record<Network, Array<{ value: string; label: stri
   ee: [{ value: "ee-current", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
   o2: [{ value: "o2-travel", label: "O2 Travel — £7 on days used" }, { value: "included", label: "O2 Travel is included in my plan" }, { value: "custom", label: "Enter my own trip cost" }],
   vodafone: [{ value: "vodafone-check", label: "I need to check my Vodafone plan" }, { value: "included", label: "Turkey is included in my plan" }, { value: "custom", label: "Enter my own trip cost" }],
-  three: [{ value: "plan-check", label: "Check your Go Roam rate in My3" }, ...common],
+  three: [{ value: "three-extra-pass-turkey", label: "Three Go Roam Extra — £7/day or a 3, 5, 7 or 14-day pass" }, ...common],
   "id-mobile": [{ value: "id-roam-beyond", label: "iD Roam Beyond pass — £5/1d, £20/5d, £35/10d" }, ...common],
   "sky-mobile": [{ value: "sky-passport", label: "Roaming Passport Plus — £2/24 hours" }, ...common],
   giffgaff: [{ value: "giffgaff-check", label: "Check my Turkey travel add-on" }, ...common],
@@ -427,6 +431,13 @@ export function getRoamingResult(
           : `The estimate prices all ${formattedData}GB you'll use on the days you're roaming. A network spend limit can still stop service.`,
     });
   };
+
+  if (scenario === "three-extra-pass-turkey") {
+    // Three's Turkey page prices both the daily unlock and the passes, so the
+    // cheapest mix of the two is what a customer would actually pay.
+    const pass = getPasses(billableDays, [{ days: 14, cost: 84, label: "14-day" }, { days: 7, cost: 42, label: "7-day" }, { days: 5, cost: 29.75, label: "5-day" }, { days: 3, cost: 17.5, label: "3-day" }, { days: 1, cost: 7, label: "day at £7" }]);
+    return ukAllowanceResult({ cost: pass.cost, title: "Three Go Roam Extra estimate", detail: `${pass.labels.join(" + ")} covers at least ${billableDays} ${billableDays === 1 ? "day" : "days"}.`, caveat: "£7 a day for plans taken out between 1 October 2021 and 17 December 2025; £8 a day from 18 December 2025. Uses your UK allowance, with up to 12GB abroad. Hotspot use isn't allowed, and days are counted in Turkish time.", capGb: 12, tethering: "not-allowed", callsTexts: "included" });
+  }
 
   if (destination !== "turkey") {
     if (scenario === "ee-europe-new") {

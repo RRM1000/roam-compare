@@ -1,4 +1,4 @@
-import type { Provider } from "./catalog";
+import type { Plan, Provider } from "./catalog";
 
 export type DestinationId = "turkey" | "united-states" | "spain" | "france" | "italy" | "greece" | "portugal" | "germany" | "netherlands" | "ireland" | "cyprus" | "united-arab-emirates" | "thailand" | "japan" | "australia" | "canada" | "mexico" | "morocco" | "egypt" | "indonesia";
 
@@ -216,6 +216,20 @@ export function getProviderSourceUrl(provider: Provider, destination: Destinatio
   if (provider === "Nomad") return nomadProductUrl(destination);
   if (provider === "Airalo") return `https://www.airalo.com/${destination.airaloSlug}-esim`;
   return `https://saily.com/esim-${destination.sailySlug}/`;
+}
+
+/**
+ * The link a "See this plan" button should open for one plan.
+ *
+ * Klook always goes through the tracked product page. Nomad plans carry a
+ * catalogue sourceUrl, which would otherwise win over a configured tracking
+ * link and send the click through unattributed. Everything else prefers the
+ * checkout URL the provider's feed handed back, then its source page.
+ */
+export function getPlanUrl(plan: Pick<Plan, "provider" | "checkoutUrl" | "sourceUrl">, destination: Destination) {
+  if (plan.provider === "Klook") return getProviderUrl("Klook", destination);
+  if (plan.provider === "Nomad" && hasNomadTracking(destination.id)) return getProviderUrl("Nomad", destination);
+  return plan.checkoutUrl ?? plan.sourceUrl ?? getProviderUrl(plan.provider, destination);
 }
 
 export function getProviderUrl(provider: Provider, destination: Destination) {

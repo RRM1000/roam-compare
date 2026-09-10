@@ -1,5 +1,6 @@
 import { DATA_CHECKED_AT, DATA_REVIEW_AFTER, FX_EVIDENCE, plans, pricedDestinationIds } from "../lib/catalog.ts";
 import { esimSources } from "../lib/esim-devices.ts";
+import { guides } from "../lib/guides/index.ts";
 import { networkRoamingEvidence, ROAMING_CHECKED_AT, ROAMING_REVIEW_AFTER, scenarioRoamingEvidence } from "../lib/roaming.ts";
 
 const providerDomains = {
@@ -78,6 +79,16 @@ function sourceIntegrityErrors(groups, now) {
       errors.push(`Roaming · ${source.label}: invalid evidence URL ${source.url}`);
     }
   }
+  for (const [destination, guide] of Object.entries(guides)) {
+    for (const source of guide.sources) {
+      errors.push(...validateWindow(`Guide · ${destination} · ${source.publisher}: ${source.label}`, source.checkedAt, source.reviewAfter, now));
+      try {
+        if (new URL(source.url).protocol !== "https:") errors.push(`Guide · ${destination} · ${source.id}: source URL must use HTTPS`);
+      } catch {
+        errors.push(`Guide · ${destination} · ${source.id}: invalid source URL ${source.url}`);
+      }
+    }
+  }
   errors.push(...validateWindow("eSIM catalogue constants", DATA_CHECKED_AT, DATA_REVIEW_AFTER, now));
   errors.push(...validateWindow("UK roaming", ROAMING_CHECKED_AT, ROAMING_REVIEW_AFTER, now));
   errors.push(...validateWindow("GBP conversion assumptions", FX_EVIDENCE.checkedAt, FX_EVIDENCE.reviewAfter, now));
@@ -122,6 +133,8 @@ try {
   const roamingDue = reviewIsDue(ROAMING_REVIEW_AFTER, now);
   const compatibilityDue = Object.values(esimSources).filter((source) => reviewIsDue(source.reviewAfter, now));
   const fxDue = reviewIsDue(FX_EVIDENCE.reviewAfter, now);
+  const guideSources = Object.entries(guides).flatMap(([destination, guide]) => guide.sources.map((source) => ({ destination, ...source })));
+  const guidesDue = guideSources.filter((source) => reviewIsDue(source.reviewAfter, now));
   const integrityErrors = sourceIntegrityErrors(plans, now);
 
   console.log(`Data freshness check for ${now.toISOString().slice(0, 10)}`);
@@ -130,6 +143,7 @@ try {
   console.log(`${new Set([...Object.values(networkRoamingEvidence), ...Object.values(scenarioRoamingEvidence)].map((source) => source.url)).size} official roaming sources checked.`);
   console.log(`${Object.keys(esimSources).length} compatibility sources checked; ${compatibilityDue.length} need review.`);
   console.log(`GBP conversion assumptions ${fxDue ? "need review" : `are current through ${FX_EVIDENCE.reviewAfter}`}.`);
+  console.log(`${guideSources.length} destination guide sources across ${Object.keys(guides).length} ${Object.keys(guides).length === 1 ? "guide" : "guides"} checked; ${guidesDue.length} need review.`);
 
   for (const plan of due) {
     console.log(`DUE  ${plan.destination} · ${plan.provider} · review after ${plan.reviewAfter} · ${plan.sourceUrl}`);
@@ -137,9 +151,12 @@ try {
   for (const source of compatibilityDue) {
     console.log(`DUE  compatibility · ${source.label} · review after ${source.reviewAfter} · ${source.url}`);
   }
+  for (const source of guidesDue) {
+    console.log(`DUE  guide · ${source.destination} · ${source.publisher}: ${source.label} · review after ${source.reviewAfter} · ${source.url}`);
+  }
   for (const error of integrityErrors) console.log(`ERROR  ${error}`);
 
-  if (duePlans.length > 0 || roamingDue || compatibilityDue.length > 0 || fxDue || integrityErrors.length > 0) process.exitCode = 1;
+  if (duePlans.length > 0 || roamingDue || compatibilityDue.length > 0 || fxDue || guidesDue.length > 0 || integrityErrors.length > 0) process.exitCode = 1;
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));
   process.exitCode = 2;
