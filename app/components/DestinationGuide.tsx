@@ -2,7 +2,7 @@ import Link from "next/link";
 import { formatCheckedDate, isPlanStale, plans, providerDetails, usagePerDay, type Plan, type Provider } from "@/lib/catalog";
 import { getPlanMatch, money } from "@/lib/comparison";
 import { destinationById, destinations, getPlanUrl, getProviderUrl, isTrackedUrl, type DestinationId } from "@/lib/destinations";
-import type { DestinationGuide as Guide, GuideSource } from "@/lib/guides";
+import type { DestinationGuide as Guide } from "@/lib/guides";
 import { getRoamingEvidence, getRoamingResult, networkNames, type Network } from "@/lib/roaming";
 
 type Props = { guide: Guide; livePlans?: Plan[] };
@@ -38,24 +38,8 @@ function cheapestPerProvider(destination: DestinationId, livePlans: Plan[] | und
   return best;
 }
 
-function sourceList(guide: Guide, ids: string[]) {
-  const byId = new Map(guide.sources.map((source) => [source.id, source]));
-  return ids.map((id) => byId.get(id)).filter((source): source is GuideSource => Boolean(source));
-}
-
-function Cite({ guide, ids }: { guide: Guide; ids: string[] }) {
-  const sources = sourceList(guide, ids);
-  if (sources.length === 0) return null;
-  return (
-    <span className="guide-cite">
-      {sources.map((source, index) => (
-        <span key={source.id}>
-          {index > 0 ? ", " : ""}
-          <a href={`#source-${source.id}`} aria-label={`Source: ${source.publisher}, ${source.label}`}>{source.publisher}</a>
-        </span>
-      ))}
-    </span>
-  );
+function Cite({ guide, ids }: { guide: Guide; ids?: string[] }) {
+  return null;
 }
 
 export default function DestinationGuide({ guide, livePlans }: Props) {
@@ -89,7 +73,6 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
             <tbody>
               {guide.networks.rows.map((row) => {
                 const evidence = getRoamingEvidence(row.network, row.scenario ?? "");
-                const extra = sourceList(guide, row.sourceIds);
                 return (
                   <tr key={row.network}>
                     <th scope="row">{networkNames[row.network]}</th>
@@ -98,7 +81,6 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
                     <td>
                       <a href={evidence.url} target="_blank" rel="noopener noreferrer">{evidence.label} ↗</a>
                       <small>checked {formatCheckedDate(evidence.checkedAt)}</small>
-                      {extra.map((source) => <a key={source.id} href={`#source-${source.id}`}>{source.publisher}: {source.label}</a>)}
                     </td>
                   </tr>
                 );
@@ -211,25 +193,8 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
           <li><Link href="/">All {destinations.length} destinations</Link></li>
         </ul>
       </div>
-
-      <div className="guide-block guide-sources" id="guide-sources">
-        <h3>Sources for this guide</h3>
-        <p>Written {formatCheckedDate(guide.writtenAt)}, last updated {formatCheckedDate(guide.updatedAt)}. Official and operator pages are listed first. Each entry shows the day we read it and the day our freshness check asks for it to be reread.</p>
-        <ol>
-          {[...guide.sources].sort((a, b) => kindRank(a.kind) - kindRank(b.kind)).map((source) => (
-            <li key={source.id} id={`source-${source.id}`}>
-              <a href={source.url} target="_blank" rel="noopener noreferrer">{source.publisher}: {source.label} ↗</a>
-              <small>{source.kind === "press" ? "Reporting" : source.kind === "official" ? "Official" : source.kind === "operator" ? "Network's own page" : "Provider's own page"} · checked {formatCheckedDate(source.checkedAt)} · review by {formatCheckedDate(source.reviewAfter)}</small>
-            </li>
-          ))}
-        </ol>
-      </div>
     </section>
   );
-}
-
-function kindRank(kind: GuideSource["kind"]) {
-  return { official: 0, operator: 1, provider: 2, press: 3 }[kind];
 }
 
 export type { Network };

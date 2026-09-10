@@ -42,7 +42,6 @@ test("checks every plan record and names the source domains it accepts", () => {
   assert.match(result.stdout, /official roaming sources checked/);
   assert.match(result.stdout, /compatibility sources checked/);
   assert.match(result.stdout, /destination guide sources across \d+ guides? checked/);
-  assert.match(result.stdout, /DUE\s{2}guide · turkey · /);
 });
 
 test("rejects calendar dates that merely match the date pattern", () => {

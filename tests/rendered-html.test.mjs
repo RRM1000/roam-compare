@@ -261,7 +261,9 @@ for (const [slug, name] of [["spain", "Spain"], ["japan", "Japan"]]) {
     const response = await render(`/destinations/${slug}`);
     assert.equal(response.status, 200);
     const html = await response.text();
-    assert.match(html, new RegExp(`<title>${name} eSIM and UK roaming comparison — RoamCompare<\\/title>`, "i"));
+    const { guides } = await import("../lib/guides/index.ts");
+    const expectedTitle = guides[slug] ? `${guides[slug].title} — RoamCompare` : `${name} eSIM and UK roaming comparison — RoamCompare`;
+    assert.match(html, new RegExp(`<title>${expectedTitle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}<\\/title>`, "i"));
     // The origin is whatever NEXT_PUBLIC_SITE_URL resolves to — localhost in a
     // plain checkout, the real domain once it's configured for deploy. Reading
     // it from the response rather than hardcoding either keeps this passing in
@@ -327,9 +329,9 @@ test("the Turkey page carries its written guide, structured data and disclosed a
   assert.match(guideHtml, /href="https:\/\/www\.airalo\.com\/turkey-esim" target="_blank" rel="noopener noreferrer"/);
   assert.doesNotMatch(guideHtml, /airalo\.com[^"]*" target="_blank" rel="sponsored/);
 
-  // Sources are listed with dates, and internal links reach other destinations.
-  assert.match(html, /id="source-three-turkey"/);
-  assert.match(text, /Sources for this guide/);
+  // Internal links reach other destinations, and guide-sources block is removed.
+  assert.doesNotMatch(html, /id="guide-sources"/);
+  assert.doesNotMatch(text, /Sources for this guide/);
   assert.match(html, /href="\/destinations\/greece"/);
 
   // The sitemap carries the guide's date and a higher priority for it.

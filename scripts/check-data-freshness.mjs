@@ -80,7 +80,7 @@ function sourceIntegrityErrors(groups, now) {
     }
   }
   for (const [destination, guide] of Object.entries(guides)) {
-    for (const source of guide.sources) {
+    for (const source of guide.sources ?? []) {
       errors.push(...validateWindow(`Guide · ${destination} · ${source.publisher}: ${source.label}`, source.checkedAt, source.reviewAfter, now));
       try {
         if (new URL(source.url).protocol !== "https:") errors.push(`Guide · ${destination} · ${source.id}: source URL must use HTTPS`);
@@ -133,7 +133,7 @@ try {
   const roamingDue = reviewIsDue(ROAMING_REVIEW_AFTER, now);
   const compatibilityDue = Object.values(esimSources).filter((source) => reviewIsDue(source.reviewAfter, now));
   const fxDue = reviewIsDue(FX_EVIDENCE.reviewAfter, now);
-  const guideSources = Object.entries(guides).flatMap(([destination, guide]) => guide.sources.map((source) => ({ destination, ...source })));
+  const guideSources = Object.entries(guides).flatMap(([destination, guide]) => (guide.sources ?? []).map((source) => ({ destination, ...source })));
   const guidesDue = guideSources.filter((source) => reviewIsDue(source.reviewAfter, now));
   const integrityErrors = sourceIntegrityErrors(plans, now);
 

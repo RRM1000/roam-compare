@@ -19,7 +19,7 @@ export type GuideSource = {
   kind: "official" | "operator" | "provider" | "press";
 };
 
-export type GuideFact = { label: string; value: string; sourceIds: string[] };
+export type GuideFact = { label: string; value: string; sourceIds?: string[] };
 
 export type GuideNetworkRow = {
   network: Network;
@@ -27,7 +27,7 @@ export type GuideNetworkRow = {
   scenario: string | null;
   headline: string;
   detail: string;
-  sourceIds: string[];
+  sourceIds?: string[];
 };
 
 export type GuideProviderNote = {
@@ -36,12 +36,14 @@ export type GuideProviderNote = {
   localNetwork: string;
   summary: string;
   watchOut?: string;
-  sourceIds: string[];
+  bestFor?: string;
+  watchFor?: string;
+  sourceIds?: string[];
 };
 
-export type GuideSection = { id: string; heading: string; paragraphs: string[]; sourceIds: string[] };
+export type GuideSection = { id: string; heading: string; paragraphs: string[]; sourceIds?: string[] };
 
-export type GuideFaq = { question: string; answer: string; sourceIds: string[] };
+export type GuideFaq = { question: string; answer: string; sourceIds?: string[] };
 
 export type DestinationGuide = {
   destination: DestinationId;
@@ -50,16 +52,17 @@ export type DestinationGuide = {
   title: string;
   description: string;
   /** The one-paragraph answer a searcher wants before anything else. */
-  verdict: { heading: string; body: string; sourceIds: string[] };
+  verdict: { heading: string; body: string; sourceIds?: string[] };
   facts: GuideFact[];
   networks: { intro: string; rows: GuideNetworkRow[] };
   providers: { intro: string; notes: GuideProviderNote[] };
   sections: GuideSection[];
   setup: Array<{ title: string; body: string }>;
   faq: GuideFaq[];
-  sources: GuideSource[];
+  sources?: GuideSource[];
   /** Destinations worth linking to from this page, by id. */
   related: DestinationId[];
   writtenAt: string;
   updatedAt: string;
 };
+

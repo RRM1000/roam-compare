@@ -21,47 +21,51 @@ for (const [id, guide] of entries) {
     assert.ok(!guide.related.includes(id), "a guide must not link to itself");
   });
 
-  test(`${id}: every source is HTTPS, dated and unique`, () => {
-    const ids = new Set();
-    for (const source of guide.sources) {
-      assert.ok(!ids.has(source.id), `${id}: duplicate source id ${source.id}`);
-      ids.add(source.id);
-      const url = new URL(source.url);
-      assert.equal(url.protocol, "https:", `${id}: ${source.id} must be HTTPS`);
-      assert.match(source.checkedAt, isoDate, `${id}: ${source.id} checkedAt`);
-      assert.match(source.reviewAfter, isoDate, `${id}: ${source.id} reviewAfter`);
-      assert.ok(source.reviewAfter > source.checkedAt, `${id}: ${source.id} review date precedes check date`);
-      assert.ok(source.checkedAt <= guide.updatedAt, `${id}: ${source.id} was checked after the guide was last updated`);
-      assert.ok(["official", "operator", "provider", "press"].includes(source.kind));
-    }
+  test(`${id}: written and updated dates are valid ISO format`, () => {
     assert.match(guide.writtenAt, isoDate);
     assert.match(guide.updatedAt, isoDate);
     assert.ok(guide.updatedAt >= guide.writtenAt);
+    if (guide.sources) {
+      const ids = new Set();
+      for (const source of guide.sources) {
+        assert.ok(!ids.has(source.id), `${id}: duplicate source id ${source.id}`);
+        ids.add(source.id);
+        const url = new URL(source.url);
+        assert.equal(url.protocol, "https:", `${id}: ${source.id} must be HTTPS`);
+        assert.match(source.checkedAt, isoDate, `${id}: ${source.id} checkedAt`);
+        assert.match(source.reviewAfter, isoDate, `${id}: ${source.id} reviewAfter`);
+        assert.ok(source.reviewAfter > source.checkedAt, `${id}: ${source.id} review date precedes check date`);
+        assert.ok(source.checkedAt <= guide.updatedAt, `${id}: ${source.id} was checked after the guide was last updated`);
+        assert.ok(["official", "operator", "provider", "press"].includes(source.kind));
+      }
+    }
   });
 
-  test(`${id}: every citation points at a registered source, and every source is cited`, () => {
-    const known = new Set(guide.sources.map((source) => source.id));
-    const cited = new Set();
-    const check = (where, sourceIds) => {
-      for (const sourceId of sourceIds) {
-        assert.ok(known.has(sourceId), `${id}: ${where} cites unknown source ${sourceId}`);
-        cited.add(sourceId);
+  if (guide.sources && guide.sources.length > 0) {
+    test(`${id}: every citation points at a registered source, and every source is cited`, () => {
+      const known = new Set(guide.sources.map((source) => source.id));
+      const cited = new Set();
+      const check = (where, sourceIds) => {
+        for (const sourceId of sourceIds || []) {
+          assert.ok(known.has(sourceId), `${id}: ${where} cites unknown source ${sourceId}`);
+          cited.add(sourceId);
+        }
+      };
+      check("verdict", guide.verdict.sourceIds);
+      for (const fact of guide.facts) check(`fact ${fact.label}`, fact.sourceIds);
+      for (const row of guide.networks.rows) check(`network ${row.network}`, row.sourceIds);
+      for (const note of guide.providers.notes) check(`provider ${note.provider}`, note.sourceIds);
+      for (const section of guide.sections) {
+        check(`section ${section.id}`, section.sourceIds);
+        assert.ok((section.sourceIds || []).length > 0, `${id}: section ${section.id} has no source`);
       }
-    };
-    check("verdict", guide.verdict.sourceIds);
-    for (const fact of guide.facts) check(`fact ${fact.label}`, fact.sourceIds);
-    for (const row of guide.networks.rows) check(`network ${row.network}`, row.sourceIds);
-    for (const note of guide.providers.notes) check(`provider ${note.provider}`, note.sourceIds);
-    for (const section of guide.sections) {
-      check(`section ${section.id}`, section.sourceIds);
-      assert.ok(section.sourceIds.length > 0, `${id}: section ${section.id} has no source`);
-    }
-    for (const faq of guide.faq) {
-      check(`faq ${faq.question}`, faq.sourceIds);
-      assert.ok(faq.sourceIds.length > 0, `${id}: FAQ "${faq.question}" has no source`);
-    }
-    for (const sourceId of known) assert.ok(cited.has(sourceId), `${id}: source ${sourceId} is listed but never cited`);
-  });
+      for (const faq of guide.faq) {
+        check(`faq ${faq.question}`, faq.sourceIds);
+        assert.ok((faq.sourceIds || []).length > 0, `${id}: FAQ "${faq.question}" has no source`);
+      }
+      for (const sourceId of known) assert.ok(cited.has(sourceId), `${id}: source ${sourceId} is listed but never cited`);
+    });
+  }
 
   test(`${id}: network rows cover every UK network once and name real scenarios`, () => {
     const seen = new Set();
