@@ -46,16 +46,16 @@ export const networkRoamingEvidence: Record<Network, RoamingEvidence> = {
   o2: evidence("O2 Europe Zone roaming", "https://www.o2.co.uk/eu-roaming", CHECKED_2026_09_10),
   // Backs the zone list and the 25GB roaming fair-use limit, both reconfirmed.
   // It quotes no per-day rate, and nothing here claims one any more.
-  vodafone: evidence("Vodafone global roaming", "https://www.vodafone.co.uk/mobile/global-roaming", CHECKED_2026_08_25),
+  vodafone: evidence("Vodafone global roaming", "https://www.vodafone.co.uk/mobile/global-roaming", CHECKED_2026_09_10),
   // Backs the 12GB Go Roam fair-use limit, reconfirmed. The per-day rates it used
   // to back are gone; only the passes, which Three still quotes, remain priced.
-  three: evidence("Three Go Roam guidance", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad/go-roam", CHECKED_2026_08_25),
-  "id-mobile": evidence("iD Mobile roaming guidance", "https://www.idmobile.co.uk/help-and-support/roaming", CHECKED_2026_08_25),
+  three: evidence("Three Go Roam guidance", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad/go-roam", CHECKED_2026_09_10),
+  "id-mobile": evidence("iD Mobile roaming guidance", "https://www.idmobile.co.uk/help-and-support/roaming", CHECKED_2026_09_10),
   "sky-mobile": evidence("Sky Roaming Passport Plus", "https://www.sky.com/shop/mobile/roaming", CHECKED_2026_08_25),
-  giffgaff: evidence("giffgaff roaming checker", "https://www.giffgaff.com/roaming", CHECKED_2026_08_25),
-  smarty: evidence("SMARTY roaming guidance", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international", CHECKED_2026_08_25),
-  voxi: evidence("VOXI roaming guidance", "https://www.voxi.co.uk/help/roaming-international/how-to-use-voxi-plan-abroad", CHECKED_2026_08_25),
-  "tesco-mobile": evidence("Tesco Mobile roaming checker", "https://www.tescomobile.com/roaming", CHECKED_2026_08_25),
+  giffgaff: evidence("giffgaff roaming checker", "https://www.giffgaff.com/roaming", CHECKED_2026_09_10),
+  smarty: evidence("SMARTY roaming guidance", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international", CHECKED_2026_09_10),
+  voxi: evidence("VOXI roaming guidance", "https://www.voxi.co.uk/help/roaming-international/how-to-use-voxi-plan-abroad", CHECKED_2026_09_10),
+  "tesco-mobile": evidence("Tesco Mobile roaming checker", "https://www.tescomobile.com/roaming", CHECKED_2026_09_10),
 };
 
 export const scenarioRoamingEvidence: Record<string, RoamingEvidence> = {
@@ -72,25 +72,27 @@ export const scenarioRoamingEvidence: Record<string, RoamingEvidence> = {
   "ee-ireland": evidence("EE roaming plan terms", "https://ee.co.uk/help/terms-and-conditions/mobile/pay-monthly/roaming/roaming-plans", CHECKED_2026_09_10),
   "vodafone-ireland": evidence("Vodafone roaming Extras", "https://www.vodafone.co.uk/mobile/extras", CHECKED_2026_09_10),
   "three-ireland": evidence("Three roaming abroad: Ireland", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad?country=Ireland&plan=paym", CHECKED_2026_09_10),
+  "voxi-ireland": evidence("VOXI European Roaming Pass", "https://www.voxi.co.uk/help/roaming-international/does-voxi-have-european-roaming", CHECKED_2026_09_10),
   "smarty-ireland": evidence("SMARTY roaming and international", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international", CHECKED_2026_09_10),
   // Turkey is a Go Roam Around the World Extra destination on Three's own page
   // for it, with the same pass prices as Japan and the UAE. Kept as its own
   // entry so the Turkey result links to the page that names Turkey.
   "three-extra-pass-turkey": evidence("Three roaming abroad: Turkey", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad?country=Turkey&plan=paym", { checkedAt: "2026-09-10", reviewAfter: "2026-10-10" }),
-  "id-europe": evidence("iD Mobile EU fair-use policy", "https://www.idmobile.co.uk/help-and-support/eu-roaming/fair-usage-policy", CHECKED_2026_08_25),
+  // The roaming page states the 30GB limit directly; the fair-use page now refuses automated reads.
+  "id-europe": evidence("iD Mobile roaming", "https://www.idmobile.co.uk/help-and-support/roaming", CHECKED_2026_09_10),
   "id-roam-beyond": evidence("iD Mobile Roam Beyond", "https://www.idmobile.co.uk/help-and-support/roaming", CHECKED_2026_08_25),
   "giffgaff-europe": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_09_10),
   "giffgaff-europe-overage": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_09_10),
   // The general help article rather than the Spain page, now that the same EU
   // terms back every EU destination. It confirms the 12GB limit and the Ireland exception.
   "smarty-europe": evidence("SMARTY roaming and international", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international", CHECKED_2026_09_10),
-  "smarty-metered-us": evidence("SMARTY roaming in the USA", "https://smarty.co.uk/roaming/international/united-states-of-america/", CHECKED_2026_08_25),
-  "voxi-europe": evidence("VOXI European Roaming Pass", "https://www.voxi.co.uk/help/roaming-international/does-voxi-have-european-roaming", CHECKED_2026_08_25),
-  "voxi-global": evidence("VOXI Global Roaming Extra", "https://www.voxi.co.uk/help/roaming-international/what-are-global-roaming-extras", CHECKED_2026_08_25),
-  "voxi-metered": evidence("VOXI standard roaming charges", "https://www.voxi.co.uk/charges", CHECKED_2026_08_25),
+  "smarty-metered-us": evidence("SMARTY roaming in the USA", "https://smarty.co.uk/roaming/international/united-states-of-america/", CHECKED_2026_09_10),
+  "voxi-europe": evidence("VOXI European Roaming Pass", "https://www.voxi.co.uk/help/roaming-international/does-voxi-have-european-roaming", CHECKED_2026_09_10),
+  "voxi-global": evidence("VOXI Global Roaming Extra", "https://www.voxi.co.uk/help/roaming-international/what-are-global-roaming-extras", CHECKED_2026_09_10),
+  "voxi-metered": evidence("VOXI standard roaming charges", "https://www.voxi.co.uk/charges", CHECKED_2026_09_10),
   "tesco-europe": evidence("Tesco Mobile Home From Home", "https://www.tescomobile.com/why-tesco-mobile/awards-and-reviews/home-from-home", CHECKED_2026_09_10),
-  "tesco-metered-us": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go", CHECKED_2026_08_25),
-  "tesco-metered-world": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go", CHECKED_2026_08_25),
+  "tesco-metered-us": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go", CHECKED_2026_09_10),
+  "tesco-metered-world": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go", CHECKED_2026_09_10),
 };
 
 /**
@@ -172,6 +174,7 @@ const destinationScenarioOptions: Partial<Record<DestinationId, Partial<Record<N
     "id-mobile": [{ value: "id-europe", label: "iD Roam Free — up to 30GB" }, ...common],
     giffgaff: [{ value: "giffgaff-europe", label: "Eligible giffgaff plan — up to 5GB" }, { value: "giffgaff-europe-overage", label: "Beyond allowance — 10p/MB" }, ...common],
     smarty: [{ value: "smarty-ireland", label: "SMARTY — full UK allowance in Ireland" }, ...common],
+    voxi: [{ value: "voxi-ireland", label: "VOXI — Ireland without a pass, up to 20GB" }, ...common],
     "tesco-mobile": [{ value: "tesco-europe", label: "Tesco Home From Home — UK allowance" }, ...common],
   },
   "cyprus": euZoneOptions,
@@ -487,6 +490,7 @@ export function getRoamingResult(
     if (scenario === "ee-ireland") return ukAllowanceResult({ cost: 0, title: "EE in the Republic of Ireland", detail: "EE's roaming terms say calls, texts and data used in the Republic of Ireland come out of your UK allowance.", caveat: "There's no daily charge here, unlike the rest of EE's Europe zone.", callsTexts: "included" });
     if (scenario === "vodafone-ireland") return ukAllowanceResult({ cost: 0, title: "Vodafone in the Republic of Ireland", detail: "Vodafone says every Pay monthly and Pay as you go plan already includes the Republic of Ireland.", caveat: "Vodafone's fair usage policy still applies.", callsTexts: "included" });
     if (scenario === "three-ireland") return ukAllowanceResult({ cost: 0, title: "Three in the Republic of Ireland", detail: "Three doesn't charge to unlock your UK calls, texts and data in the Republic of Ireland.", caveat: "Three's Ireland page lists up to 12GB of your plan's data.", capGb: 12, callsTexts: "included" });
+    if (scenario === "voxi-ireland") return ukAllowanceResult({ cost: 0, title: "VOXI in the Republic of Ireland", detail: "VOXI says you can use your plan's allowance in the Republic of Ireland without buying a European Roaming Pass.", caveat: "Data is capped at your plan's allowance or 20GB, whichever is less.", capGb: 20, callsTexts: "included" });
     if (scenario === "smarty-ireland") return ukAllowanceResult({ cost: 0, title: "SMARTY in the Republic of Ireland", detail: "SMARTY plans use their normal UK allowance in the Republic of Ireland at no extra cost.", caveat: "The 12GB roaming limit SMARTY applies elsewhere in the EU doesn't apply in Ireland.", callsTexts: "check-plan" });
     if (scenario === "o2-europe") {
       return ukAllowanceResult({ cost: 0, title: "O2 Europe Zone estimate", detail: "Eligible Pay Monthly plans use your normal UK allowance, with nothing extra to pay.", caveat: "Data is capped at 25GB. Calls and texts within the Europe Zone and back to the UK are included.", capGb: 25, tethering: "allowed", callsTexts: "included" });

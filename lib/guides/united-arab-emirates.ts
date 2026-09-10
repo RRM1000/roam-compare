@@ -32,7 +32,7 @@ export const unitedArabEmiratesGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("the UAE", { nomad: "du", airalo: "Etisalat", klook: "Etisalat" }, { airaloDailyCap: true }),
+    notes: providerNotes("the UAE", { nomad: "du", airalo: "Etisalat", klook: "Etisalat" }, { airaloDailyCapGb: 3 }),
   },
   sections: [
     {

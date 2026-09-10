@@ -6,8 +6,9 @@ import { DATA_CHECKED_AT, formatCheckedDate, hasPricedPlans, isPlanStale, plans,
 test("every catalogue record declares calls, hotspot, limits and provenance", () => {
   // One date format across the whole site, from one source.
   // Derived from the constant so a price refresh does not break the formatter test.
+  // en-GB abbreviates September as "Sept", which a refresh in August never exercised.
   const [year, month, day] = DATA_CHECKED_AT.split("-").map(Number);
-  const expected = `${day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][month - 1]} ${year}`;
+  const expected = `${day} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"][month - 1]} ${year}`;
   assert.equal(formatCheckedDate(DATA_CHECKED_AT), expected);
   assert.ok(plans.length > 45);
   assert.equal(new Set(plans.map((plan) => plan.id)).size, plans.length);

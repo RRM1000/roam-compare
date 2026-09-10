@@ -19,7 +19,8 @@ const officialSources = {
   three: "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad/go-roam",
   threePasses: "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad",
   id: "https://www.idmobile.co.uk/help-and-support/roaming",
-  idEurope: "https://www.idmobile.co.uk/help-and-support/eu-roaming/fair-usage-policy",
+  // The fair-use page now refuses automated reads; the roaming page states the 30GB limit.
+  idEurope: "https://www.idmobile.co.uk/help-and-support/roaming",
 };
 
 function optionValues(network, destination) {

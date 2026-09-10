@@ -24,7 +24,7 @@ export const canadaGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Canada", { nomad: "Telus and Bell", airalo: "Bell", klook: null }),
+    notes: providerNotes("Canada", { nomad: "Telus and Bell", airalo: "Bell", klook: "Rogers" }),
   },
   sections: [
     {

@@ -36,10 +36,10 @@ export type Plan = {
   live?: boolean;
 };
 
-export const DATA_CHECKED_AT = "2026-08-25";
-export const DATA_REVIEW_AFTER = "2026-09-01";
-export const FX_CHECKED_AT = "2026-08-25";
-export const FX_REVIEW_AFTER = "2026-09-01";
+export const DATA_CHECKED_AT = "2026-09-10";
+export const DATA_REVIEW_AFTER = "2026-09-17";
+export const FX_CHECKED_AT = "2026-09-10";
+export const FX_REVIEW_AFTER = "2026-09-17";
 export const FX_EVIDENCE = {
   label: "Bank of England daily spot exchange rates",
   url: "https://www.bankofengland.co.uk/statistics/exchange-rates",
@@ -48,9 +48,9 @@ export const FX_EVIDENCE = {
 } as const;
 export const usagePerDay: Record<Usage, number> = { light: 0.35, everyday: 0.8, heavy: 2 };
 export const tripLengths = [...Array.from({ length: 30 }, (_, index) => index + 1), 45, 60, 90];
-// Bank of England daily spot rates published 21 August 2026, the most recent
-// available when checked on the 25th: £1 = 1.3625 USD, £1 = 1.1672 EUR.
-export const gbpRates: Record<Currency, number> = { GBP: 1, EUR: 0.86, USD: 0.73 };
+// Bank of England daily spot rates published 9 September 2026, the most recent
+// available when checked on the 10th: £1 = 1.3563 USD, £1 = 1.1644 EUR.
+export const gbpRates: Record<Currency, number> = { GBP: 1, EUR: 0.86, USD: 0.74 };
 
 export const providerDetails: Record<Provider, { accent: string; initials: string; affiliate: boolean; summary: string }> = {
   Airalo: { accent: "#a82350", initials: "AI", affiliate: false, summary: "Plans for one country, a region, or worldwide" },

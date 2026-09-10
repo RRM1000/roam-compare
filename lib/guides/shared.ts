@@ -101,9 +101,9 @@ type ProviderNetworks = {
 
 /**
  * Provider notes. Only Airalo plans we have checked by hand carry a confirmed
- * daily unlimited cap, so `airaloDailyCap` is set only for those destinations.
+ * daily unlimited cap, so `airaloDailyCapGb` is set only for those destinations.
  */
-export function providerNotes(country: string, networks: ProviderNetworks, options: { airaloDailyCap?: boolean; extra?: Partial<Record<"Saily" | "Nomad" | "Airalo" | "Klook", string>> } = {}): GuideProviderNote[] {
+export function providerNotes(country: string, networks: ProviderNetworks, options: { airaloDailyCapGb?: number; extra?: Partial<Record<"Saily" | "Nomad" | "Airalo" | "Klook", string>> } = {}): GuideProviderNote[] {
   const plus = (provider: "Saily" | "Nomad" | "Airalo" | "Klook", text: string) => (options.extra?.[provider] ? `${text} ${options.extra[provider]}` : text);
   return [
     {
@@ -122,7 +122,7 @@ export function providerNotes(country: string, networks: ProviderNetworks, optio
       provider: "Airalo",
       localNetwork: networks.airalo ?? "the network shown at checkout",
       summary: plus("Airalo", `We have no affiliate relationship with Airalo and list it anyway.${networks.airalo ? ` Its ${country} eSIM lists ${networks.airalo} as the main network.` : ""}`),
-      watchOut: options.airaloDailyCap ? "Its unlimited plans slow to 1Mbps once you've used 3GB in a day." : "If you pick an unlimited plan, check its daily full-speed limit before you buy.",
+      watchOut: options.airaloDailyCapGb ? `Its unlimited plans slow to 1Mbps once you've used ${options.airaloDailyCapGb}GB in a day.` : "If you pick an unlimited plan, check its daily full-speed limit before you buy.",
     },
     {
       provider: "Klook",

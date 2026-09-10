@@ -25,7 +25,7 @@ export const australiaGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Australia", { nomad: "Optus and Telstra", airalo: "Optus", klook: null }),
+    notes: providerNotes("Australia", { nomad: "Optus and Telstra", airalo: "Optus", klook: "Optus" }),
   },
   sections: [
     {

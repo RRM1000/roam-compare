@@ -33,7 +33,7 @@ export const japanGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Japan", { nomad: "au and SoftBank", airalo: "SoftBank", klook: "SoftBank or docomo, by option" }, { airaloDailyCap: true }),
+    notes: providerNotes("Japan", { nomad: "au and SoftBank", airalo: "SoftBank", klook: "SoftBank or docomo, by option" }, { airaloDailyCapGb: 3 }),
   },
   sections: [
     {

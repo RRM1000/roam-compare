@@ -24,7 +24,7 @@ export const thailandGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Thailand", { nomad: "True, AIS and dtac", airalo: "True", klook: null }),
+    notes: providerNotes("Thailand", { nomad: "True, AIS and dtac", airalo: "True", klook: "AIS" }),
   },
   sections: [
     {

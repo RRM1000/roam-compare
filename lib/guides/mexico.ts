@@ -24,7 +24,7 @@ export const mexicoGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Mexico", { nomad: "AT&T and Movistar", airalo: "Movistar", klook: null }),
+    notes: providerNotes("Mexico", { nomad: "AT&T and Movistar", airalo: "Movistar", klook: "Movistar" }),
   },
   sections: [
     {

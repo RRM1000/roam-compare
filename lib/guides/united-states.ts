@@ -35,7 +35,7 @@ export const unitedStatesGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("the US", { nomad: "T-Mobile", airalo: "T-Mobile", klook: "AT&T or Verizon, by option" }, { airaloDailyCap: true, extra: { Airalo: "Its US range also includes plans with calls and texts." } }),
+    notes: providerNotes("the US", { nomad: "T-Mobile", airalo: "T-Mobile", klook: "AT&T or Verizon, by option" }, { airaloDailyCapGb: 3, extra: { Airalo: "Its US range also includes plans with calls and texts." } }),
   },
   sections: [
     {

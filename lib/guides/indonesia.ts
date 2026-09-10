@@ -25,7 +25,7 @@ export const indonesiaGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Indonesia", { nomad: "Telkomsel", airalo: "3 (Indosat Ooredoo Hutchison)", klook: null }),
+    notes: providerNotes("Indonesia", { nomad: "Telkomsel", airalo: "3 (Indosat Ooredoo Hutchison)", klook: "Telkomsel" }),
   },
   sections: [
     {

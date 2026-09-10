@@ -23,7 +23,7 @@ export const spainGuide: DestinationGuide = {
   networks: { intro: euNetworksIntro("Spain"), rows: euRows("Spain", { o2: "Gibraltar is in O2's Europe Zone; Andorra isn't." }) },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Spain", { nomad: "Orange and Movistar", airalo: "Orange", klook: "Vodafone, Orange, Movistar and Yoigo" }, { airaloDailyCap: true }),
+    notes: providerNotes("Spain", { nomad: "Orange and Movistar", airalo: "Orange", klook: "Vodafone, Orange, Movistar and Yoigo" }, { airaloDailyCapGb: 5 }),
   },
   sections: [
     {
