@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(origin),
     title: "RoamCompare — UK roaming vs travel eSIMs",
     description: "Compare UK roaming with travel eSIMs across 20 destinations, including dated prices, hotspot rules, speed caps and fair-use limits.",
-    robots: { index: false, follow: false, nocache: true },
+    robots: { index: true, follow: true },
     alternates: { canonical: `${origin}/` },
     openGraph: {
       title: "RoamCompare — Know your roaming cost before take-off",

@@ -1,11 +1,33 @@
 import assert from "node:assert/strict";
-import test from "node:test";
+import test, { mock } from "node:test";
+
+import { DATA_CHECKED_AT } from "../lib/catalog.ts";
 
 async function render(path = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${Math.random()}`);
   const { default: worker } = await import(workerUrl.href);
   return worker.fetch(new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }), { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } }, { waitUntil() {}, passThroughOnException() {} });
+}
+
+/**
+ * Renders as of the day the hand-checked snapshots were last confirmed.
+ *
+ * Some tests cover how a priced plan is presented (a calls requirement, the
+ * saving against roaming), and in CI the only priced plans are the dated
+ * snapshots. Rendered on the real clock, those tests went red on a calendar
+ * timer every time the seven-day review window lapsed, which is the scheduled
+ * data-freshness job's concern, not the unit suite's. The body is read inside
+ * the pin because the page streams.
+ */
+async function renderAtSnapshotDate(path) {
+  mock.timers.enable({ apis: ["Date"], now: new Date(`${DATA_CHECKED_AT}T12:00:00Z`) });
+  try {
+    const response = await render(path);
+    return { status: response.status, html: await response.text() };
+  } finally {
+    mock.timers.reset();
+  }
 }
 
 function visible(html) {
@@ -20,7 +42,8 @@ test("server-renders the premium comparison and complete controls", async () => 
   const text = visible(html);
 
   assert.match(html, /<title>RoamCompare — UK roaming vs travel eSIMs<\/title>/i);
-  assert.match(html, /<meta name="robots" content="[^"]*noindex[^"]*nofollow[^"]*">/i);
+  assert.match(html, /<meta name="robots" content="index, follow">/i);
+  assert.doesNotMatch(html, /noindex|nofollow/i);
   assert.match(text, /Know the roaming cost before take-off\./);
   assert.match(text, /See the hotspot rules, speed caps and fair-use limits/);
   // Counted from the plans actually in hand: 5 without the live feed (as in CI), 20 with it.
@@ -119,9 +142,9 @@ test("choosing a network reveals the roaming questions, in charging terms", asyn
 });
 
 test("normal-call requirement can select a verified US voice plan", async () => {
-  const response = await render("/?compare=1&destination=united-states&days=7&roamingDays=7&network=ee&scenario=ee-row1&usage=light&calls=yes&allowance=10");
-  assert.equal(response.status, 200);
-  const text = visible(await response.text());
+  const { status, html } = await renderAtSnapshotDate("/?compare=1&destination=united-states&days=7&roamingDays=7&network=ee&scenario=ee-row1&usage=light&calls=yes&allowance=10");
+  assert.equal(status, 200);
+  const text = visible(html);
   // Airalo sells a range of calls/texts plans; the cheapest that covers a light
   // 7-day trip should win. Matched by shape so a repricing does not break this.
   assert.match(text, /\dGB \+ \d+ min\/SMS/);
@@ -314,19 +337,27 @@ test("the Turkey page carries its written guide, structured data and disclosed a
   assert.match(sitemap, /<loc>[^<]*\/destinations\/turkey<\/loc>\s*<lastmod>2026-09-10/);
 });
 
-test("a destination without a guide keeps the generic page and no FAQ markup", async () => {
-  const response = await render("/destinations/greece");
+test("a destination without a guide keeps the generic page and no FAQ markup", async (t) => {
+  // Picked from the data rather than named, because destinations gain guides over time.
+  const { destinations } = await import("../lib/destinations.ts");
+  const { guides } = await import("../lib/guides/index.ts");
+  const unguided = destinations.find((destination) => !guides[destination.id]);
+  if (!unguided) return t.skip("every destination has a guide");
+  const response = await render(`/destinations/${unguided.id}`);
   const html = await response.text();
-  assert.match(html, /<title>Greece eSIM and UK roaming comparison — RoamCompare<\/title>/);
+  assert.match(html, new RegExp(`<title>${unguided.name} eSIM and UK roaming comparison — RoamCompare<\\/title>`));
   assert.doesNotMatch(html, /id="guide"/);
   assert.doesNotMatch(html, /"FAQPage"/);
   assert.doesNotMatch(html, /<a href="#guide">/);
 });
 
-test("private launch controls block crawlers and expose launch-ready routes", async () => {
+test("crawlers are allowed everywhere and pointed at the sitemap", async () => {
   const robots = await render("/robots.txt");
   assert.equal(robots.status, 200);
-  assert.match(await robots.text(), /User-Agent: \*\s+Disallow: \//i);
+  const robotsText = await robots.text();
+  assert.match(robotsText, /User-Agent: \*\s+Allow: \//i);
+  assert.doesNotMatch(robotsText, /Disallow: \/\s*$/im);
+  assert.match(robotsText, /Sitemap: https?:\/\/[^\s]+\/sitemap\.xml/i);
 
   const sitemap = await render("/sitemap.xml");
   assert.equal(sitemap.status, 200);
@@ -339,9 +370,8 @@ test("private launch controls block crawlers and expose launch-ready routes", as
 });
 
 test("the saving against roaming is stated once in prose, not on every row", async () => {
-  const response = await render("/?compare=1&destination=turkey&days=7&roamingDays=7&network=ee&scenario=ee-current&usage=everyday&calls=no&allowance=10");
-  assert.equal(response.status, 200);
-  const html = await response.text();
+  const { status, html } = await renderAtSnapshotDate("/?compare=1&destination=turkey&days=7&roamingDays=7&network=ee&scenario=ee-current&usage=everyday&calls=no&allowance=10");
+  assert.equal(status, 200);
   const text = visible(html);
 
   // The full clause belongs on the decision card and nowhere else; it used to

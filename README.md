@@ -14,7 +14,7 @@ UK-first roaming and travel-eSIM comparison site. Built with vinext and deployed
 - normal calls/SMS requirements, exact-model eSIM compatibility, filters and a three-plan shortlist
 - visible hotspot/tethering rules, speed caps, fair-use limits, activation rules and sources
 - browser-local saved comparisons; no account or comparison database
-- private-launch robots policy, canonical destination pages and a launch-ready sitemap
+- public robots policy advertising the sitemap, canonical destination pages and indexable metadata
 
 Saily rows are labelled "Live price" and are exact GBP amounts from the provider, not FX estimates. Manual snapshots are removed from ranking after seven days. Provider currency is preserved and GBP is labelled as an estimate. The test command also fails when a manual data review is overdue.
 
@@ -163,7 +163,7 @@ Done:
 Still open:
 - a monitored contact address, published somewhere on the site
 - a real consent banner, so Analytics can move past the denied-by-default stopgap
-- replace the private `Disallow: /` robots policy only when the site is intentionally made public
+- submit `/sitemap.xml` in Google Search Console and Bing Webmaster Tools (the site is now indexable)
 
 ## Deployment
 
