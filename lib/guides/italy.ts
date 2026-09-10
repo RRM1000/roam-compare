@@ -1,224 +1,80 @@
+import { euNetworksIntro, euRows, providerNotes, providersIntro, setupSteps } from "./shared.ts";
 import type { DestinationGuide } from "./types.ts";
 
-/**
- * Italy guide. Written 10 September 2026. UK network prices reflect published
- * tariffs and scenarios in lib/roaming.ts.
- */
+/** Italy guide. Checked 10 September 2026; UK network rows come from lib/guides/shared.ts. */
 export const italyGuide: DestinationGuide = {
   destination: "italy",
   keyword: "Italy eSIM",
-  title: "Italy eSIM vs UK roaming: best travel data options (2026)",
+  title: "Italy eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Heading to Italy? Compare UK mobile roaming costs across EE, O2, Vodafone and Three with travel eSIMs from Airalo, Nomad, Saily and Klook for Rome, Venice, Florence and the Amalfi Coast.",
+    "Italy is in every UK network's Europe zone, but only some include it. Compare EE, O2, Vodafone, Three and the rest with live Italy eSIM prices, and check San Marino, the Vatican and cruise ship roaming.",
   verdict: {
-    heading: "Short answer: O2 and Tesco include free roaming in Italy; EE, Vodafone and Three charge extra.",
-    body: "Italy is an EU country, meaning UK operators treat it under post-Brexit roaming terms. Customers on O2, iD Mobile, SMARTY and Tesco Mobile enjoy inclusive roaming using their domestic UK allowance, subject to fair-use data caps (5GB to 30GB). If your contract is with EE (£2.47/day), Vodafone (£2.75/day) or Three (£2/day), daily fees can quickly add £14 to £38 to a holiday. A prepaid Italy travel eSIM from £3.50 connects directly to major Italian networks like TIM or Vodafone Italia with zero carrier roaming fees.",
+    heading: "Short answer: check your UK plan first. If it charges a daily fee in Italy, an eSIM usually costs less.",
+    body:
+      "Italy is in every UK network's Europe zone. O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile include it on eligible plans, up to a roaming cap. EE, Vodafone, Three, Sky Mobile and VOXI charge a daily fee or sell passes. If you're with one of those, or your cap won't cover the trip, an eSIM bought before you fly is usually the cheaper option. The worked costs below price a week and a fortnight.",
   },
   facts: [
-    {
-      label: "Local networks",
-      value: "TIM (Telecom Italia), Vodafone Italia, WindTre and Iliad. TIM and Vodafone offer the strongest coverage in rural Tuscany, the Amalfi Coast and the Dolomites.",
-    },
-    {
-      label: "5G rollout",
-      value: "Active in all primary metropolitan areas including Rome, Milan, Florence, Naples, Turin and Bologna, operating primarily on 3.7GHz frequencies.",
-    },
-    {
-      label: "Island coverage",
-      value: "Sicily, Sardinia, Capri and Ischia are fully covered by standard Italian national mobile networks with seamless 4G/5G connectivity.",
-    },
-    {
-      label: "EU fair-use caps",
-      value: "Inclusive UK roaming plans apply domestic caps: O2 caps at 25GB, iD Mobile at 30GB, SMARTY at 12GB, and giffgaff limits roaming to 5GB per monthly plan.",
-    },
-    {
-      label: "Airport Wi-Fi",
-      value: "Rome Fiumicino (FCO), Milan Malpensa (MXP), and Venice Marco Polo (VCE) offer free high-speed public Wi-Fi without time restrictions.",
-    },
-    {
-      label: "UK visitors",
-      value: "Over 5 million visits are made each year from the UK to Italy for summer holidays, cultural city breaks and ski trips.",
-    },
+    { label: "Local networks", value: "TIM, Vodafone, WindTre and Iliad. Nomad lists Iliad and WindTre, Airalo lists WindTre, and Klook's Italy eSIM runs on Vodafone." },
+    { label: "Caps on included roaming", value: "O2 25GB, iD Mobile 30GB, SMARTY 12GB and giffgaff 5GB of your plan's data. Tesco Mobile sets no separate cap." },
+    { label: "San Marino and the Vatican", value: "Neither is in the EU. O2 includes both in its Europe Zone; check other networks." },
+    { label: "Cruises", value: "Out of range of land, your phone can connect to the ship's own network, which UK roaming allowances don't cover." },
+    { label: "Local SIMs", value: "An Italian prepaid SIM needs your passport and an Italian tax code, which shops can generate for visitors." },
   ],
-  networks: {
-    intro:
-      "Italy is an EU destination. UK mobile operators handle roaming differently following Brexit: some continue to offer free inclusive roaming up to strict fair-use limits, while others enforce daily roaming fees.",
-    rows: [
-      {
-        network: "ee",
-        scenario: "ee-europe-new",
-        headline: "Roam Abroad Pass: £2.47 per day or £15 monthly add-on for contracts joined from 7 July 2021",
-        detail: "Uses your domestic UK data allowance up to a 50GB fair-use limit. Older grandfathered contracts started before 7 July 2021 retain surcharge-free EU roaming.",
-      },
-      {
-        network: "o2",
-        scenario: null,
-        headline: "O2 Europe Zone: Included at no extra charge on Pay Monthly and SIM-only plans",
-        detail: "Roam in Italy without extra charge using your UK allowance. A 25GB fair-use monthly ceiling applies; exceeding 25GB costs £3.50 per gigabyte.",
-      },
-      {
-        network: "vodafone",
-        scenario: null,
-        headline: "Vodafone Europe Roaming: £2.75 daily fee or multi-day passes (£16 for 8d, £21 for 15d)",
-        detail: "Standard pay monthly plans charge £2.75/day or require a European Roaming Pass. A 25GB fair-use cap applies. Select Xtra plans with 4 roaming benefits include Italy free.",
-      },
-      {
-        network: "three",
-        scenario: null,
-        headline: "Go Roam in Europe: £2 daily charge or discounted Go Roam multi-day passes",
-        detail: "Daily charge of £2 to access your domestic allowance (or passes: £5 for 3 days, £10 for 7 days, £18 for 14 days). Data is capped at 12GB abroad per billing cycle; hotspot tethering is prohibited on passes.",
-      },
-      {
-        network: "id-mobile",
-        scenario: null,
-        headline: "iD Roam Free: Included at no extra cost across Italy and 50 EU destinations",
-        detail: "Utilises your UK allowance with a fair-use data limit of up to 30GB per month (or your monthly plan limit if lower). Connects seamlessly with Italian partner networks.",
-      },
-      {
-        network: "sky-mobile",
-        scenario: null,
-        headline: "Roaming Passport Plus: £2 per 24 hours to access your UK allowance",
-        detail: "Triggers automatically when you make a call, send an SMS, or use mobile data in Italy. Draws from your domestic data allowance up to a 25GB fair-use cap.",
-      },
-      {
-        network: "giffgaff",
-        scenario: null,
-        headline: "EU Roaming included: Up to 5GB of your plan allowance per goodybag",
-        detail: "Free roaming up to a strict 5GB fair-use ceiling per plan. Data beyond 5GB is charged at 10p/MB unless you start your next goodybag early in the giffgaff app.",
-      },
-      {
-        network: "smarty",
-        scenario: null,
-        headline: "EU Roaming included: Up to 12GB per month with no daily connection fees",
-        detail: "Roam in Italy using your normal UK allowance up to a 12GB monthly cap. If you need additional data, add-ons cost £1 per gigabyte with no expiration during your active plan.",
-      },
-      {
-        network: "voxi",
-        scenario: null,
-        headline: "European Roaming Pass: £2.45 for 1 day, £4.50 for 2 days, £12.50 for 8 days, £17.50 for 15 days",
-        detail: "VOXI requires a European pass to access mobile data in Italy. Endless Social and Endless Video streaming benefits do not apply abroad; a 20GB cap applies.",
-      },
-      {
-        network: "tesco-mobile",
-        scenario: null,
-        headline: "Home From Home: Included at no extra cost across 48 European destinations",
-        detail: "Use your UK minutes, texts, and data allowance in Italy without surcharge. Clubcard deals and standard pay monthly contracts are covered by the fair-use policy.",
-      },
-    ],
-  },
+  networks: { intro: euNetworksIntro("Italy"), rows: euRows("Italy", { o2: "San Marino and Vatican City are in O2's Europe Zone too." }) },
   providers: {
-    intro:
-      "We compare four major travel eSIM providers for Italy. Saily and Nomad stream live real-time pricing; Airalo prices are independently checked; Klook offers flexible daily and fixed packages.",
-    notes: [
-      {
-        provider: "Airalo",
-        localNetwork: "TIM / Vodafone Italia",
-        summary: "High-speed coverage across Italy on TIM and Vodafone Italia, featuring fixed data bundles from 1GB to 50GB and unlimited daily plans.",
-        bestFor: "Travellers wanting reliable mobile data across Italian cities, historical centres and islands.",
-        watchOut: "Unlimited data plans throttle speeds to 1Mbps once you pass 3GB of daily consumption.",
-        watchFor: "Fair-use throttling after 3GB per day on unlimited plans.",
-      },
-      {
-        provider: "Nomad",
-        localNetwork: "TIM / Vodafone Italia",
-        summary: "Delivers 4G and 5G connectivity on TIM and Vodafone, priced in USD with transparent high-speed data allowances and hotspot capability.",
-        bestFor: "Power users needing fast 5G data, mobile hotspot tethering, and larger multi-week allowances.",
-        watchOut: "Must be activated within 60 days of purchase date.",
-        watchFor: "60-day activation window from date of purchase.",
-      },
-      {
-        provider: "Saily",
-        localNetwork: "Local partner networks",
-        summary: "Displays checkout prices directly in GBP, avoiding bank foreign exchange fees. Simple in-app activation with dedicated customer support.",
-        bestFor: "UK travellers who want fixed British pound pricing and quick app-based management.",
-        watchOut: "Activates automatically the moment the profile connects to an Italian network.",
-        watchFor: "Immediate activation upon first network connection in Italy.",
-      },
-      {
-        provider: "Klook",
-        localNetwork: "TIM / WindTre",
-        summary: "Provides flexible daily-allowance bundles (1GB–3GB/day or unlimited) with QR code voucher delivery for travelers wanting daily resets.",
-        bestFor: "Sightseers and city breakers looking for convenient daily data refreshes.",
-        watchOut: "Requires a carrier-unlocked phone and QR voucher setup prior to arrival.",
-        watchFor: "Handset must be carrier-unlocked for QR voucher activation.",
-      },
-    ],
+    intro: providersIntro,
+    notes: providerNotes("Italy", { nomad: "Iliad and WindTre", airalo: "WindTre", klook: "Vodafone" }),
   },
   sections: [
     {
-      id: "uk-roaming-rules-italy",
-      heading: "Post-Brexit roaming in Italy: which UK networks charge daily fees?",
+      id: "which-networks-include-italy",
+      heading: "Which UK networks include Italy, and which charge",
       paragraphs: [
-        "Since the UK left the European Union, UK mobile networks are no longer required to provide free roaming across EU destinations. If you are travelling to Italy, your costs will vary significantly depending on which mobile provider you use.",
-        "O2, iD Mobile, SMARTY, and Tesco Mobile maintain inclusive roaming for Italy within your existing monthly plan, subject to domestic fair-use caps. In contrast, EE (£2.47/day), Vodafone (£2.75/day), Three (£2/day) and Sky Mobile (£2/24h) charge daily fees. For a 10-day trip exploring Florence, Venice and Rome, network roaming passes can add £20 to £30 to your expenses, whereas a 10GB Italy travel eSIM costs a fraction of that amount.",
+        "O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile let eligible plans use their UK allowance in Italy at no extra charge. EE, Vodafone, Three, Sky Mobile and VOXI charge for each day you use your phone, or sell passes that bring the daily cost down.",
+        "For a week, the passes run from £12 on Three to £16.50 on EE. Vodafone's £16 pass lasts 8 days and its £21 pass 15, so it's competitive on a fortnight. The worked example below prices each against live eSIM prices.",
       ],
     },
     {
-      id: "coverage-across-italy",
-      heading: "Network coverage: Northern cities, Tuscany, the South and the Islands",
+      id: "san-marino-vatican-cruises",
+      heading: "San Marino, the Vatican and cruise ships",
       paragraphs: [
-        "Italy has four nationwide infrastructure operators: TIM, Vodafone Italia, WindTre, and Iliad. TIM and Vodafone operate the most extensive rural and coastal cell grids, providing reliable connectivity through winding Tuscan roads, the Amalfi coast, and alpine valleys.",
-        "Major Italian tourist hotspots and high-speed Frecciarossa rail corridors enjoy fast 4G and widespread 5G coverage. Travel eSIM profiles from Airalo and Nomad connect via TIM and Vodafone, giving you premium signal strength whether you are visiting the Colosseum or relaxing in Sicily.",
+        "San Marino and Vatican City are separate countries outside the EU. O2 includes both in its Europe Zone. Other networks treat them in different ways, so if you're staying in San Marino, check your network's list before you use data.",
+        "On a Mediterranean cruise, your phone can connect to the ship's own network once you're out of range of land. That isn't covered by UK Europe roaming or an Italy eSIM. Turn data roaming off at sea and switch back in port.",
       ],
     },
     {
-      id: "fair-use-roaming-caps",
-      heading: "Watch out for UK fair-use roaming caps in Italy",
+      id: "local-sim",
+      heading: "Buying a SIM in Italy",
       paragraphs: [
-        "Even when your UK network offers surcharge-free roaming, you cannot use an unlimited UK data allowance in Italy. All UK operators enforce fair-use roaming limits to control international data costs.",
-        "For example, giffgaff limits inclusive roaming to 5GB per bundle, SMARTY limits data to 12GB, and O2 and Sky enforce a 25GB monthly ceiling. If you exceed your cap while travelling, networks will throttle your data or bill steep out-of-bundle rates of around 10p per megabyte. An independent travel eSIM avoids these limitations entirely.",
-      ],
-    },
-    {
-      id: "local-italian-sim-codice-fiscale",
-      heading: "Buying a SIM in Italy: the Codice Fiscale hurdle vs instant eSIMs",
-      paragraphs: [
-        "Buying a physical Italian prepaid SIM card in an operator shop (TIM, Vodafone, or WindTre) in Italy legally requires presenting a physical passport and providing an Italian tax identification code (Codice Fiscale). While store clerks can sometimes generate a provisional code for tourists, the bureaucratic process can take 30 to 45 minutes of paperwork.",
-        "A travel eSIM bypasses Italian SIM registration rules completely. You can purchase and install your eSIM online before departing the UK, avoiding airport lines and language barriers, with instant data connectivity the moment you step off the plane.",
+        "Italian networks need your passport and a codice fiscale, the Italian tax code, before they'll activate a prepaid SIM. Shops can generate a code for visitors, but it adds time at the counter.",
+        "An eSIM from the providers above is bought online and installed at home, so it's working when you land, and your UK number stays on the phone for bank texts.",
       ],
     },
   ],
-  setup: [
-    {
-      title: "Purchase and install your Italy eSIM at home",
-      body: "Set up your travel eSIM on home Wi-Fi before your flight. Install the eSIM profile via the provider's app or scan the QR code, label it 'Italy Travel', and keep roaming off on this profile until departure.",
-    },
-    {
-      title: "Turn off data roaming on your UK line",
-      body: "If your UK network (such as EE, Vodafone, Three or Sky) charges daily fees in Europe, keep your primary SIM switched on for two-factor authentication SMS, but switch off 'Data Roaming' on that SIM.",
-    },
-    {
-      title: "Turn on mobile data on your Italy eSIM on arrival",
-      body: "When landing in Rome, Milan, Venice or Naples, turn off Airplane Mode, select the Italy eSIM for Cellular Data, and enable Data Roaming for that profile to connect to TIM or Vodafone.",
-    },
-  ],
+  setup: setupSteps("Italy", { checkPlanFirst: true }),
   faq: [
     {
-      question: "Do UK mobile phones work in Italy without extra charges?",
-      answer: "Only if you subscribe to a UK network offering inclusive EU roaming, such as O2, iD Mobile, SMARTY, or Tesco Mobile. EE, Vodafone, Three and Sky Mobile charge daily roaming fees or pass costs.",
+      question: "Do UK phones work in Italy without extra charges?",
+      answer: "On O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile, eligible plans use their UK allowance in Italy at no extra cost, up to each network's cap. EE, Vodafone, Three, Sky Mobile and VOXI charge a daily fee or sell passes.",
     },
     {
-      question: "Which UK mobile networks charge daily roaming fees in Italy?",
-      answer: "EE charges £2.47 per day on plans started after July 2021. Vodafone charges £2.75 per day or £16 for 8 days. Three charges £2 per day or sells Go Roam passes. Sky Mobile charges £2 per 24 hours.",
+      question: "What does Vodafone charge for roaming in Italy?",
+      answer: "£2.75 a day if your plan doesn't include Europe, or a European Roaming pass: £16 for 8 days or £21 for 15, covering 52 destinations. Vodafone's 25GB roaming limit applies.",
     },
     {
-      question: "Will my Italy travel eSIM work in Sicily, Sardinia and Venice?",
-      answer: "Yes. Sicily, Sardinia, Capri, Ischia, and the Venetian Lagoon use the same national mobile networks (TIM, Vodafone, WindTre) as the mainland, with solid 4G and 5G coverage throughout.",
+      question: "Is San Marino covered by EU roaming?",
+      answer: "San Marino isn't in the EU. O2 includes it, and Vatican City, in its Europe Zone. Check other networks, and the eSIM provider's coverage list, if you're staying there.",
     },
     {
-      question: "Do I need a Codice Fiscale (tax code) to buy an Italy travel eSIM?",
-      answer: "No. While buying a physical local SIM in an Italian shop requires a passport and an Italian tax code (Codice Fiscale), prepaid travel data eSIMs do not require tax code registration or identity checks.",
+      question: "Do I need a codice fiscale to use an eSIM in Italy?",
+      answer: "Not for the travel eSIMs compared here, which you buy from the provider online. A local Italian prepaid SIM does need one, along with your passport.",
     },
     {
-      question: "Can I use WhatsApp and tether other devices with an Italy eSIM?",
-      answer: "Yes. WhatsApp, FaceTime, and Google Maps work seamlessly over eSIM data. Providers like Saily and Nomad permit personal hotspot tethering, whereas Three Go Roam passes strictly ban tethering.",
-    },
-    {
-      question: "Is 5G widely available across Italy on travel eSIMs?",
-      answer: "Yes, 5G coverage is active across Rome, Milan, Florence, Naples, Bologna, Turin and other urban regions. If your handset is 5G compatible and the eSIM profile supports it, you will connect to local 5G cells.",
+      question: "Will an Italy eSIM give me an Italian phone number?",
+      answer: "The plans compared here are data only, so there's no Italian number and no ordinary calls or texts. WhatsApp and FaceTime work over data, and your UK SIM can stay on for texts.",
     },
   ],
-  related: ["spain", "france", "greece", "portugal", "germany"],
+  related: ["spain", "france", "greece", "germany", "portugal"],
   writtenAt: "2026-09-10",
   updatedAt: "2026-09-10",
 };

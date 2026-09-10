@@ -34,6 +34,8 @@ export type RoamingResult = {
  * shows the date for the page it actually links to.
  */
 const CHECKED_2026_08_25 = { checkedAt: "2026-08-25", reviewAfter: "2026-09-01" } as const;
+/** Pages reread on 10 September 2026, while checking the destination guides. */
+const CHECKED_2026_09_10 = { checkedAt: "2026-09-10", reviewAfter: "2026-10-10" } as const;
 
 function evidence(label: string, url: string, dates: { checkedAt: string; reviewAfter: string }): RoamingEvidence {
   return { label, url, checkedAt: dates.checkedAt, reviewAfter: dates.reviewAfter };
@@ -41,7 +43,7 @@ function evidence(label: string, url: string, dates: { checkedAt: string; review
 
 export const networkRoamingEvidence: Record<Network, RoamingEvidence> = {
   ee: evidence("EE mobile price guide", "https://ee.co.uk/content/dam/help/terms-and-conditions/price-plans/mobile/pay-monthly-price-plans/ee-mobile-plan-price-guide-04082026.pdf", CHECKED_2026_08_25),
-  o2: evidence("O2 Europe Zone roaming", "https://www.o2.co.uk/eu-roaming", CHECKED_2026_08_25),
+  o2: evidence("O2 Europe Zone roaming", "https://www.o2.co.uk/eu-roaming", CHECKED_2026_09_10),
   // Backs the zone list and the 25GB roaming fair-use limit, both reconfirmed.
   // It quotes no per-day rate, and nothing here claims one any more.
   vodafone: evidence("Vodafone global roaming", "https://www.vodafone.co.uk/mobile/global-roaming", CHECKED_2026_08_25),
@@ -59,26 +61,34 @@ export const networkRoamingEvidence: Record<Network, RoamingEvidence> = {
 export const scenarioRoamingEvidence: Record<string, RoamingEvidence> = {
   // Confirmed on the pages that actually quote them: the passes on the global
   // roaming page, and the £2.75 day rate on the Extras page.
-  "vodafone-europe-pass": evidence("Vodafone roaming Extras", "https://www.vodafone.co.uk/mobile/extras", CHECKED_2026_08_25),
-  "vodafone-europe-day": evidence("Vodafone roaming Extras", "https://www.vodafone.co.uk/mobile/extras", CHECKED_2026_08_25),
-  "o2-travel": evidence("O2 Travel", "https://www.o2.co.uk/international/o2-travel", CHECKED_2026_08_25),
-  "three-europe-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
-  "three-world-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
-  "three-extra-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_08_25),
+  "vodafone-europe-pass": evidence("Vodafone roaming Extras", "https://www.vodafone.co.uk/mobile/extras", CHECKED_2026_09_10),
+  "vodafone-europe-day": evidence("Vodafone roaming Extras", "https://www.vodafone.co.uk/mobile/extras", CHECKED_2026_09_10),
+  "o2-travel": evidence("O2 Travel", "https://www.o2.co.uk/international/o2-travel", CHECKED_2026_09_10),
+  "three-europe-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_09_10),
+  "three-world-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_09_10),
+  "three-extra-pass": evidence("Three Go Roam passes", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad", CHECKED_2026_09_10),
+  // The Republic of Ireland is carved out of the EU daily charges on these
+  // networks; each page says so in terms.
+  "ee-ireland": evidence("EE roaming plan terms", "https://ee.co.uk/help/terms-and-conditions/mobile/pay-monthly/roaming/roaming-plans", CHECKED_2026_09_10),
+  "vodafone-ireland": evidence("Vodafone roaming Extras", "https://www.vodafone.co.uk/mobile/extras", CHECKED_2026_09_10),
+  "three-ireland": evidence("Three roaming abroad: Ireland", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad?country=Ireland&plan=paym", CHECKED_2026_09_10),
+  "smarty-ireland": evidence("SMARTY roaming and international", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international", CHECKED_2026_09_10),
   // Turkey is a Go Roam Around the World Extra destination on Three's own page
   // for it, with the same pass prices as Japan and the UAE. Kept as its own
   // entry so the Turkey result links to the page that names Turkey.
   "three-extra-pass-turkey": evidence("Three roaming abroad: Turkey", "https://www.three.co.uk/support/roaming-and-calling-abroad/roaming-abroad?country=Turkey&plan=paym", { checkedAt: "2026-09-10", reviewAfter: "2026-10-10" }),
   "id-europe": evidence("iD Mobile EU fair-use policy", "https://www.idmobile.co.uk/help-and-support/eu-roaming/fair-usage-policy", CHECKED_2026_08_25),
   "id-roam-beyond": evidence("iD Mobile Roam Beyond", "https://www.idmobile.co.uk/help-and-support/roaming", CHECKED_2026_08_25),
-  "giffgaff-europe": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_08_25),
-  "giffgaff-europe-overage": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_08_25),
-  "smarty-europe": evidence("SMARTY roaming in Spain", "https://smarty.co.uk/roaming/europe/spain/", CHECKED_2026_08_25),
+  "giffgaff-europe": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_09_10),
+  "giffgaff-europe-overage": evidence("giffgaff EU roaming rules", "https://help.giffgaff.com/en/articles/229458-everything-you-need-to-know-about-roaming-in-the-eu", CHECKED_2026_09_10),
+  // The general help article rather than the Spain page, now that the same EU
+  // terms back every EU destination. It confirms the 12GB limit and the Ireland exception.
+  "smarty-europe": evidence("SMARTY roaming and international", "https://help.smarty.co.uk/en/articles/2090500-roaming-and-international", CHECKED_2026_09_10),
   "smarty-metered-us": evidence("SMARTY roaming in the USA", "https://smarty.co.uk/roaming/international/united-states-of-america/", CHECKED_2026_08_25),
   "voxi-europe": evidence("VOXI European Roaming Pass", "https://www.voxi.co.uk/help/roaming-international/does-voxi-have-european-roaming", CHECKED_2026_08_25),
   "voxi-global": evidence("VOXI Global Roaming Extra", "https://www.voxi.co.uk/help/roaming-international/what-are-global-roaming-extras", CHECKED_2026_08_25),
   "voxi-metered": evidence("VOXI standard roaming charges", "https://www.voxi.co.uk/charges", CHECKED_2026_08_25),
-  "tesco-europe": evidence("Tesco Mobile Home From Home", "https://www.tescomobile.com/why-tesco-mobile/awards-and-reviews/home-from-home", CHECKED_2026_08_25),
+  "tesco-europe": evidence("Tesco Mobile Home From Home", "https://www.tescomobile.com/why-tesco-mobile/awards-and-reviews/home-from-home", CHECKED_2026_09_10),
   "tesco-metered-us": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go", CHECKED_2026_08_25),
   "tesco-metered-world": evidence("Tesco Mobile roaming rates", "https://www.tescomobile.com/help/roaming-and-international/roaming-charges-for-pay-as-you-go", CHECKED_2026_08_25),
 };
@@ -121,69 +131,86 @@ const genericScenarioOptions: ScenarioOption[] = [
   { value: "custom", label: "Enter my own trip cost" },
 ];
 
+/**
+ * EU roaming terms are set per zone, not per country: every page behind these
+ * scenarios describes the whole Europe zone (O2's 48 destinations, Vodafone's
+ * 52, Tesco's 48, giffgaff's and SMARTY's EU lists). Reconfirmed 10 September
+ * 2026. The Republic of Ireland is the exception on several networks and has
+ * its own set below.
+ */
+const euZoneOptions: Partial<Record<Network, ScenarioOption[]>> = {
+  ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
+  o2: [{ value: "o2-europe", label: "O2 Europe Zone — included, up to 25GB" }, ...common],
+  vodafone: [{ value: "vodafone-europe-pass", label: "Vodafone Europe pass — £16/8d or £21/15d" }, { value: "vodafone-europe-day", label: "Vodafone daily charge — £2.75/day" }, ...common],
+  three: [{ value: "three-europe-pass", label: "Three Go Roam pass — 3, 7 or 14 days" }, ...common],
+  "id-mobile": [{ value: "id-europe", label: "iD Roam Free — up to 30GB" }, ...common],
+  "sky-mobile": [{ value: "sky-passport", label: "Sky Passport Plus — £2/24h" }, ...common],
+  giffgaff: [{ value: "giffgaff-europe", label: "Eligible giffgaff plan — up to 5GB" }, { value: "giffgaff-europe-overage", label: "Beyond allowance — 10p/MB" }, ...common],
+  smarty: [{ value: "smarty-europe", label: "SMARTY EU roaming — up to 12GB" }, ...common],
+  voxi: [{ value: "voxi-europe", label: "VOXI European pass — 1, 2, 8 or 15 days" }, ...common],
+  "tesco-mobile": [{ value: "tesco-europe", label: "Tesco Home From Home — UK allowance" }, ...common],
+};
+
 const destinationScenarioOptions: Partial<Record<DestinationId, Partial<Record<Network, ScenarioOption[]>>>> = {
   // EE roaming zones, read from the EE mobile plan price guide (4 Aug 2026),
   // "Countries included in ROW", page 14. EU/EEA destinations need no ROW pass.
-  // Other networks are not mapped for these destinations yet and still fall
-  // through to the generic "check your network" option.
-  "france": {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
-  },
-  "italy": {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
-  },
-  "greece": {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
-  },
-  "portugal": {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
-  },
-  "germany": {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
-  },
-  "netherlands": {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
-  },
+  // EU destinations share the zone-wide set above. Outside Europe, O2 Travel and
+  // Three's Go Roam zones were read from each network's own destination pages on
+  // 10 September 2026. Anything still unmapped falls through to the generic
+  // "check your network" option.
+  "france": euZoneOptions,
+  "italy": euZoneOptions,
+  "greece": euZoneOptions,
+  "portugal": euZoneOptions,
+  "germany": euZoneOptions,
+  "netherlands": euZoneOptions,
   "ireland": {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
+    ee: [{ value: "ee-ireland", label: "EE — Ireland uses your UK allowance" }, ...common],
+    o2: [{ value: "o2-europe", label: "O2 Europe Zone — included, up to 25GB" }, ...common],
+    vodafone: [{ value: "vodafone-ireland", label: "Vodafone — Ireland included on every plan" }, ...common],
+    three: [{ value: "three-ireland", label: "Three — no charge in Ireland" }, ...common],
+    "id-mobile": [{ value: "id-europe", label: "iD Roam Free — up to 30GB" }, ...common],
+    giffgaff: [{ value: "giffgaff-europe", label: "Eligible giffgaff plan — up to 5GB" }, { value: "giffgaff-europe-overage", label: "Beyond allowance — 10p/MB" }, ...common],
+    smarty: [{ value: "smarty-ireland", label: "SMARTY — full UK allowance in Ireland" }, ...common],
+    "tesco-mobile": [{ value: "tesco-europe", label: "Tesco Home From Home — UK allowance" }, ...common],
   },
-  "cyprus": {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
-  },
+  "cyprus": euZoneOptions,
   "thailand": {
     ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
   },
   "australia": {
     ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
   },
   "canada": {
     ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
   },
   "mexico": {
     ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    three: [{ value: "three-extra-pass", label: "Three Go Roam Extra pass — 3, 5, 7 or 14 days" }, ...common],
   },
   "indonesia": {
     ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
   },
   "morocco": {
     ee: [{ value: "ee-row2", label: "EE roaming pass — £8/24h, £40/7d, £60/15d" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
   },
   "egypt": {
     ee: [{ value: "ee-row2", label: "EE roaming pass — £8/24h, £40/7d, £60/15d" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
   },
 
-  spain: {
-    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
-    o2: [{ value: "o2-europe", label: "O2 Europe Zone — included, up to 25GB" }, ...common],
-    vodafone: [{ value: "vodafone-europe-pass", label: "Vodafone Europe pass — £16/8d or £21/15d" }, { value: "vodafone-europe-day", label: "Vodafone daily charge — £2.75/day" }, ...common],
-    three: [{ value: "three-europe-pass", label: "Three Go Roam pass — 3, 7 or 14 days" }, ...common],
-    "id-mobile": [{ value: "id-europe", label: "iD Roam Free — up to 30GB" }, ...common],
-    "sky-mobile": [{ value: "sky-passport", label: "Sky Passport Plus — £2/24h" }, ...common],
-    giffgaff: [{ value: "giffgaff-europe", label: "Eligible giffgaff plan — up to 5GB" }, { value: "giffgaff-europe-overage", label: "Beyond allowance — 10p/MB" }, ...common],
-    smarty: [{ value: "smarty-europe", label: "SMARTY EU roaming — up to 12GB" }, ...common],
-    voxi: [{ value: "voxi-europe", label: "VOXI European pass — 1, 2, 8 or 15 days" }, ...common],
-    "tesco-mobile": [{ value: "tesco-europe", label: "Tesco Home From Home — UK allowance" }, ...common],
-  },
+  spain: euZoneOptions,
   "united-states": {
     ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
     o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
@@ -457,6 +484,10 @@ export function getRoamingResult(
       const match = allowanceMatch(allowance, neededDataGb, "");
       return finish({ cost: billableDays * 8, title: "EE rest-of-world Zone 3 pass estimate", detail: `£8 × ${billableDays} 24-hour ${billableDays === 1 ? "period" : "periods"}, each including 500MB.`, caveat: "Includes unlimited minutes and texts. Data is 500MB per day, not one pot for the whole trip.", dataAllowanceGb: allowance, unlimitedData: false, allowanceSource: "published", speedCap: "Your EE plan’s UK speed cap", tethering: "allowed", callsTexts: "included", ...match });
     }
+    if (scenario === "ee-ireland") return ukAllowanceResult({ cost: 0, title: "EE in the Republic of Ireland", detail: "EE's roaming terms say calls, texts and data used in the Republic of Ireland come out of your UK allowance.", caveat: "There's no daily charge here, unlike the rest of EE's Europe zone.", callsTexts: "included" });
+    if (scenario === "vodafone-ireland") return ukAllowanceResult({ cost: 0, title: "Vodafone in the Republic of Ireland", detail: "Vodafone says every Pay monthly and Pay as you go plan already includes the Republic of Ireland.", caveat: "Vodafone's fair usage policy still applies.", callsTexts: "included" });
+    if (scenario === "three-ireland") return ukAllowanceResult({ cost: 0, title: "Three in the Republic of Ireland", detail: "Three doesn't charge to unlock your UK calls, texts and data in the Republic of Ireland.", caveat: "Three's Ireland page lists up to 12GB of your plan's data.", capGb: 12, callsTexts: "included" });
+    if (scenario === "smarty-ireland") return ukAllowanceResult({ cost: 0, title: "SMARTY in the Republic of Ireland", detail: "SMARTY plans use their normal UK allowance in the Republic of Ireland at no extra cost.", caveat: "The 12GB roaming limit SMARTY applies elsewhere in the EU doesn't apply in Ireland.", callsTexts: "check-plan" });
     if (scenario === "o2-europe") {
       return ukAllowanceResult({ cost: 0, title: "O2 Europe Zone estimate", detail: "Eligible Pay Monthly plans use your normal UK allowance, with nothing extra to pay.", caveat: "Data is capped at 25GB. Calls and texts within the Europe Zone and back to the UK are included.", capGb: 25, tethering: "allowed", callsTexts: "included" });
     }

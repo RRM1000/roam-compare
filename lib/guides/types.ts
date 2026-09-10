@@ -36,8 +36,6 @@ export type GuideProviderNote = {
   localNetwork: string;
   summary: string;
   watchOut?: string;
-  bestFor?: string;
-  watchFor?: string;
   sourceIds?: string[];
 };
 

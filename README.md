@@ -4,8 +4,8 @@ UK-first roaming and travel-eSIM comparison site. Built with vinext and deployed
 
 ## What is implemented
 
-- allowance-matched UK roaming estimates for 52 network-and-destination combinations, every one traceable to a
-  charge the operator publishes — all 20 destinations on EE, and 33 combinations across the other nine networks.
+- allowance-matched UK roaming estimates for 136 network-and-destination combinations, every one traceable to a
+  charge the operator publishes — all 20 destinations on EE, and 116 combinations across the other nine networks.
   Where an operator no longer publishes a rate, the site hands off to their own checker instead of quoting a number.
 - live Saily prices in GBP for all 20 destinations, fetched per request from the Saily partners API
 - dated manual eSIM price snapshots for Turkey, the United States, Spain, Japan and the UAE
@@ -20,27 +20,31 @@ Saily rows are labelled "Live price" and are exact GBP amounts from the provider
 
 ## Destination guides
 
-Every destination has a comparison page at `/destinations/<id>`. A destination with a written
-guide in `lib/guides/` additionally renders an editorial section under the comparison — verdict,
-key facts, a per-network charges table, worked trip costs, provider notes, prose sections, setup
-steps, a FAQ and a dated source list — plus `FAQPage` and `Article` structured data and
-guide-specific title and description tags. Turkey is the first; the others fall back to the
-generic page until a guide is written.
+Every destination has a comparison page at `/destinations/<id>`, and all 20 carry a written guide
+from `lib/guides/` under the comparison: verdict, key facts, a table of what all ten UK networks
+charge, worked 7- and 14-day costs, provider notes, prose sections, setup steps and a FAQ, plus
+`FAQPage` and `Article` structured data and guide-specific title and description tags.
 
 A guide is data, not markup (`lib/guides/types.ts`), and the rules the tests enforce are:
 
-- every fact, section and FAQ entry names its sources, and every listed source is cited somewhere
-- sources are HTTPS, carry `checkedAt` and `reviewAfter`, and `npm run data:check` flags them when due
 - network rows point at scenario ids in `lib/roaming.ts` rather than repeating prices, so the
-  guide, the calculator and the source register cannot disagree
+  guide, the calculator and the source register cannot disagree; a row with a scenario must be
+  offered for that destination and must price
+- text shared between guides (the EU zone terms, O2 Travel, Three's passes, provider notes, setup
+  steps) lives in `lib/guides/shared.ts`, so a price change is corrected once
+- where a guide carries a `sources` list, as Turkey does, every citation must resolve and every
+  source must be cited, and `npm run data:check` flags sources when they fall due; sources are kept
+  in the data but not rendered on the page
 - provider links reuse `getPlanUrl`/`getProviderUrl`, so tracked links are disclosed as sponsored
   exactly as they are in the comparison, and Airalo stays unmarked
 - the worked examples are computed at render time from the same live plans the comparison uses;
   when neither feed answers and the hand-checked prices are due, the guide says so rather than
   ranking a stale price
 
-To add a destination: copy `lib/guides/turkey.ts`, research it against primary sources, register
-it in `lib/guides/index.ts`, and run `npm test`.
+To add or refresh a guide: research it against the networks' and providers' own pages, write
+`lib/guides/<id>.ts`, register it in `lib/guides/europe.ts` or `lib/guides/rest-of-world.ts`, and
+run `npm test`. When a UK network publishes a charge the engine doesn't price yet, add the scenario
+to `lib/roaming.ts` first, so the guide row and the calculator stay in step.
 
 ## Local development
 

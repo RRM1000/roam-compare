@@ -1,214 +1,103 @@
+import { providerNotes, providersIntro } from "./shared.ts";
 import type { DestinationGuide } from "./types.ts";
 
+/**
+ * Ireland guide. Checked 10 September 2026. Unlike the other EU guides, Ireland
+ * has its own scenarios in lib/roaming.ts, because EE, Vodafone, Three and SMARTY
+ * all make an exception for it in their published terms.
+ */
 export const irelandGuide: DestinationGuide = {
   destination: "ireland",
   keyword: "Ireland eSIM",
-  title: "Ireland eSIM vs UK roaming: best travel data options (2026)",
+  title: "Ireland eSIM vs UK roaming: do you need one? (2026)",
   description:
-    "Visiting Ireland from the UK? Compare Ireland eSIM deals with UK network roaming policies. Learn why most UK networks treat the Republic of Ireland like home and when an eSIM is still useful.",
+    "Most UK networks let you use your plan in the Republic of Ireland at no extra cost, including EE, Vodafone and Three. See which networks do, what the caps are, and when an Ireland eSIM is still worth having.",
   verdict: {
-    heading: "Short answer: most UK travellers do not need an eSIM for Ireland, as major UK networks include roaming with no surcharges.",
+    heading: "Short answer: on most UK networks, you don't need an eSIM for the Republic of Ireland.",
     body:
-      "Because of the Common Travel Area and bilateral operator agreements, the Republic of Ireland is treated as a domestic or surcharge-free zone by nearly all major UK mobile providers—including EE, O2, Vodafone, Three, Sky Mobile, and Tesco Mobile. Most UK travellers can simply use their standard domestic minutes, texts, and data allowance as if they were in the UK. An Ireland eSIM is primarily valuable for heavy data users bumping against UK carrier fair-use roaming limits (such as giffgaff's 5GB cap or SMARTY's 12GB limit), or for travellers wanting high-speed data backup on Irish networks like Vodafone Ireland, Three, or Eir.",
+      "EE, Vodafone and Three all include the Republic of Ireland, even though they charge elsewhere in Europe. O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile include it too, and SMARTY lifts its usual 12GB roaming cap there. An eSIM is mainly worth it if your plan's data is small, you're on giffgaff and need more than 5GB, or you're on Sky Mobile or VOXI, whose Ireland terms we couldn't confirm.",
   },
   facts: [
-    {
-      label: "Local networks",
-      value: "Vodafone Ireland, Three Ireland, and Eir. Travel eSIM providers typically connect via Vodafone Ireland or Three.",
-    },
-    {
-      label: "Common Travel Area",
-      value: "Most UK networks exempt the Republic of Ireland from EU roaming daily surcharges, treating usage like domestic UK allowances.",
-    },
-    {
-      label: "5G availability",
-      value: "Widespread 5G coverage across Dublin, Cork, Galway, Limerick, Waterford, and main intercity motorway corridors.",
-    },
-    {
-      label: "Emergency services",
-      value: "Dial 999 or 112 for emergency services in Ireland. Both numbers connect free of charge from any active mobile phone.",
-    },
-    {
-      label: "UK visitors",
-      value: "Over 4.5 million visits from the UK to Ireland take place annually, making it one of the UK's most frequent travel corridors.",
-    },
+    { label: "No daily charge", value: "EE, Vodafone and Three, which charge elsewhere in Europe, all include the Republic of Ireland." },
+    { label: "Caps", value: "giffgaff 5GB, Three 12GB, O2 25GB and iD Mobile 30GB of your plan's data. SMARTY's 12GB roaming cap doesn't apply in Ireland." },
+    { label: "Local networks", value: "Vodafone, Three and Eir. Nomad lists Three and Eir, and Airalo lists Three." },
+    { label: "The border", value: "Near the border your phone can switch between UK and Irish networks. On the networks above, that doesn't change what you pay." },
+    { label: "Emergency calls", value: "112 and 999 both work in the Republic of Ireland." },
   ],
   networks: {
     intro:
-      "Unlike continental Europe where many UK networks impose £2 to £2.75 daily roaming fees, Ireland enjoys special domestic-like status across most UK networks. Check your specific carrier terms below.",
+      "The Republic of Ireland is in every UK network's Europe zone, and several networks that charge elsewhere in Europe make an exception for it. Every priced row below links to the page that says so.",
     rows: [
-      {
-        network: "ee",
-        scenario: "ee-europe-new",
-        headline: "EE treats Ireland as domestic: included with no daily fee",
-        detail: "While EE charges daily Europe fees in continental EU countries, the Republic of Ireland is included in your standard domestic UK allowance. No Roam Abroad pass or £2.72 daily fee is charged.",
-      },
-      {
-        network: "o2",
-        scenario: null,
-        headline: "O2 Europe Zone: included at no extra cost (up to 25GB)",
-        detail: "O2 includes roaming in Ireland as part of its Europe Zone. You can use your domestic minutes, texts, and data up to 25GB with zero daily surcharges.",
-      },
-      {
-        network: "vodafone",
-        scenario: null,
-        headline: "Vodafone Zone A / Ireland: inclusive roaming on all plans",
-        detail: "Vodafone includes the Republic of Ireland in Zone A (domestic/included). All Pay Monthly and SIM-only customers use their UK allowance in Ireland without daily charges or passes.",
-      },
-      {
-        network: "three",
-        scenario: null,
-        headline: "Three Go Roam: included in Ireland with no daily fee",
-        detail: "Three waives its standard £2/day Go Roam Europe fee for the Republic of Ireland. Roaming is free of charge up to a 12GB fair-use ceiling.",
-      },
-      {
-        network: "id-mobile",
-        scenario: null,
-        headline: "iD Roam Free: inclusive roaming across Ireland (up to 30GB)",
-        detail: "iD Mobile includes roaming in the Republic of Ireland with no extra charges, using your plan allowance up to 30GB.",
-      },
-      {
-        network: "sky-mobile",
-        scenario: null,
-        headline: "Sky Mobile: inclusive roaming in the Republic of Ireland",
-        detail: "Sky Mobile does not charge the £2/day Roaming Passport Plus fee for Ireland. Domestic allowances and piggybank data work seamlessly.",
-      },
-      {
-        network: "giffgaff",
-        scenario: null,
-        headline: "EU roaming included: up to 5GB fair-use data limit",
-        detail: "Giffgaff plans include roaming in Ireland up to 5GB per plan. If you need more data, buying an eSIM or starting your next goodybag early is recommended.",
-      },
-      {
-        network: "smarty",
-        scenario: null,
-        headline: "Inclusive roaming: up to 12GB fair-use cap",
-        detail: "SMARTY includes roaming in Ireland at no extra charge, subject to its standard 12GB EU roaming limit per billing cycle.",
-      },
-      {
-        network: "voxi",
-        scenario: null,
-        headline: "Inclusive roaming in the Republic of Ireland",
-        detail: "VOXI includes the Republic of Ireland in its domestic roaming list without requiring an EU Roaming Pass, subject to standard fair-use rules.",
-      },
-      {
-        network: "tesco-mobile",
-        scenario: null,
-        headline: "Home From Home: included with standard UK allowances",
-        detail: "Tesco Mobile allows full use of UK data, minutes, and texts in Ireland under its Home From Home policy with no surcharge.",
-      },
+      { network: "ee", scenario: "ee-ireland", headline: "Included: the Republic of Ireland uses your UK allowance", detail: "EE's roaming terms say calls, texts and data used in the Republic of Ireland come out of your UK allowance, without the daily charge EE applies elsewhere in Europe." },
+      { network: "o2", scenario: "o2-europe", headline: "O2 Europe Zone: included, up to 25GB", detail: "Ireland is in O2's Europe Zone, so Pay Monthly plans use their UK allowance there. Past 25GB of data abroad, you need to buy a Bolt On." },
+      { network: "vodafone", scenario: "vodafone-ireland", headline: "Included on every plan", detail: "Vodafone says all Pay monthly and Pay as you go plans already include the Republic of Ireland, along with the Isle of Man, Iceland and Norway." },
+      { network: "three", scenario: "three-ireland", headline: "Included: no charge to unlock your allowance", detail: "Three doesn't charge to use your UK calls, texts and data in the Republic of Ireland. Its Ireland page lists up to 12GB of your plan's data." },
+      { network: "id-mobile", scenario: "id-europe", headline: "iD Roam Free: included, up to 30GB", detail: "iD's published EU limit is 30GB for customers who joined on or after 21 June 2023. On a smaller plan, your own allowance is the limit." },
+      { network: "sky-mobile", scenario: null, headline: "Check Sky's destination list for Ireland", detail: "Roaming Passport Plus costs £2 on each day you use it in the destinations Sky covers. We couldn't confirm whether Sky charges for the Republic of Ireland." },
+      { network: "giffgaff", scenario: "giffgaff-europe", headline: "Included on eligible plans, up to 5GB", detail: "Ireland is on giffgaff's EU roaming list. Beyond 5GB of your plan's data, it's 10p per MB." },
+      { network: "smarty", scenario: "smarty-ireland", headline: "Included, with no roaming cap", detail: "SMARTY's 12GB roaming limit doesn't apply in the Republic of Ireland, so you can use your full UK allowance." },
+      { network: "voxi", scenario: null, headline: "Check VOXI's roaming terms for Ireland", detail: "VOXI sells a European Roaming Pass for EU destinations. We couldn't confirm whether you need one in the Republic of Ireland, so check My VOXI before you use data." },
+      { network: "tesco-mobile", scenario: "tesco-europe", headline: "Home From Home: included", detail: "Tesco Mobile lists the Republic of Ireland among its 48 Home From Home destinations, on pay monthly and pay as you go." },
     ],
   },
   providers: {
-    intro:
-      "For travellers who need high-capacity data beyond UK carrier caps or independent backup connectivity, four major eSIM providers offer competitive Ireland plans.",
-    notes: [
-      {
-        provider: "Airalo",
-        localNetwork: "Three Ireland",
-        summary: "Airalo's 'Clover' eSIM runs on Three Ireland's robust 4G/5G network. Quick setup and reliable urban coverage in Dublin, Cork, and Galway.",
-        watchOut: "Daily unlimited plans throttle to 1Mbps after 3GB per day; standard bundles provide full speeds throughout.",
-      },
-      {
-        provider: "Klook",
-        localNetwork: "Vodafone / Eir",
-        summary: "Flexible short-term daily and multi-day data passes available on reliable Irish partner networks.",
-        watchOut: "Delivered via digital QR voucher code; smartphone must be unlocked from carrier restrictions.",
-      },
-      {
-        provider: "Nomad",
-        localNetwork: "Three Ireland / Vodafone",
-        summary: "Fast 5G and 4G connectivity powered by top-tier Irish networks. Straightforward tethering support for laptops and tablets.",
-        watchOut: "Packages must be activated within 60 days of order. Prices converted from USD.",
-      },
-      {
-        provider: "Saily",
-        localNetwork: "Vodafone Ireland / Eir",
-        summary: "Fixed pricing in GBP with strong multi-network roaming across Ireland. Ideal for tourists touring the Wild Atlantic Way or Dublin.",
-        watchOut: "Line activates upon first network connection in Ireland; download profile before crossing the Irish Sea.",
-      },
-    ],
+    intro: providersIntro,
+    notes: providerNotes("Ireland", { nomad: "Three and Eir", airalo: "Three", klook: null }),
   },
   sections: [
     {
-      id: "why-most-uk-travellers-roam-free-in-ireland",
-      heading: "Why most UK travellers roam free in the Republic of Ireland",
+      id: "why-ireland-is-different",
+      heading: "Why Ireland is different from the rest of Europe",
       paragraphs: [
-        "Following Brexit, several UK operators reintroduced daily roaming fees of £2 to £2.75 for travel within the European Union. However, the Republic of Ireland is treated as a major exception by almost every UK mobile network due to the Common Travel Area and strong historical telecommunications agreements.",
-        "Major carriers—including EE, O2, Vodafone, Three, Sky Mobile, and Tesco Mobile—explicitly exclude the Republic of Ireland from their daily EU roaming charges. That means you can generally use your UK allowance of minutes, texts, and data just as you would in Belfast, Cardiff, Edinburgh, or London.",
+        "Most UK networks that brought back roaming charges for Europe made an exception for the Republic of Ireland. EE's roaming terms, Vodafone's roaming page and Three's Ireland page all say you can use your UK allowance there at no extra cost. SMARTY goes further and lifts its usual 12GB roaming cap.",
+        "That makes the choice about data, not daily fees. If your UK plan has plenty of data, it will almost certainly cover a trip to Dublin or the west coast without an eSIM.",
       ],
     },
     {
-      id: "crossing-the-border-from-northern-ireland",
-      heading: "Crossing the border between Northern Ireland and the Republic",
+      id: "when-an-esim-makes-sense",
+      heading: "When an Ireland eSIM still makes sense",
       paragraphs: [
-        "If you are driving between Northern Ireland and the Republic of Ireland (for example, taking the motorway between Belfast and Dublin), your phone will seamlessly hand off between UK and Irish network towers near the border.",
-        "Because both jurisdictions are treated as inclusive roaming zones on primary UK operators, you will not receive surprise bill shock when crossing County Armagh into County Louth. However, ensure data roaming is switched on in your handset settings so data continues working smoothly after your phone connects to an Irish network.",
+        "giffgaff includes Ireland but only up to 5GB of your plan's data, after which it's 10p per MB. At our everyday estimate of about 0.8GB a day, a week needs around 6GB, so a longer stay can pass that. A small eSIM is cheaper than paying by the megabyte.",
+        "We couldn't confirm Sky Mobile's or VOXI's terms for Ireland. If you're on either, check your app before you use data, or use an eSIM and keep your UK line's data roaming off.",
       ],
     },
     {
-      id: "irish-mobile-networks-and-rural-coverage",
-      heading: "Irish mobile networks: Vodafone Ireland, Three Ireland, and Eir",
+      id: "crossing-the-border",
+      heading: "Crossing the border from Northern Ireland",
       paragraphs: [
-        "Ireland has three major mobile network operators: Vodafone Ireland, Three Ireland, and Eir. Vodafone Ireland historically maintains the strongest coverage across rugged rural areas such as Connemara, County Kerry, and coastal routes along the Wild Atlantic Way.",
-        "Three Ireland and Eir have built out comprehensive 5G networks in urban centres including Dublin, Cork, Galway, Limerick, and Waterford. Most international travel eSIMs roam across Vodafone Ireland or Three Ireland, delivering fast download speeds for navigation and video streaming.",
-      ],
-    },
-    {
-      id: "when-an-ireland-esim-makes-sense",
-      heading: "When buying an Ireland eSIM still makes financial sense",
-      paragraphs: [
-        "While standard UK roaming covers most travellers, an Ireland eSIM remains a smart choice in specific scenarios. First, if your UK provider imposes a restrictive fair-use roaming cap (such as giffgaff's 5GB limit), heavy data users or remote workers can quickly exhaust their allowance and face 10p/MB penalty fees.",
-        "Second, if you run a business or need redundant internet connectivity while traveling along rural touring routes, having an independent eSIM on a different local Irish carrier guarantees backup signal if your UK SIM's roaming partner experiences a dead zone.",
+        "Near the border, your phone can switch between UK and Irish networks without you noticing. On the networks that include the Republic of Ireland, that makes no difference to your bill.",
+        "Your UK SIM does need data roaming switched on to use an Irish network. If you're on a network whose Ireland terms you're unsure of, check before you turn it on.",
       ],
     },
   ],
   setup: [
-    {
-      title: "Check your UK provider's roaming policy",
-      body: "Confirm that your UK mobile plan includes the Republic of Ireland with no daily surcharge, and note your contract's fair-use data cap (usually 5GB to 25GB).",
-    },
-    {
-      title: "Purchase an eSIM if you need extra data",
-      body: "If your domestic allowance is small or you plan heavy hotspot use, choose a 5GB to 20GB Ireland eSIM and install the profile before your trip.",
-    },
-    {
-      title: "Enable data roaming when entering Ireland",
-      body: "Whether using your UK SIM or an eSIM, ensure 'Data Roaming' is turned on in your phone's cellular settings so it can connect to Irish networks.",
-    },
-    {
-      title: "Keep UK line active for incoming calls and texts",
-      body: "Leave your domestic UK SIM switched on to receive incoming phone calls and two-factor authentication banking texts at no charge while in Ireland.",
-    },
+    { title: "Check your plan's roaming cap", body: "Your network's app shows whether Ireland is included and how much of your data you can use there." },
+    { title: "If it's included, turn on data roaming", body: "Your UK SIM needs data roaming switched on to use Irish networks. On the networks that include Ireland, that costs nothing extra." },
+    { title: "If you need more data, add an eSIM", body: "Install it at home on Wi-Fi, set it as your data line when you arrive, and turn off data roaming on your UK line so the two don't compete." },
   ],
   faq: [
     {
-      question: "Do UK mobile networks charge for roaming in Ireland?",
-      answer:
-        "Almost all major UK networks (EE, O2, Vodafone, Three, Sky Mobile, and Tesco Mobile) include roaming in the Republic of Ireland at no extra charge, exempting it from daily EU roaming surcharges under Common Travel Area agreements.",
+      question: "Do UK networks charge for roaming in Ireland?",
+      answer: "Most don't. EE, Vodafone and Three include the Republic of Ireland even though they charge elsewhere in Europe, and O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile include it as part of their Europe roaming. We couldn't confirm Sky Mobile or VOXI.",
     },
     {
-      question: "Will my UK phone work automatically when crossing into Ireland?",
-      answer:
-        "Yes, as long as 'Data Roaming' is enabled in your phone's cellular settings. Your phone will seamlessly connect to an Irish partner network like Vodafone Ireland, Three, or Eir.",
+      question: "Does EE charge for roaming in the Republic of Ireland?",
+      answer: "No. EE's roaming terms say calls, texts and data used in the Republic of Ireland come out of your UK allowance, unlike the daily charge it applies elsewhere in its Europe zone.",
     },
     {
-      question: "Why would I buy an Ireland eSIM if UK roaming is included?",
-      answer:
-        "An Ireland eSIM is ideal if your UK plan has a low fair-use cap (such as giffgaff's 5GB limit), if you need tethering for work, or if you want network redundancy on remote routes along the Wild Atlantic Way.",
+      question: "Is there a data cap on roaming in Ireland?",
+      answer: "It depends on the network: 5GB on giffgaff, 12GB on Three, 25GB on O2 and 30GB on iD Mobile. SMARTY's 12GB cap doesn't apply in Ireland, and Tesco Mobile sets no separate cap.",
     },
     {
-      question: "Can I use mobile hotspot and tethering in Ireland with an eSIM?",
-      answer:
-        "Yes, travel eSIMs from Saily, Nomad, and Airalo support tethering on standard fixed-data packages, making it easy to share data with laptops and tablets.",
+      question: "Do I need to change anything on my phone in Ireland?",
+      answer: "Turn on data roaming for your UK SIM, because it connects to Irish networks. On the networks that include Ireland, that doesn't cost extra.",
     },
     {
-      question: "What emergency number should I call in Ireland?",
-      answer:
-        "You can dial either 999 or 112 in Ireland for emergency assistance (police/Gardaí, ambulance, fire, or coast guard). Both work free of charge on any mobile device.",
+      question: "What's the emergency number in Ireland?",
+      answer: "112 and 999 both work in the Republic of Ireland.",
     },
   ],
-  related: ["netherlands", "spain", "france", "germany", "united-states"],
+  related: ["netherlands", "spain", "france", "germany", "portugal"],
   writtenAt: "2026-09-10",
   updatedAt: "2026-09-10",
 };

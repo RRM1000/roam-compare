@@ -14,7 +14,11 @@ import { getRoamingResult, getScenarioOptions } from "../lib/roaming.ts";
 const eeZones = {
   // EU / EEA — no ROW pass required
   spain: "eu", france: "eu", italy: "eu", greece: "eu", portugal: "eu",
-  germany: "eu", netherlands: "eu", ireland: "eu", cyprus: "eu",
+  germany: "eu", netherlands: "eu", cyprus: "eu",
+  // EE's pay monthly roaming terms carve the Republic of Ireland out of the EU
+  // daily charge: "Calls, texts and data used within the Republic of Ireland is
+  // included in your allowance."
+  ireland: "ireland",
   // ROW Zone 1
   australia: "row1", canada: "row1", indonesia: "row1", mexico: "row1",
   thailand: "row1", turkey: "row1", "united-arab-emirates": "row1", "united-states": "row1",
@@ -26,6 +30,7 @@ const eeZones = {
 
 const expectedTitle = {
   eu: "EE Europe roaming estimate",
+  ireland: "EE in the Republic of Ireland",
   row1: "EE rest-of-world Zone 1 pass estimate",
   row2: "EE rest-of-world Zone 2 pass estimate",
   row3: "EE rest-of-world Zone 3 pass estimate",

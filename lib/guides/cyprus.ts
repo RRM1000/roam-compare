@@ -1,211 +1,80 @@
+import { euRows, providerNotes, providersIntro, setupSteps } from "./shared.ts";
 import type { DestinationGuide } from "./types.ts";
 
+/** Cyprus guide. Checked 10 September 2026; UK network rows come from lib/guides/shared.ts. */
 export const cyprusGuide: DestinationGuide = {
   destination: "cyprus",
   keyword: "Cyprus eSIM",
-  title: "Cyprus eSIM vs UK roaming: best travel data options (2026)",
+  title: "Cyprus eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Visiting Cyprus from the UK? Compare Cyprus eSIM plans with UK roaming charges. Understand how EU roaming rules apply in the south and how to avoid costly rest-of-world charges in Northern Cyprus.",
+    "The Republic of Cyprus is in every UK network's Europe zone; Northern Cyprus isn't. Compare EE, O2, Vodafone, Three and the rest with live Cyprus eSIM prices, and avoid roaming onto northern networks near the Green Line.",
   verdict: {
-    heading: "Short answer: your UK EU roaming rules apply in southern Cyprus, but beware Northern Cyprus where rest-of-world charges hit.",
+    heading: "Short answer: your Europe roaming applies in the Republic of Cyprus, but not in the north.",
     body:
-      "The Republic of Cyprus is an EU member state, meaning UK mobile networks treat it under standard European roaming tiers—inclusive on O2 and iD Mobile, or subject to daily surcharges on EE (£2.72/day), Vodafone (£2.75/day), and Three (£2/day). Crucially, Northern Cyprus (north of the UN Buffer Zone) is not covered by EU roaming; UK carriers treat it as Rest of World with severe out-of-bundle rates reaching £5 to £9 per megabyte. A travel eSIM provides cheap, predictable high-speed data across coastal holiday resorts and prevents accidental cross-border roaming bills.",
+      "The Republic of Cyprus is in the EU, so UK networks treat it like the rest of their Europe zone: included on O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile, and charged daily or by pass on EE, Vodafone, Three, Sky Mobile and VOXI. Northern Cyprus runs on Turkish networks and isn't covered; O2 and giffgaff both exclude it. If you're staying near Nicosia or visiting the north, that border matters more than which eSIM you pick.",
   },
   facts: [
-    {
-      label: "Local networks",
-      value: "Cyta (Cytamobile-Vodafone), Epic (formerly MTN), and PrimeTel. Travel eSIMs generally connect via Cyta or Epic.",
-    },
-    {
-      label: "Northern Cyprus warning",
-      value: "Northern Cyprus uses Turkish mobile networks (Turkcell and KKTC Telsim). EU roaming passes and allowances do not apply north of the Green Line.",
-    },
-    {
-      label: "5G coverage",
-      value: "Widespread 5G available across Nicosia, Limassol, Larnaca, Paphos, and popular southeastern resort towns like Ayia Napa.",
-    },
-    {
-      label: "Airport connectivity",
-      value: "Larnaca (LCA) and Paphos (PFO) airports offer free Wi-Fi, but registration portals can delay booking rides after landing.",
-    },
-    {
-      label: "UK visitors",
-      value: "Over 1.3 million UK holidaymakers visit Cyprus each year, making British tourists the single largest national group on the island.",
-    },
+    { label: "Local networks", value: "Cyta, Epic and PrimeTel. Nomad lists Epic and PrimeTel, Airalo lists PrimeTel, and Klook's Cyprus eSIM names Cyta and Vodafone." },
+    { label: "Northern Cyprus", value: "The north uses Turkish networks, Turkcell and KKTC Telsim. O2's Europe Zone and giffgaff's EU roaming both exclude it." },
+    { label: "Near the Green Line", value: "In Nicosia and near the buffer zone, your phone can connect to a northern network without you crossing." },
+    { label: "Caps on included roaming", value: "O2 25GB, iD Mobile 30GB, SMARTY 12GB and giffgaff 5GB of your plan's data. Tesco Mobile sets no separate cap." },
   ],
   networks: {
     intro:
-      "In the Republic of Cyprus (southern Cyprus), UK operators apply their standard European roaming terms. North of the Green Line, Rest of World pricing applies.",
-    rows: [
-      {
-        network: "ee",
-        scenario: "ee-europe-new",
-        headline: "EE Europe passes: £2.72 per day, £16.50 for 7 days, or £30 for 15 days",
-        detail: "Applies to contracts taken out or upgraded since 7 July 2021. Covers the Republic of Cyprus under EE's 50GB fair-use policy. Northern Cyprus is in Zone 1 (rest-of-world).",
-      },
-      {
-        network: "o2",
-        scenario: null,
-        headline: "O2 Europe Zone: included at no extra cost (up to 25GB)",
-        detail: "O2 includes the Republic of Cyprus in its Europe Zone with no daily surcharge, up to 25GB. Northern Cyprus triggers O2 Travel (£7/day).",
-      },
-      {
-        network: "vodafone",
-        scenario: null,
-        headline: "European roaming: included on Xtra plans, or £2.75/day",
-        detail: "Vodafone includes Cyprus on plans with inclusive roaming; standard contracts pay £2.75 daily or use 8-day (£16) / 15-day (£21) passes with a 25GB limit.",
-      },
-      {
-        network: "three",
-        scenario: null,
-        headline: "Go Roam Europe: £2/day or bundle passes, up to 12GB",
-        detail: "Three charges £2 per calendar day or sells Go Roam passes for southern Cyprus up to 12GB. Northern Cyprus falls under Go Roam Extra at £7-£8 daily.",
-      },
-      {
-        network: "id-mobile",
-        scenario: null,
-        headline: "iD Roam Free: inclusive EU roaming (up to 30GB)",
-        detail: "iD Mobile covers the Republic of Cyprus under standard inclusive roaming up to 30GB. Northern Cyprus is excluded.",
-      },
-      {
-        network: "sky-mobile",
-        scenario: null,
-        headline: "Roaming Passport Plus: £2 for 24 hours of access",
-        detail: "Sky Mobile charges £2 per 24 hours to use your domestic UK allowance in Cyprus, capped at 25GB per billing period.",
-      },
-      {
-        network: "giffgaff",
-        scenario: null,
-        headline: "EU roaming included: up to 5GB fair-use limit",
-        detail: "Giffgaff provides up to 5GB of inclusive EU roaming in southern Cyprus per plan. 10p/MB applies afterwards.",
-      },
-      {
-        network: "smarty",
-        scenario: null,
-        headline: "EU roaming included: up to 12GB allowance",
-        detail: "SMARTY includes southern Cyprus in its EU roaming destinations up to 12GB with no daily access fees.",
-      },
-      {
-        network: "voxi",
-        scenario: null,
-        headline: "European Roaming Pass: £2.75/day or multi-day passes",
-        detail: "VOXI requires a European Roaming Pass for Cyprus. Passes run from 1 to 15 days; unlimited social media is domestic only.",
-      },
-      {
-        network: "tesco-mobile",
-        scenario: null,
-        headline: "Home From Home: inclusive EU roaming on eligible tariffs",
-        detail: "Tesco Mobile includes the Republic of Cyprus under Home From Home rules with no additional fees on eligible plans.",
-      },
-    ],
+      "The Republic of Cyprus is in every UK network's Europe zone, and every row below is priced for your trip in the calculator above. Northern Cyprus isn't in any of these zones.",
+    rows: euRows("the Republic of Cyprus", { o2: "Northern Cyprus isn't in the Europe Zone.", giffgaff: "Northern Cyprus isn't on giffgaff's list." }),
   },
   providers: {
-    intro:
-      "Four leading travel eSIM providers cover Cyprus. Check whether a plan covers only the Republic of Cyprus or includes regional coverage.",
-    notes: [
-      {
-        provider: "Airalo",
-        localNetwork: "Cyta",
-        summary: "Airalo's 'Cytamobile' eSIM provides seamless access to Cyta's extensive coastal 5G network in Paphos, Limassol, and Ayia Napa.",
-        watchOut: "Plans do not include cellular coverage in Northern Cyprus (TRNC); 3GB daily limit on unlimited plans.",
-      },
-      {
-        provider: "Klook",
-        localNetwork: "Cyta / Epic",
-        summary: "Offers single-country and regional Europe eSIM packages with flexible day allowances on Cyta and Epic.",
-        watchOut: "Delivered electronically via voucher QR code; handset must be carrier unlocked.",
-      },
-      {
-        provider: "Nomad",
-        localNetwork: "Cyta (Cytamobile-Vodafone)",
-        summary: "High-speed 5G/4G connectivity via Cyta, Cyprus's largest telecommunications operator. Tethering and hotspot sharing supported.",
-        watchOut: "Valid for activation up to 60 days after purchase. Coverage strictly limited to southern networks.",
-      },
-      {
-        provider: "Saily",
-        localNetwork: "Cyta / Epic",
-        summary: "Clean GBP pricing with excellent signal on Cyta and Epic networks across southern coastal resorts and mountain regions.",
-        watchOut: "Plan begins upon connecting to a Cypriot cell tower; install QR profile before landing.",
-      },
-    ],
+    intro: providersIntro,
+    notes: providerNotes("Cyprus", { nomad: "Epic and PrimeTel", airalo: "PrimeTel", klook: "Cyta and Vodafone" }),
   },
   sections: [
     {
-      id: "the-green-line-and-northern-cyprus-trap",
-      heading: "The Green Line divide: Republic of Cyprus vs Northern Cyprus",
+      id: "green-line",
+      heading: "The Green Line: Republic of Cyprus and Northern Cyprus",
       paragraphs: [
-        "Cyprus is geographically divided between the internationally recognised Republic of Cyprus in the south and the de facto Turkish Republic of Northern Cyprus (TRNC) in the north, separated by a United Nations buffer zone known as the Green Line.",
-        "This geopolitical partition has enormous ramifications for mobile roaming. In the south, standard EU roaming regulations apply. But in Northern Cyprus, cell towers connect to Turkish operators (Turkcell Northern Cyprus and KKTC Telsim). UK networks treat Northern Cyprus as Rest of World, exposing unsuspecting holidaymakers to charges of £5 to £9 per megabyte if their phone connects across the border.",
+        "Cyprus is divided by a UN buffer zone, the Green Line. The Republic of Cyprus in the south is an EU member and its networks, Cyta, Epic and PrimeTel, are covered by UK networks' Europe roaming.",
+        "Northern Cyprus uses Turkish networks, Turkcell and KKTC Telsim. O2's Europe Zone and giffgaff's EU roaming both exclude it, so on a day trip north, or near the line, your phone can run up rest-of-world charges.",
       ],
     },
     {
-      id: "cypriot-mobile-networks-and-coverage",
-      heading: "Cypriot mobile networks: Cyta, Epic, and PrimeTel",
+      id: "avoiding-accidental-roaming",
+      heading: "How to avoid roaming onto a northern network",
       paragraphs: [
-        "In the Republic of Cyprus, telecommunications are led by Cyta (operating the Cytamobile-Vodafone brand), Epic, and PrimeTel. Cyta commands the broadest geographic coverage, extending deep into the Troodos mountain villages and along rural coastal cliffs.",
-        "5G connectivity is well developed across all major urban and tourist centers, including Limassol, Larnaca, Paphos, Ayia Napa, and Protaras. International travel eSIMs primarily partner with Cyta and Epic, delivering dependable speeds for maps, photo uploads, and streaming.",
+        "In Nicosia and along the buffer zone, northern networks can reach across the line. A phone left on automatic network selection can connect to one while you're still in the south.",
+        "Set network selection to manual and choose Cyta, Epic or PrimeTel. A Cyprus eSIM uses the Republic's networks, so don't assume it works in the north; check with the provider before you cross.",
       ],
     },
     {
-      id: "uk-roaming-vs-cyprus-esim-cost-comparison",
-      heading: "UK roaming vs Cyprus eSIM: which offers better value?",
+      id: "which-networks-include-cyprus",
+      heading: "Which UK networks include the Republic of Cyprus",
       paragraphs: [
-        "If you are on an O2 or iD Mobile contract that includes free EU roaming, visiting southern Cyprus will cost you nothing extra as long as you remain within your fair-use allowance (up to 25GB or 30GB).",
-        "However, on EE, Vodafone, Three, and VOXI, a standard 7 to 14-day beach holiday will incur £14 to £38 in carrier roaming surcharges. Sizing a 5GB or 10GB Cyprus eSIM for £6 to £12 eliminates daily fees and provides an isolated data connection that will not rack up huge unexpected charges if you take a day trip to Northern Cyprus.",
-      ],
-    },
-    {
-      id: "how-to-prevent-accidental-border-roaming",
-      heading: "How to prevent accidental cross-border roaming",
-      paragraphs: [
-        "If you visit divided Nicosia or travel near the UN Buffer Zone, powerful cellular transmitters from Northern Cyprus can reach across the border. If your phone is set to automatic network selection, it might seamlessly latch onto a Turkish cell tower without your knowledge.",
-        "To protect yourself, go to your phone's cellular settings and switch network selection from 'Automatic' to 'Manual', choosing Cyta or Epic. This ensures your handset will never connect to Northern Cyprus towers unless you deliberately select them.",
+        "O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile let eligible plans use their UK allowance in the Republic of Cyprus at no extra charge, up to each network's cap. EE, Vodafone, Three, Sky Mobile and VOXI charge daily or sell passes.",
+        "For a week, those passes run from £12 on Three to £16.50 on EE. The worked costs below compare them with live eSIM prices.",
       ],
     },
   ],
-  setup: [
-    {
-      title: "Choose and install your eSIM before flying",
-      body: "Select a Cyprus eSIM plan suited to your holiday duration and scan the activation QR code at home on stable Wi-Fi before departure.",
-    },
-    {
-      title: "Set network selection to manual near the border",
-      body: "If staying near Nicosia or exploring the border regions, manually lock your phone's network to Cyta or Epic to avoid connecting to Northern Cyprus towers.",
-    },
-    {
-      title: "Turn off data roaming on your UK line",
-      body: "Disable data roaming on your UK carrier SIM to eliminate accidental daily charges, while leaving voice and SMS active for banking verification codes.",
-    },
-    {
-      title: "Activate the Cyprus eSIM upon arrival",
-      body: "Switch your cellular data line to the Cyprus eSIM when landing at Larnaca or Paphos airport. Data roaming must be turned on for the eSIM profile.",
-    },
-  ],
+  setup: setupSteps("the Republic of Cyprus", { checkPlanFirst: true, extra: [{ title: "Choose a southern network near the line", body: "In Nicosia or near the buffer zone, set network selection to manual and pick Cyta, Epic or PrimeTel." }] }),
   faq: [
     {
-      question: "Is Cyprus included in UK free EU mobile roaming?",
-      answer:
-        "The Republic of Cyprus (southern Cyprus) is an EU member state and is covered under UK networks' European roaming tiers. Some networks (like O2 and iD Mobile) include it for free, while others (EE, Vodafone, Three) charge £2 to £2.75 daily.",
+      question: "Is Cyprus included in UK networks' EU roaming?",
+      answer: "The Republic of Cyprus is. O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile include it on eligible plans, and EE, Vodafone, Three, Sky Mobile and VOXI charge daily or by pass. Northern Cyprus isn't in any of these zones.",
     },
     {
-      question: "Does an EU roaming pass work in Northern Cyprus?",
-      answer:
-        "No. Northern Cyprus is outside the EU roaming area and uses Turkish cellular networks. UK networks treat Northern Cyprus as Rest of World, where standard roaming fees can cost £5 to £9 per megabyte.",
+      question: "Does my UK roaming work in Northern Cyprus?",
+      answer: "Not under Europe roaming. Northern Cyprus uses Turkish networks, and O2 and giffgaff both exclude it. Check your network's charges for Northern Cyprus before you use data there.",
     },
     {
-      question: "How can I avoid roaming charges near the Cyprus Green Line?",
-      answer:
-        "Switch your mobile phone's network selection setting from Automatic to Manual, and select a southern operator such as Cyta or Epic. This prevents your handset from latching onto Turkish transmitters.",
+      question: "How can I avoid roaming charges near the Green Line?",
+      answer: "Set your phone's network selection to manual and choose Cyta, Epic or PrimeTel, so it can't connect to a northern network while you're in the south.",
     },
     {
-      question: "Will I get 5G coverage on Cyprus beach resorts?",
-      answer:
-        "Yes, 5G coverage is widespread across major resort destinations including Ayia Napa, Protaras, Limassol, and Paphos on Cyta and Epic networks.",
+      question: "What does Vodafone charge in the Republic of Cyprus?",
+      answer: "£2.75 a day if your plan doesn't include Europe, or a European Roaming pass: £16 for 8 days or £21 for 15.",
     },
     {
-      question: "Can I use WhatsApp and tethering on a Cyprus eSIM?",
-      answer:
-        "Yes. All travel eSIM providers featured here support WhatsApp and internet messaging, and standard plans permit mobile hotspot sharing with other devices.",
+      question: "Will a Cyprus eSIM give me a Cypriot phone number?",
+      answer: "The plans compared here are data only, so there's no local number and no ordinary calls or texts. WhatsApp and FaceTime work over data, and your UK SIM can stay on for texts.",
     },
   ],
   related: ["greece", "turkey", "spain", "portugal", "italy"],
