@@ -38,10 +38,6 @@ function cheapestPerProvider(destination: DestinationId, livePlans: Plan[] | und
   return best;
 }
 
-function Cite({ guide, ids }: { guide: Guide; ids?: string[] }) {
-  return null;
-}
-
 export default function DestinationGuide({ guide, livePlans }: Props) {
   const destination = destinationById[guide.destination];
   const examples = EXAMPLE_TRIPS.map((days) => ({ days, target: neededData(days), esim: cheapestPerProvider(guide.destination, livePlans, days) }));
@@ -53,12 +49,12 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
       <header className="guide-header">
         <p className="eyebrow">The {destination.name} guide · updated {formatCheckedDate(guide.updatedAt)}</p>
         <h2 id="guide-title">{guide.verdict.heading}</h2>
-        <p className="guide-lede">{guide.verdict.body} <Cite guide={guide} ids={guide.verdict.sourceIds} /></p>
+        <p className="guide-lede">{guide.verdict.body}</p>
       </header>
 
       <dl className="guide-facts" aria-label={`${destination.name} connectivity facts`}>
         {guide.facts.map((fact) => (
-          <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value} <Cite guide={guide} ids={fact.sourceIds} /></dd></div>
+          <div key={fact.label}><dt>{fact.label}</dt><dd>{fact.value}</dd></div>
         ))}
       </dl>
 
@@ -148,7 +144,7 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
                   <h4>{note.provider} <small>on {note.localNetwork}</small></h4>
                   <p>{note.summary}</p>
                   {note.watchOut && <p className="guide-watch-out"><strong>Watch out:</strong> {note.watchOut}</p>}
-                  <p className="guide-provider-links"><a href={url} target="_blank" rel={sponsored ? "sponsored noopener noreferrer" : "noopener noreferrer"}>{note.provider} {destination.name} plans ↗</a>{sponsored && <small>We may earn a commission on this link.</small>}<Cite guide={guide} ids={note.sourceIds} /></p>
+                  <p className="guide-provider-links"><a href={url} target="_blank" rel={sponsored ? "sponsored noopener noreferrer" : "noopener noreferrer"}>{note.provider} {destination.name} plans ↗</a>{sponsored && <small>We may earn a commission on this link.</small>}</p>
                 </div>
               </article>
             );
@@ -160,7 +156,7 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
         <div className="guide-block guide-prose" id={`guide-${section.id}`} key={section.id}>
           <h3>{section.heading}</h3>
           {section.paragraphs.map((paragraph, index) => (
-            <p key={index}>{paragraph}{index === section.paragraphs.length - 1 && <> <Cite guide={guide} ids={section.sourceIds} /></>}</p>
+            <p key={index}>{paragraph}</p>
           ))}
         </div>
       ))}
@@ -178,7 +174,7 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
         <h3>{destination.name} questions, answered</h3>
         <div className="faq-list guide-faq">
           {guide.faq.map((entry) => (
-            <details key={entry.question}><summary>{entry.question}</summary><p>{entry.answer} <Cite guide={guide} ids={entry.sourceIds} /></p></details>
+            <details key={entry.question}><summary>{entry.question}</summary><p>{entry.answer}</p></details>
           ))}
         </div>
       </div>
