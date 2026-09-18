@@ -1,4 +1,5 @@
 import { destinations, type DestinationId } from "./destinations.ts";
+import { readMappedPlans, writeMappedPlans } from "./plan-cache.ts";
 import type { Plan } from "./catalog.ts";
 
 /**
@@ -17,6 +18,10 @@ const SAILY_API_URL = "https://web.saily.com/v3/partners/plans";
 const SAILY_CLICK_HOST = "go.saily.site";
 const CACHE_TTL_SECONDS = 3 * 60 * 60;
 const REQUEST_TIMEOUT_MS = 4000;
+const CACHE_NAME = "saily-plans";
+// Plans read from the shared cache are already part-way through their life, so
+// the isolate holds them briefly rather than for a full TTL of their own.
+const MEMO_FROM_CACHE_MS = 30 * 60 * 1000;
 
 // web.saily.com sits behind Cloudflare, which rejects requests without a
 // browser-shaped User-Agent. Verified: default fetch UA returns 403.
@@ -192,17 +197,35 @@ function affiliateCredentials() {
 }
 
 let cached: { plans: Plan[]; expiresAt: number } | null = null;
+let inFlight: Promise<Plan[] | null> | null = null;
 
 /**
  * Returns live Saily plans, or null when the API is unreachable, unconfigured or
- * returns nothing usable. Results are memoised per isolate and additionally
- * cached at the edge for the same TTL.
+ * returns nothing usable. Results are memoised per isolate, shared between
+ * isolates through the mapped-plan cache, and the upstream response is cached at
+ * the edge for the same TTL.
  */
 export async function fetchSailyPlans(now = new Date()): Promise<Plan[] | null> {
   const credentials = affiliateCredentials();
   if (!credentials) return null;
 
   if (cached && cached.expiresAt > now.getTime()) return cached.plans;
+
+  // One rebuild at a time per isolate. Without this, a burst of cold requests
+  // each fetched and parsed the whole catalogue, which is what exhausted the
+  // Worker's resources and returned 503s to crawlers.
+  if (inFlight) return inFlight;
+  inFlight = loadPlans(credentials, now).finally(() => { inFlight = null; });
+  return inFlight;
+}
+
+async function loadPlans(credentials: { affId: string; offerId: string }, now: Date): Promise<Plan[] | null> {
+  // Plans another request already mapped, which is far cheaper than rebuilding.
+  const shared = await readMappedPlans(CACHE_NAME);
+  if (shared) {
+    cached = { plans: shared, expiresAt: now.getTime() + MEMO_FROM_CACHE_MS };
+    return shared;
+  }
 
   const url = new URL(SAILY_API_URL);
   url.searchParams.set("format_price", "true");
@@ -225,6 +248,7 @@ export async function fetchSailyPlans(now = new Date()): Promise<Plan[] | null> 
     if (plans.length === 0) return null;
 
     cached = { plans, expiresAt: now.getTime() + CACHE_TTL_SECONDS * 1000 };
+    await writeMappedPlans(CACHE_NAME, plans, CACHE_TTL_SECONDS);
     return plans;
   } catch {
     return null;

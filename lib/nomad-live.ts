@@ -1,4 +1,5 @@
 import { destinations, type DestinationId } from "./destinations.ts";
+import { readMappedPlans, writeMappedPlans } from "./plan-cache.ts";
 import type { Plan } from "./catalog.ts";
 
 /**
@@ -22,6 +23,10 @@ const PAGE_SIZE = 1000;
 // The catalogue is ~1,400 items over two pages; the cap stops a malformed
 // cursor turning into an unbounded fetch loop.
 const MAX_PAGES = 4;
+const CACHE_NAME = "nomad-plans";
+// Plans read from the shared cache are already part-way through their life, so
+// the isolate holds them briefly rather than for a full TTL of their own.
+const MEMO_FROM_CACHE_MS = 30 * 60 * 1000;
 
 export type ImpactCatalogItem = {
   CatalogItemId?: unknown;
@@ -166,16 +171,34 @@ function impactCredentials() {
 }
 
 let cached: { plans: Plan[]; expiresAt: number } | null = null;
+let inFlight: Promise<Plan[] | null> | null = null;
 
 /**
  * Returns live Nomad plans, or null when Impact is unreachable, unconfigured or
- * returns nothing usable. Results are memoised per isolate and cached at the
- * edge for the same TTL.
+ * returns nothing usable. Results are memoised per isolate, shared between
+ * isolates through the mapped-plan cache, and the upstream responses are cached
+ * at the edge for the same TTL.
  */
 export async function fetchNomadPlans(now = new Date()): Promise<Plan[] | null> {
   const credentials = impactCredentials();
   if (!credentials) return null;
   if (cached && cached.expiresAt > now.getTime()) return cached.plans;
+
+  // One rebuild at a time per isolate. The catalogue runs to two pages of a
+  // thousand items, and a burst of cold requests each parsing it is what pushed
+  // the Worker past its resource limits and returned 503s to crawlers.
+  if (inFlight) return inFlight;
+  inFlight = loadPlans(credentials, now).finally(() => { inFlight = null; });
+  return inFlight;
+}
+
+async function loadPlans(credentials: { accountSid: string; authToken: string }, now: Date): Promise<Plan[] | null> {
+  // Plans another request already mapped, which is far cheaper than rebuilding.
+  const shared = await readMappedPlans(CACHE_NAME);
+  if (shared) {
+    cached = { plans: shared, expiresAt: now.getTime() + MEMO_FROM_CACHE_MS };
+    return shared;
+  }
 
   const authorization = `Basic ${btoa(`${credentials.accountSid}:${credentials.authToken}`)}`;
   const base = `${IMPACT_API_HOST}/Mediapartners/${credentials.accountSid}/Catalogs/${NOMAD_CATALOG_ID}/Items`;
@@ -203,6 +226,7 @@ export async function fetchNomadPlans(now = new Date()): Promise<Plan[] | null> 
     if (plans.length === 0) return null;
 
     cached = { plans, expiresAt: now.getTime() + CACHE_TTL_SECONDS * 1000 };
+    await writeMappedPlans(CACHE_NAME, plans, CACHE_TTL_SECONDS);
     return plans;
   } catch {
     return null;
