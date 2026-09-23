@@ -14,7 +14,7 @@ export const indiaGuide: DestinationGuide = {
       "India is outside every UK network's Europe zone. EE sells Rest of World Zone 1 passes from £6 for 24 hours, O2 Travel is £7 a day at 2Mbps, and Three's Around the World passes start at £12.50 for 3 days. A local Indian SIM costs very little, but you need your passport, your visa and a local address, and it can take anywhere from two to twenty-four hours to activate. An eSIM bought at home works the moment you land, usually for less than a week of roaming. The worked costs below price both.",
   },
   facts: [
-    { label: "Local networks", value: "Jio, Airtel and Vi carry almost all of India's traffic. Nomad lists Airtel, and Airalo lists Vi India." },
+    { label: "Local networks", value: "Jio, Airtel and Vi carry almost all of India's traffic. Nomad and Klook both list Airtel, and Airalo lists Vi India." },
     { label: "Local SIMs need paperwork", value: "Indian rules require a passport, a valid visa and a local address for a tourist SIM, with a photograph taken in the shop." },
     { label: "Activation isn't instant", value: "A tourist SIM is usually verified before it works, which can take from a couple of hours to a day. An eSIM has no such wait." },
     { label: "5G is widespread", value: "Jio and Airtel have built out 5G across the cities. We can't confirm 5G roaming on any UK network, so plan on 4G speeds." },
@@ -30,7 +30,7 @@ export const indiaGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("India", { nomad: "Airtel", airalo: "Vi India", klook: null }, { klookSearchOnly: true }),
+    notes: providerNotes("India", { nomad: "Airtel", airalo: "Vi India", klook: "Airtel" }),
   },
   sections: [
     {

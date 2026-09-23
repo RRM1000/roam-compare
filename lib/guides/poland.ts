@@ -14,7 +14,7 @@ export const polandGuide: DestinationGuide = {
       "Poland is an EU country, so it sits in every UK network's Europe zone. O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile include it on eligible plans, up to a roaming cap. EE, Vodafone, Three, Sky Mobile and VOXI charge a daily fee or sell passes. For a long weekend in Kraków that difference is small; for a fortnight it isn't. The worked costs below price both.",
   },
   facts: [
-    { label: "Local networks", value: "Orange, Play, Plus and T-Mobile. Nomad lists Plus, Orange and Play, and Airalo lists P4, the company behind Play." },
+    { label: "Local networks", value: "Orange, Play, Plus and T-Mobile. Nomad lists Plus, Orange and Play, Airalo lists P4, the company behind Play, and Klook's Poland eSIM runs on Orange." },
     { label: "Caps on included roaming", value: "O2 25GB, iD Mobile 30GB, SMARTY 12GB and giffgaff 5GB of your plan's data. Tesco Mobile sets no separate cap." },
     { label: "Local SIMs need registering", value: "Polish prepaid SIMs have had to be registered to an identity document since 2017. A passport is accepted, but it means a shop counter and a form." },
     { label: "5G in the cities", value: "Warsaw, Kraków, Gdańsk and Wrocław have wide 5G. We can't confirm 5G roaming on any UK network, so plan on 4G speeds." },
@@ -23,7 +23,7 @@ export const polandGuide: DestinationGuide = {
   networks: { intro: euNetworksIntro("Poland"), rows: euRows("Poland") },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Poland", { nomad: "Plus, Orange and Play", airalo: "P4", klook: null }, { klookSearchOnly: true }),
+    notes: providerNotes("Poland", { nomad: "Plus, Orange and Play", airalo: "P4", klook: "Orange" }),
   },
   sections: [
     {

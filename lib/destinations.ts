@@ -39,11 +39,11 @@ export function isDestination(value: string): value is DestinationId { return Ob
 
 /**
  * Country-specific Klook eSIM products. Every URL was confirmed to return 200
- * with a matching country title on 18 August 2026. Destinations added since have
- * no confirmed product page, so they fall back to Klook's own search, which the
- * affiliate id tracks just the same.
+ * with a matching country title on 18 August 2026, and the six added on
+ * 23 September 2026 were confirmed the same way. A search fallback remains for
+ * any destination added later.
  */
-const klookProductUrls: Partial<Record<DestinationId, string>> = {
+const klookProductUrls: Record<DestinationId, string> = {
   turkey: "https://www.klook.com/en-GB/activity/128551-turkey-esim-high-speed-internet-qr-code-voucher/",
   "united-states": "https://www.klook.com/activity/108033-usa-esim-travel/",
   spain: "https://www.klook.com/activity/163606-5g-esim-spain-vodafone-orange-movistar-yoigo/",
@@ -64,6 +64,12 @@ const klookProductUrls: Partial<Record<DestinationId, string>> = {
   morocco: "https://www.klook.com/en-GB/activity/215157-5g-esim-morocco-orange/",
   egypt: "https://www.klook.com/en-GB/activity/177701-5g-esim-egypt-orange-egypt/",
   indonesia: "https://www.klook.com/en-GB/activity/109371-indonesia-esim-high-speed-internet-qr-code-voucher/",
+  switzerland: "https://www.klook.com/en-GB/activity/158751-5g-esim-switzerland-swisscom-sunrise/",
+  poland: "https://www.klook.com/en-GB/activity/214973-poland-esim-travel/",
+  croatia: "https://www.klook.com/en-GB/activity/216174-croatia-esim-travel/",
+  india: "https://www.klook.com/en-GB/activity/110926-india-esim-high-speed-internet-access-qr-code-is-in-the-voucher/",
+  vietnam: "https://www.klook.com/en-GB/activity/123902-vietnam-esim-high-speed-internet-qr-code-voucher/",
+  "sri-lanka": "https://www.klook.com/en-GB/activity/215043-sri-lanka-esim-travel/",
 };
 
 /**
@@ -82,7 +88,7 @@ function klookSearchUrl(destination: Destination) {
 }
 
 function trackedKlookUrl(destination: Destination) {
-  const base = klookProductUrls[destination.id] ?? klookSearchUrl(destination);
+  const base: string = klookProductUrls[destination.id] ?? klookSearchUrl(destination);
   const affiliateId = klookAffiliateId();
   if (!affiliateId) return base;
   const url = new URL(base);

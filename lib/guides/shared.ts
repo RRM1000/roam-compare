@@ -114,7 +114,7 @@ type ProviderNetworks = {
  * Provider notes. Only Airalo plans we have checked by hand carry a confirmed
  * daily unlimited cap, so `airaloDailyCapGb` is set only for those destinations.
  */
-export function providerNotes(country: string, networks: ProviderNetworks, options: { airaloDailyCapGb?: number; klookSearchOnly?: boolean; extra?: Partial<Record<"Saily" | "Nomad" | "Airalo" | "Klook", string>> } = {}): GuideProviderNote[] {
+export function providerNotes(country: string, networks: ProviderNetworks, options: { airaloDailyCapGb?: number; extra?: Partial<Record<"Saily" | "Nomad" | "Airalo" | "Klook", string>> } = {}): GuideProviderNote[] {
   const plus = (provider: "Saily" | "Nomad" | "Airalo" | "Klook", text: string) => (options.extra?.[provider] ? `${text} ${options.extra[provider]}` : text);
   return [
     {
@@ -138,12 +138,7 @@ export function providerNotes(country: string, networks: ProviderNetworks, optio
     {
       provider: "Klook",
       localNetwork: networks.klook ?? "the network named on Klook's page",
-      summary: plus(
-        "Klook",
-        options.klookSearchOnly
-          ? `Klook's price changes with every combination of days and data, so we don't show one. We haven't confirmed a single Klook product page for ${country}, so the link opens Klook's own search for it.`
-          : "Klook's price changes with every combination of days and data, so we don't show one. The link opens Klook's own page for this country.",
-      ),
+      summary: plus("Klook", "Klook's price changes with every combination of days and data, so we don't show one. The link opens Klook's own page for this country."),
       watchOut: "You get a QR code on a voucher. Install it on Wi-Fi before you travel and check when the countdown starts.",
     },
   ];

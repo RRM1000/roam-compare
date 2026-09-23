@@ -14,7 +14,7 @@ export const sriLankaGuide: DestinationGuide = {
       "Sri Lanka is in EE's Rest of World Zone 3, its dearest band: £8 for 24 hours, and that pass includes only 500MB a day. O2 Travel covers Sri Lanka at £7 a day at 2Mbps, and Three's Around the World passes start at £12.50 for 3 days. Against that, the tourist SIMs sold in the arrivals hall at Colombo are genuinely cheap — Dialog and Mobitel packages with 20GB or more for around £4. An eSIM costs more than that but has you online before you clear customs, with no counter and no passport copy. The worked costs below price the roaming options against live eSIM prices.",
   },
   facts: [
-    { label: "Local networks", value: "Dialog, Mobitel, Hutch and Airtel. Nomad lists Mobitel and Hutch, and Airalo lists Mobitel and Hutch too." },
+    { label: "Local networks", value: "Dialog, Mobitel, Hutch and Airtel. Nomad and Airalo both list Mobitel and Hutch, and Klook's Sri Lanka eSIM runs on Mobitel." },
     { label: "EE's dearest zone", value: "Sri Lanka is in EE's Rest of World Zone 3, where the pass is £8 for 24 hours and includes 500MB a day rather than one pot for the trip." },
     { label: "Airport SIMs are cheap", value: "At Bandaranaike arrivals, Dialog and Mobitel tourist packages with 20GB or more sell for roughly £4, with your passport shown at the counter." },
     { label: "Coverage", value: "The coast, the cities and the hill country towns are well covered. Yala, Wilpattu and the inland reserves have gaps." },
@@ -30,7 +30,7 @@ export const sriLankaGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Sri Lanka", { nomad: "Mobitel and Hutch", airalo: "Mobitel and Hutch", klook: null }, { klookSearchOnly: true }),
+    notes: providerNotes("Sri Lanka", { nomad: "Mobitel and Hutch", airalo: "Mobitel and Hutch", klook: "Mobitel" }),
   },
   sections: [
     {

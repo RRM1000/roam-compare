@@ -14,7 +14,7 @@ export const switzerlandGuide: DestinationGuide = {
       "EE, O2, Vodafone, Three, VOXI and Tesco Mobile all put Switzerland in their Europe zone, so it costs the same as Spain or France on those networks. giffgaff's EU roaming excludes it, and we could not confirm it on iD Mobile, SMARTY or Sky, so on those four you should check before you travel rather than assume. If your network charges a daily fee, or leaves Switzerland out altogether, an eSIM bought before you fly is usually cheaper. The worked costs below price both.",
   },
   facts: [
-    { label: "Local networks", value: "Swisscom, Sunrise and Salt. Nomad lists Salt and Sunrise, and Airalo lists Sunrise." },
+    { label: "Local networks", value: "Swisscom, Sunrise and Salt. Nomad lists Salt and Sunrise, Airalo lists Sunrise, and Klook's Switzerland eSIM runs on Swisscom or Sunrise." },
     { label: "Not in the EU", value: "Switzerland is outside the EU and the EEA, so nothing obliges a UK network to include it. Most do anyway; giffgaff's EU list doesn't." },
     { label: "Trains and tunnels", value: "Coverage along the main lines is good, but long tunnels and side valleys drop out. Download tickets and maps before you set off." },
     { label: "Mountains", value: "Ski areas and high passes rely on Swisscom more than the other two. Check which network an eSIM uses if you're heading above the treeline." },
@@ -30,7 +30,7 @@ export const switzerlandGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Switzerland", { nomad: "Salt and Sunrise", airalo: "Sunrise", klook: null }, { klookSearchOnly: true }),
+    notes: providerNotes("Switzerland", { nomad: "Salt and Sunrise", airalo: "Sunrise", klook: "Swisscom or Sunrise, by option" }),
   },
   sections: [
     {

@@ -100,11 +100,10 @@ test("one Klook affiliate id tracks every destination", () => {
   try {
     delete process.env.NEXT_PUBLIC_KLOOK_AFFILIATE_ID;
     assert.equal(hasKlookTracking(), false);
-    // Each destination links to a confirmed country product page, or to Klook's
-    // own search where we have not confirmed one.
+    // Every destination has a real country product page, never a search fallback.
     for (const destination of Object.values(destinationById)) {
       const url = getProviderUrl("Klook", destination);
-      assert.match(url, /^https:\/\/www\.klook\.com\/(?:[a-zA-Z-]*\/?activity\/|en-GB\/search\/result\/)/, `${destination.id} has no Klook link`);
+      assert.match(url, /^https:\/\/www\.klook\.com\/[a-zA-Z-]*\/?activity\//, `${destination.id} has no Klook product page`);
       assert.doesNotMatch(url, /aid=/, `${destination.id} must not be tracked before an id is set`);
     }
 

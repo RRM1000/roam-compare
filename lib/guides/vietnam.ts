@@ -14,7 +14,7 @@ export const vietnamGuide: DestinationGuide = {
       "Vietnam sits outside every UK network's Europe zone, and it isn't on O2 Travel's destination list, so O2 customers fall back to standard roaming rates rather than the £7 daily cap. EE sells Rest of World Zone 1 passes from £6 for 24 hours and Three's Around the World passes start at £12.50 for 3 days. Local SIMs are cheap, but every one has to be registered to your passport. An eSIM installed at home costs less than a week of passes and works the moment you land. The worked costs below price both.",
   },
   facts: [
-    { label: "Local networks", value: "Viettel, Vinaphone and MobiFone cover the country. Nomad lists Vietnamobile, MobiFone and Vinaphone, and Airalo lists VNPT, which runs Vinaphone." },
+    { label: "Local networks", value: "Viettel, Vinaphone and MobiFone cover the country. Nomad lists Vietnamobile, MobiFone and Vinaphone, Airalo lists VNPT, which runs Vinaphone, and Klook's Vietnam eSIM runs on Viettel." },
     { label: "O2 Travel doesn't list Vietnam", value: "The £7-a-day bolt-on covers a long list of destinations, and Vietnam isn't among them, so check O2's standard rate for your plan before you use data." },
     { label: "SIM registration is mandatory", value: "Vietnamese SIMs must be registered to a passport, and unregistered numbers are cut off. Airport and shop counters do it while you wait." },
     { label: "Airport SIM prices", value: "Tourist SIMs at Hanoi and Ho Chi Minh City airports typically run from about 150,000 to 350,000 dong, roughly £4.50 to £10.50." },
@@ -29,7 +29,7 @@ export const vietnamGuide: DestinationGuide = {
   },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Vietnam", { nomad: "Vietnamobile, MobiFone and Vinaphone", airalo: "VNPT", klook: null }, { klookSearchOnly: true }),
+    notes: providerNotes("Vietnam", { nomad: "Vietnamobile, MobiFone and Vinaphone", airalo: "VNPT", klook: "Viettel" }),
   },
   sections: [
     {

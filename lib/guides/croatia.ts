@@ -14,7 +14,7 @@ export const croatiaGuide: DestinationGuide = {
       "Croatia is an EU country, so it's in every UK network's Europe zone. O2, iD Mobile, giffgaff, SMARTY and Tesco Mobile include it on eligible plans, up to a roaming cap; EE, Vodafone, Three, Sky Mobile and VOXI charge a daily fee or sell passes. The catch here is geography rather than price: the old coast road to Dubrovnik crosses into Bosnia and Herzegovina, which is outside the Europe zone on every one of them. The worked costs below price a week and a fortnight both ways.",
   },
   facts: [
-    { label: "Local networks", value: "A1, Hrvatski Telekom and Telemach. Nomad lists Telemach and A1, and Airalo lists Telemach." },
+    { label: "Local networks", value: "A1, Hrvatski Telekom and Telemach. Nomad lists Telemach and A1, Airalo lists Telemach, and Klook's Croatia eSIM runs on A1." },
     { label: "Caps on included roaming", value: "O2 25GB, iD Mobile 30GB, SMARTY 12GB and giffgaff 5GB of your plan's data. Tesco Mobile sets no separate cap." },
     { label: "The Neum corridor", value: "The old coast road to Dubrovnik passes through a short stretch of Bosnian territory at Neum, where your phone can latch onto a Bosnian network at non-Europe rates." },
     { label: "The Pelješac Bridge", value: "Open since July 2022 and toll-free, it carries the main route past Neum without leaving Croatia. Most hire cars and coaches now use it." },
@@ -23,7 +23,7 @@ export const croatiaGuide: DestinationGuide = {
   networks: { intro: euNetworksIntro("Croatia"), rows: euRows("Croatia") },
   providers: {
     intro: providersIntro,
-    notes: providerNotes("Croatia", { nomad: "Telemach and A1", airalo: "Telemach", klook: null }, { klookSearchOnly: true }),
+    notes: providerNotes("Croatia", { nomad: "Telemach and A1", airalo: "Telemach", klook: "A1 HR" }),
   },
   sections: [
     {

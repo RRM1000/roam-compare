@@ -136,10 +136,10 @@ Klook runs its own affiliate programme at <https://affiliate.klook.com>, and att
 NEXT_PUBLIC_KLOOK_AFFILIATE_ID
 ```
 
-Twenty destinations have a confirmed country-specific Klook eSIM product page in `klookProductUrls`
-(each checked for a 200 and a matching country title on 18 August 2026). The six added on
-23 September 2026 — Switzerland, Poland, Croatia, India, Vietnam and Sri Lanka — have none we could
-confirm, so they fall back to Klook's own search, which the same `aid` tracks. Klook rows never show a price:
+Every destination has a confirmed country-specific Klook eSIM product page in `klookProductUrls`
+(checked for a 200 and a matching country title on 18 August 2026, and on 23 September 2026 for the
+six added then). Klook blocks scripted requests, so the later six were found through Klook's own
+search results, which carry `/activity/` URLs, and confirmed by loading each page. Klook rows never show a price:
 a single destination has hundreds of priced permutations of validity, daily-vs-total data and package
 size, so the row stays a labelled handoff and the price is read at Klook.
 
