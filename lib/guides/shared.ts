@@ -25,10 +25,15 @@ function ordered(rows: RowOverrides): GuideNetworkRow[] {
   });
 }
 
-/** Rows for an EU destination, every one priced by the zone-wide EU scenarios. */
-export function euRows(country: string, extra: Partial<Record<Network, string>> = {}): GuideNetworkRow[] {
+/**
+ * Rows for a Europe-zone destination, priced by the zone-wide EU scenarios.
+ * `handOff` names any network that doesn't list the country, which gets the same
+ * "check your network" row as a destination outside Europe rather than a price
+ * we can't stand behind.
+ */
+export function euRows(country: string, extra: Partial<Record<Network, string>> = {}, handOff: Network[] = []): GuideNetworkRow[] {
   const add = (network: Network, text: string) => (extra[network] ? `${text} ${extra[network]}` : text);
-  return ordered({
+  const priced = ordered({
     ee: row("ee", "ee-europe-new", "EE Europe roaming: £2.72 a day, £16.50 for 7 days or £30 for 15 days", add("ee", `For plans taken out or upgraded from 7 July 2021. Uses your UK allowance in ${country}, up to a 50GB fair-use ceiling. On an older plan, check the EE app.`)),
     o2: row("o2", "o2-europe", "O2 Europe Zone: included, up to 25GB", add("o2", `Pay Monthly plans use their UK allowance in ${country} at no extra cost. Past 25GB of data abroad, you need to buy a Bolt On.`)),
     vodafone: row("vodafone", "vodafone-europe-pass", "£2.75 a day, or a European Roaming pass: £16 for 8 days, £21 for 15 days", add("vodafone", "Applies if your plan doesn't already include Europe. The passes cover 52 destinations, and Vodafone's 25GB roaming limit applies.")),
@@ -40,6 +45,9 @@ export function euRows(country: string, extra: Partial<Record<Network, string>> 
     voxi: row("voxi", "voxi-europe", "European Roaming Pass: £2.60 for 1 day, £4.80 for 2, £15 for 8, £20 for 15", add("voxi", "The pass starts when you buy it. You get your UK allowance or 20GB, whichever is smaller, and Endless social and video don't apply abroad.")),
     "tesco-mobile": row("tesco-mobile", "tesco-europe", "Home From Home: included on pay monthly and pay as you go", add("tesco-mobile", "Covers 48 destinations, including every EU country, with no separate data cap. A fair-use policy applies only if you spend more time abroad than in the UK.")),
   });
+  if (handOff.length === 0) return priced;
+  const unlisted = handOffRows(country);
+  return priced.map((entry) => (handOff.includes(entry.network) ? unlisted[entry.network] : entry));
 }
 
 export const euNetworksIntro = (country: string) =>
@@ -68,8 +76,8 @@ export const worldRow = {
  * Rows for a destination outside Europe. Networks without a verified charge for
  * this country get a hand-off row that says what to check, never a guessed price.
  */
-export function worldRows(country: string, rows: RowOverrides): GuideNetworkRow[] {
-  const handoff: Required<RowOverrides> = {
+function handOffRows(country: string): Required<RowOverrides> {
+  return {
     ee: row("ee", null, "Check the EE app for this destination", `We couldn't confirm which EE zone ${country} is in.`),
     o2: row("o2", null, `${country} isn't on O2 Travel's list`, `O2 Travel's £7-a-day bolt-on doesn't cover ${country}, so O2's standard roaming rates apply. Check the rate for your plan before you use data.`),
     vodafone: row("vodafone", null, "Priced against your plan in Vodafone's roaming checker", `Vodafone's public pages don't print one rate for ${country}. Its roaming checker shows the charge for your number, and some plans include it.`),
@@ -81,7 +89,10 @@ export function worldRows(country: string, rows: RowOverrides): GuideNetworkRow[
     voxi: row("voxi", null, `Check whether ${country} is on VOXI's Global Roaming Extra list`, "VOXI sells 8- and 15-day Global Roaming Extra passes for listed destinations. Elsewhere it charges by the megabyte."),
     "tesco-mobile": row("tesco-mobile", null, `Check Tesco Mobile's roaming charges for ${country}`, "Outside its Home From Home destinations, Tesco Mobile charges roaming by the megabyte. Pay-monthly charges and spend safeguards depend on your tariff."),
   };
-  return ordered({ ...handoff, ...rows });
+}
+
+export function worldRows(country: string, rows: RowOverrides): GuideNetworkRow[] {
+  return ordered({ ...handOffRows(country), ...rows });
 }
 
 export const worldNetworksIntro = (country: string) =>
@@ -103,7 +114,7 @@ type ProviderNetworks = {
  * Provider notes. Only Airalo plans we have checked by hand carry a confirmed
  * daily unlimited cap, so `airaloDailyCapGb` is set only for those destinations.
  */
-export function providerNotes(country: string, networks: ProviderNetworks, options: { airaloDailyCapGb?: number; extra?: Partial<Record<"Saily" | "Nomad" | "Airalo" | "Klook", string>> } = {}): GuideProviderNote[] {
+export function providerNotes(country: string, networks: ProviderNetworks, options: { airaloDailyCapGb?: number; klookSearchOnly?: boolean; extra?: Partial<Record<"Saily" | "Nomad" | "Airalo" | "Klook", string>> } = {}): GuideProviderNote[] {
   const plus = (provider: "Saily" | "Nomad" | "Airalo" | "Klook", text: string) => (options.extra?.[provider] ? `${text} ${options.extra[provider]}` : text);
   return [
     {
@@ -127,7 +138,12 @@ export function providerNotes(country: string, networks: ProviderNetworks, optio
     {
       provider: "Klook",
       localNetwork: networks.klook ?? "the network named on Klook's page",
-      summary: plus("Klook", "Klook's price changes with every combination of days and data, so we don't show one. The link opens Klook's own page for this country."),
+      summary: plus(
+        "Klook",
+        options.klookSearchOnly
+          ? `Klook's price changes with every combination of days and data, so we don't show one. We haven't confirmed a single Klook product page for ${country}, so the link opens Klook's own search for it.`
+          : "Klook's price changes with every combination of days and data, so we don't show one. The link opens Klook's own page for this country.",
+      ),
       watchOut: "You get a QR code on a voucher. Install it on Wi-Fi before you travel and check when the countdown starts.",
     },
   ];

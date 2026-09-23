@@ -14,7 +14,11 @@ import { getRoamingResult, getScenarioOptions } from "../lib/roaming.ts";
 const eeZones = {
   // EU / EEA — no ROW pass required
   spain: "eu", france: "eu", italy: "eu", greece: "eu", portugal: "eu",
-  germany: "eu", netherlands: "eu", cyprus: "eu",
+  germany: "eu", netherlands: "eu", cyprus: "eu", poland: "eu", croatia: "eu",
+  // The same price guide puts Switzerland alongside the EU and EEA: "To use data
+  // whilst roaming abroad outside of the EU/EEA/Switzerland you will need to
+  // purchase a pass."
+  switzerland: "eu",
   // EE's pay monthly roaming terms carve the Republic of Ireland out of the EU
   // daily charge: "Calls, texts and data used within the Republic of Ireland is
   // included in your allowance."
@@ -22,10 +26,11 @@ const eeZones = {
   // ROW Zone 1
   australia: "row1", canada: "row1", indonesia: "row1", mexico: "row1",
   thailand: "row1", turkey: "row1", "united-arab-emirates": "row1", "united-states": "row1",
+  india: "row1", vietnam: "row1",
   // ROW Zone 2
   egypt: "row2", morocco: "row2",
   // ROW Zone 3
-  japan: "row3",
+  japan: "row3", "sri-lanka": "row3",
 };
 
 const expectedTitle = {

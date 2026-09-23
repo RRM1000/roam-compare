@@ -213,6 +213,37 @@ const destinationScenarioOptions: Partial<Record<DestinationId, Partial<Record<N
     three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
   },
 
+  // Switzerland is not in the EU, but it is inside EE's, O2's, Vodafone's,
+  // Three's, VOXI's and Tesco Mobile's Europe zones. giffgaff, SMARTY, iD and
+  // Sky do not list it, so they fall through to the generic option. Read on each
+  // network's own destination list, 23 September 2026.
+  "switzerland": {
+    ee: [{ value: "ee-europe-new", label: "EE Europe passes — joined from 7 Jul 2021" }, ...common],
+    o2: [{ value: "o2-europe", label: "O2 Europe Zone — included, up to 25GB" }, ...common],
+    vodafone: [{ value: "vodafone-europe-pass", label: "Vodafone Europe pass — £16/8d or £21/15d" }, { value: "vodafone-europe-day", label: "Vodafone daily charge — £2.75/day" }, ...common],
+    three: [{ value: "three-europe-pass", label: "Three Go Roam pass — 3, 7 or 14 days" }, ...common],
+    voxi: [{ value: "voxi-europe", label: "VOXI European pass — 1, 2, 8 or 15 days" }, ...common],
+    "tesco-mobile": [{ value: "tesco-europe", label: "Tesco Home From Home — UK allowance" }, ...common],
+  },
+  "poland": euZoneOptions,
+  "croatia": euZoneOptions,
+  "india": {
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
+  },
+  // Vietnam is the one destination here O2 Travel does not list, so O2 has no
+  // priced option and the guide hands off to O2's own charge checker.
+  "vietnam": {
+    ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
+  },
+  "sri-lanka": {
+    ee: [{ value: "ee-row3", label: "EE daily pass — £8/24h, includes 500MB" }, ...common],
+    o2: [{ value: "o2-travel", label: "O2 Travel — £7/24h" }, ...common],
+    three: [{ value: "three-world-pass", label: "Three Go Roam World pass — 3, 7 or 14 days" }, ...common],
+  },
+
   spain: euZoneOptions,
   "united-states": {
     ee: [{ value: "ee-row1", label: "EE roaming pass — £6/24h, £30/7d, £50/15d" }, ...common],

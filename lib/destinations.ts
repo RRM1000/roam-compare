@@ -1,6 +1,6 @@
 import type { Plan, Provider } from "./catalog";
 
-export type DestinationId = "turkey" | "united-states" | "spain" | "france" | "italy" | "greece" | "portugal" | "germany" | "netherlands" | "ireland" | "cyprus" | "united-arab-emirates" | "thailand" | "japan" | "australia" | "canada" | "mexico" | "morocco" | "egypt" | "indonesia";
+export type DestinationId = "turkey" | "united-states" | "spain" | "france" | "italy" | "greece" | "portugal" | "germany" | "netherlands" | "ireland" | "cyprus" | "united-arab-emirates" | "thailand" | "japan" | "australia" | "canada" | "mexico" | "morocco" | "egypt" | "indonesia" | "switzerland" | "poland" | "croatia" | "india" | "vietnam" | "sri-lanka";
 
 export type Destination = { id: DestinationId; name: string; flag: string; region: string; countryCode: string; airaloSlug: string; sailySlug: string };
 
@@ -25,6 +25,12 @@ export const destinations: Destination[] = [
   { id: "morocco", name: "Morocco", flag: "🇲🇦", region: "Africa", countryCode: "MA", airaloSlug: "morocco", sailySlug: "morocco" },
   { id: "egypt", name: "Egypt", flag: "🇪🇬", region: "Africa", countryCode: "EG", airaloSlug: "egypt", sailySlug: "egypt" },
   { id: "indonesia", name: "Indonesia", flag: "🇮🇩", region: "Asia", countryCode: "ID", airaloSlug: "indonesia", sailySlug: "indonesia" },
+  { id: "switzerland", name: "Switzerland", flag: "🇨🇭", region: "Europe", countryCode: "CH", airaloSlug: "switzerland", sailySlug: "switzerland" },
+  { id: "poland", name: "Poland", flag: "🇵🇱", region: "Europe", countryCode: "PL", airaloSlug: "poland", sailySlug: "poland" },
+  { id: "croatia", name: "Croatia", flag: "🇭🇷", region: "Europe", countryCode: "HR", airaloSlug: "croatia", sailySlug: "croatia" },
+  { id: "india", name: "India", flag: "🇮🇳", region: "Asia", countryCode: "IN", airaloSlug: "india", sailySlug: "india" },
+  { id: "vietnam", name: "Vietnam", flag: "🇻🇳", region: "Asia", countryCode: "VN", airaloSlug: "vietnam", sailySlug: "vietnam" },
+  { id: "sri-lanka", name: "Sri Lanka", flag: "🇱🇰", region: "Asia", countryCode: "LK", airaloSlug: "sri-lanka", sailySlug: "sri-lanka" },
 ];
 
 export const destinationById = Object.fromEntries(destinations.map((destination) => [destination.id, destination])) as Record<DestinationId, Destination>;
@@ -33,10 +39,11 @@ export function isDestination(value: string): value is DestinationId { return Ob
 
 /**
  * Country-specific Klook eSIM products. Every URL was confirmed to return 200
- * with a matching country title on 18 August 2026; a search fallback remains for
- * any destination added later.
+ * with a matching country title on 18 August 2026. Destinations added since have
+ * no confirmed product page, so they fall back to Klook's own search, which the
+ * affiliate id tracks just the same.
  */
-const klookProductUrls: Record<DestinationId, string> = {
+const klookProductUrls: Partial<Record<DestinationId, string>> = {
   turkey: "https://www.klook.com/en-GB/activity/128551-turkey-esim-high-speed-internet-qr-code-voucher/",
   "united-states": "https://www.klook.com/activity/108033-usa-esim-travel/",
   spain: "https://www.klook.com/activity/163606-5g-esim-spain-vodafone-orange-movistar-yoigo/",
@@ -69,12 +76,16 @@ function klookAffiliateId() {
   return value && /^\d+$/.test(value) ? value : undefined;
 }
 
-function trackedKlookUrl(destination: DestinationId) {
-  const product = klookProductUrls[destination];
-  if (!product) return undefined;
+/** Klook's own search, for a destination with no confirmed product page yet. */
+function klookSearchUrl(destination: Destination) {
+  return `https://www.klook.com/en-GB/search/result/?query=${encodeURIComponent(`${destination.name} eSIM`)}`;
+}
+
+function trackedKlookUrl(destination: Destination) {
+  const base = klookProductUrls[destination.id] ?? klookSearchUrl(destination);
   const affiliateId = klookAffiliateId();
-  if (!affiliateId) return product;
-  const url = new URL(product);
+  if (!affiliateId) return base;
+  const url = new URL(base);
   url.searchParams.set("aid", affiliateId);
   return url.toString();
 }
@@ -212,7 +223,7 @@ export function isTrackedUrl(value: string | undefined) {
 }
 
 export function getProviderSourceUrl(provider: Provider, destination: Destination) {
-  if (provider === "Klook") return klookProductUrls[destination.id] ?? `https://www.klook.com/en-GB/search/result/?query=${encodeURIComponent(`${destination.name} eSIM`)}`;
+  if (provider === "Klook") return klookProductUrls[destination.id] ?? klookSearchUrl(destination);
   if (provider === "Nomad") return nomadProductUrl(destination);
   if (provider === "Airalo") return `https://www.airalo.com/${destination.airaloSlug}-esim`;
   return `https://saily.com/esim-${destination.sailySlug}/`;
@@ -233,7 +244,7 @@ export function getPlanUrl(plan: Pick<Plan, "provider" | "checkoutUrl" | "source
 }
 
 export function getProviderUrl(provider: Provider, destination: Destination) {
-  if (provider === "Klook") return configuredKlookUrl(destination.id) ?? trackedKlookUrl(destination.id) ?? `https://www.klook.com/en-GB/search/result/?query=${encodeURIComponent(`${destination.name} eSIM`)}`;
+  if (provider === "Klook") return configuredKlookUrl(destination.id) ?? trackedKlookUrl(destination);
   if (provider === "Nomad") return getConfiguredNomadUrl(destination.id) ?? nomadProductUrl(destination);
   if (provider === "Airalo") return `https://www.airalo.com/${destination.airaloSlug}-esim`;
   if (provider === "Saily") return `https://saily.com/esim-${destination.sailySlug}/`;

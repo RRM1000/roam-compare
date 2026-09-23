@@ -46,13 +46,13 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.doesNotMatch(html, /noindex|nofollow/i);
   assert.match(text, /Know the roaming cost before take-off\./);
   assert.match(text, /See the hotspot rules, speed caps and fair-use limits/);
-  // Counted from the plans actually in hand: 5 without the live feed (as in CI), 20 with it.
+  // Counted from the plans actually in hand: 5 without the live feed (as in CI), 26 with it.
   assert.match(text, /\d+ with eSIM prices/);
   assert.match(text, /Roaming priced, never guessed/);
-  // Roaming coverage differs by network: EE prices all 20 destinations, the other
-  // nine price 5. The page must not flatten that into a single blanket claim.
-  assert.match(text, /On EE we price roaming for all 20 destinations/);
-  assert.doesNotMatch(text, /calculated for all 20 destinations/);
+  // Roaming coverage differs by network: EE prices all 26 destinations, the other
+  // nine price fewer. The page must not flatten that into a single blanket claim.
+  assert.match(text, /On EE we price roaming for all 26 destinations/);
+  assert.doesNotMatch(text, /calculated for all 26 destinations/);
   assert.doesNotMatch(text, /on all 10 UK networks/);
   assert.match(html, /<option value="" disabled="" selected="">Choose your network<\/option>/);
   // The network is no longer required: results must not wait on a roaming tariff.
@@ -69,7 +69,7 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.match(html, /<option value="45">/);
   assert.match(html, /<option value="60">/);
   assert.match(html, /<option value="90">/);
-  assert.equal((html.match(/<option value="(?:turkey|united-states|spain|france|italy|greece|portugal|germany|netherlands|ireland|cyprus|united-arab-emirates|thailand|japan|australia|canada|mexico|morocco|egypt|indonesia)"/g) ?? []).length, 20);
+  assert.equal((html.match(/<option value="(?:turkey|united-states|spain|france|italy|greece|portugal|germany|netherlands|ireland|cyprus|united-arab-emirates|thailand|japan|australia|canada|mexico|morocco|egypt|indonesia|switzerland|poland|croatia|india|vietnam|sri-lanka)"/g) ?? []).length, 26);
   assert.match(text, /Will an eSIM work on your phone\?/);
   assert.match(text, /Hotspot, speed &amp; other limits/);
   assert.match(text, /Speed limit/);
@@ -233,7 +233,7 @@ test("\"Live price\" means one thing, and an unpriced plan never claims a checke
 
 test("every destination has a landing page, not only the manually priced ones", async () => {
   const { destinations } = await import("../lib/destinations.ts");
-  assert.equal(destinations.length, 20);
+  assert.equal(destinations.length, 26);
 
   for (const destination of destinations) {
     const response = await render(`/destinations/${destination.id}`);

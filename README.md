@@ -4,10 +4,10 @@ UK-first roaming and travel-eSIM comparison site. Built with vinext and deployed
 
 ## What is implemented
 
-- allowance-matched UK roaming estimates for 136 network-and-destination combinations, every one traceable to a
-  charge the operator publishes — all 20 destinations on EE, and 116 combinations across the other nine networks.
+- allowance-matched UK roaming estimates for 171 network-and-destination combinations, every one traceable to a
+  charge the operator publishes — all 26 destinations on EE, and 145 combinations across the other nine networks.
   Where an operator no longer publishes a rate, the site hands off to their own checker instead of quoting a number.
-- live Saily prices in GBP for all 20 destinations, fetched per request from the Saily partners API
+- live Saily prices in GBP for all 26 destinations, fetched per request from the Saily partners API
 - dated manual eSIM price snapshots for Turkey, the United States, Spain, Japan and the UAE
 - live provider handoffs for the remaining Airalo, Klook and Nomad catalogues without guessed prices
 - Klook, Airalo, Nomad and Saily options, with multiple suitable plans per provider
@@ -20,7 +20,7 @@ Saily rows are labelled "Live price" and are exact GBP amounts from the provider
 
 ## Destination guides
 
-Every destination has a comparison page at `/destinations/<id>`, and all 20 carry a written guide
+Every destination has a comparison page at `/destinations/<id>`, and all 26 carry a written guide
 from `lib/guides/` under the comparison: verdict, key facts, a table of what all ten UK networks
 charge, worked 7- and 14-day costs, provider notes, prose sections, setup steps and a FAQ, plus
 `FAQPage` and `Article` structured data and guide-specific title and description tags.
@@ -87,7 +87,7 @@ captured fixture rather than the network.
 
 Nomad's affiliate programme runs through Impact, which publishes the full product
 catalogue with prices and a ready-made tracking URL per item. `lib/nomad-live.ts` reads
-catalog `29881` from the Impact partner API, giving live prices for all 20 destinations
+catalog `29881` from the Impact partner API, giving live prices for all 26 destinations
 and removing Nomad from the manual snapshot burden.
 
 ```text
@@ -130,14 +130,16 @@ domain, add that host to `NOMAD_TRACKING_HOSTS` — otherwise the link is reject
 ## Klook affiliate links
 
 Klook runs its own affiliate programme at <https://affiliate.klook.com>, and attributes clicks on an
-`aid` appended to any Klook product URL. One id therefore covers all 20 destinations:
+`aid` appended to any Klook product URL. One id therefore covers all 26 destinations:
 
 ```text
 NEXT_PUBLIC_KLOOK_AFFILIATE_ID
 ```
 
-Every destination has a confirmed country-specific Klook eSIM product page in `klookProductUrls`
-(all checked for a 200 and a matching country title on 18 August 2026). Klook rows never show a price:
+Twenty destinations have a confirmed country-specific Klook eSIM product page in `klookProductUrls`
+(each checked for a 200 and a matching country title on 18 August 2026). The six added on
+23 September 2026 — Switzerland, Poland, Croatia, India, Vietnam and Sri Lanka — have none we could
+confirm, so they fall back to Klook's own search, which the same `aid` tracks. Klook rows never show a price:
 a single destination has hundreds of priced permutations of validity, daily-vs-total data and package
 size, so the row stays a labelled handoff and the price is read at Klook.
 
