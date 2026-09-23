@@ -36,10 +36,10 @@ export type Plan = {
   live?: boolean;
 };
 
-export const DATA_CHECKED_AT = "2026-09-10";
-export const DATA_REVIEW_AFTER = "2026-09-17";
-export const FX_CHECKED_AT = "2026-09-10";
-export const FX_REVIEW_AFTER = "2026-09-17";
+export const DATA_CHECKED_AT = "2026-09-23";
+export const DATA_REVIEW_AFTER = "2026-09-30";
+export const FX_CHECKED_AT = "2026-09-23";
+export const FX_REVIEW_AFTER = "2026-09-30";
 export const FX_EVIDENCE = {
   label: "Bank of England daily spot exchange rates",
   url: "https://www.bankofengland.co.uk/statistics/exchange-rates",
@@ -48,9 +48,9 @@ export const FX_EVIDENCE = {
 } as const;
 export const usagePerDay: Record<Usage, number> = { light: 0.35, everyday: 0.8, heavy: 2 };
 export const tripLengths = [...Array.from({ length: 30 }, (_, index) => index + 1), 45, 60, 90];
-// Bank of England daily spot rates published 9 September 2026, the most recent
-// available when checked on the 10th: £1 = 1.3563 USD, £1 = 1.1644 EUR.
-export const gbpRates: Record<Currency, number> = { GBP: 1, EUR: 0.86, USD: 0.74 };
+// Bank of England daily spot rates published 21 September 2026, the most recent
+// available when checked on the 23rd: £1 = 1.3374 USD, £1 = 1.1657 EUR.
+export const gbpRates: Record<Currency, number> = { GBP: 1, EUR: 0.86, USD: 0.75 };
 
 export const providerDetails: Record<Provider, { accent: string; initials: string; affiliate: boolean; summary: string }> = {
   Airalo: { accent: "#a82350", initials: "AI", affiliate: false, summary: "Plans for one country, a region, or worldwide" },
@@ -62,6 +62,18 @@ export const providerDetails: Record<Provider, { accent: string; initials: strin
 
 const CHECKED_AT = DATA_CHECKED_AT;
 const REVIEW_AFTER = DATA_REVIEW_AFTER;
+
+/**
+ * Klook's product pages sit behind a bot challenge that neither a browser
+ * session nor a request can currently get past, so they were last confirmed on
+ * 10 September 2026, when all twenty returned 200 with a matching country
+ * title. Klook rows carry that date rather than inheriting a check of the other
+ * providers' feeds.
+ */
+const KLOOK_CHECKED_AT = "2026-09-10";
+const KLOOK_REVIEW_AFTER = "2026-10-10";
+const withProviderDates = (plan: Plan): Plan =>
+  plan.provider === "Klook" ? { ...plan, checkedAt: KLOOK_CHECKED_AT, reviewAfter: KLOOK_REVIEW_AFTER } : plan;
 const turkeySources: Record<Provider, string> = {
   Airalo: "https://www.airalo.com/turkey-esim/merhaba-30days-20gb/",
   Klook: "https://www.klook.com/en-GB/activity/128551-turkey-esim-high-speed-internet-qr-code-voucher/",
@@ -160,7 +172,7 @@ const expandedPlans: Plan[] = [
   datedPlan({ id: "united-arab-emirates-klook", destination: "united-arab-emirates", provider: "Klook", name: "Choose your own size", validity: 30, price: null, speed: "Etisalat 5G options", speedCap: "Depends which package you choose", network: "Etisalat", tethering: "allowed", tetheringNote: "Hotspot should work", fairUse: "Unlimited options give 15GB a day at full speed, then 1Mbps", activation: "Pick your allowance and 1–30 days on the provider's site", note: "Price is shown on the provider's own site", callingSupport: "data-only", sourceUrl: "https://www.klook.com/en-GB/activity/123940-uae-esim-high-speed-internet-qr-code-voucher/", catalogueOnly: true }),
 ];
 
-export const plans: Plan[] = [...turkeyPlans, ...expandedPlans, ...airaloPlans];
+export const plans: Plan[] = [...turkeyPlans, ...expandedPlans, ...airaloPlans].map(withProviderDates);
 export const pricedDestinationIds = ["turkey", "united-states", "spain", "japan", "united-arab-emirates"] as const satisfies readonly DestinationId[];
 
 export function hasPricedPlans(destination: DestinationId) {

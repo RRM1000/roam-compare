@@ -39,7 +39,7 @@ test("Klook uses verified destination products and never invents package prices"
   assert.ok(klookPlans.every((plan) => plan.price === null));
 });
 
-test("five destinations have manual prices and stale snapshots cannot rank", () => {
+test("five destinations have manual prices, and staleness is measured from the review window", () => {
   assert.deepEqual([...pricedDestinationIds], ["turkey", "united-states", "spain", "japan", "united-arab-emirates"]);
   assert.ok(pricedDestinationIds.every((destination) => hasPricedPlans(destination)));
   const plan = plans.find((candidate) => candidate.price !== null);

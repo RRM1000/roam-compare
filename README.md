@@ -16,7 +16,7 @@ UK-first roaming and travel-eSIM comparison site. Built with vinext and deployed
 - browser-local saved comparisons; no account or comparison database
 - public robots policy advertising the sitemap, canonical destination pages and indexable metadata
 
-Saily rows are labelled "Live price" and are exact GBP amounts from the provider, not FX estimates. Manual snapshots are removed from ranking after seven days. Provider currency is preserved and GBP is labelled as an estimate. The test command also fails when a manual data review is overdue.
+Saily rows are labelled "Live price" and are exact GBP amounts from the provider, not FX estimates. Manual snapshots carry the date they were checked; a daily job opens an issue when one is due a recheck, and the site shows the date rather than a warning. Provider currency is preserved and GBP is labelled as an estimate. The test command also fails when a manual data review is overdue.
 
 ## Destination guides
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatCheckedDate, isPlanStale, plans, providerDetails, usagePerDay, type Plan, type Provider } from "@/lib/catalog";
+import { formatCheckedDate, plans, providerDetails, usagePerDay, type Plan, type Provider } from "@/lib/catalog";
 import { getPlanMatch, money } from "@/lib/comparison";
 import { destinationById, destinations, getPlanUrl, getProviderUrl, isTrackedUrl, type DestinationId } from "@/lib/destinations";
 import type { DestinationGuide as Guide } from "@/lib/guides";
@@ -29,7 +29,7 @@ function cheapestPerProvider(destination: DestinationId, livePlans: Plan[] | und
   const target = neededData(days);
   const best = new Map<Provider, ReturnType<typeof getPlanMatch>>();
   for (const plan of plansFor(destination, livePlans)) {
-    if (plan.price === null || isPlanStale(plan)) continue;
+    if (plan.price === null) continue;
     const match = getPlanMatch(plan, days, target);
     if (match.packs > 1 || match.suppliedData < target || match.gbpTotal === null) continue;
     const current = best.get(plan.provider);
@@ -110,7 +110,7 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
                   </div>
                   <div>
                     <strong>Travel eSIM</strong>
-                    {esimRows.length === 0 ? <p>{liveProviders.size === 0 ? "The live price feeds did not answer and our hand-checked prices are due a recheck, so we would rather show nothing than a stale figure. The comparison above still links to every provider." : "No priced plan currently covers this trip in one purchase."}</p> : (
+                    {esimRows.length === 0 ? <p>No plan we can price covers this trip in one purchase. The comparison above links to every provider.</p> : (
                       <ul>
                         {esimRows.map(([provider, plan]) => {
                           const url = getPlanUrl(plan, destination);

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  ESIM_COMPATIBILITY_REVIEW_AFTER,
   esimDevices,
   esimSources,
   getEsimDevice,
@@ -20,9 +21,12 @@ test("compatibility records are uniquely identified and traceable", () => {
     assert.ok(esimSources[device.sourceId]);
   }
 
+  // Anchored to the module's own review constant rather than fixed dates, which
+  // drift every time the manufacturer pages are rechecked.
   for (const source of Object.values(esimSources)) {
-    assert.equal(source.checkedAt, "2026-08-16");
-    assert.equal(source.reviewAfter, "2026-09-16");
+    assert.match(source.checkedAt, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(source.reviewAfter, ESIM_COMPATIBILITY_REVIEW_AFTER);
+    assert.ok(source.reviewAfter > source.checkedAt, `${source.label}: review date precedes the check`);
     assert.match(source.url, /^https:\/\//);
     assert.ok(source.label.length > 10);
   }

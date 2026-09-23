@@ -31,7 +31,7 @@ export function getFaq(): FaqEntry[] {
       question: "Are these prices live?",
       answer:
         "Saily’s and Nomad’s are — they come from each provider’s own feed and are marked “Live price”. Saily quotes real pounds; Nomad quotes US dollars, which we convert. " +
-        "Airalo prices are checked by hand, show the date we checked, and drop out of the ranking after seven days. They are already in pounds, so they need no conversion. " +
+        "Airalo prices are checked by hand and carry the date we checked them. They are already in pounds, so they need no conversion. " +
         "Klook never shows a price here, because we cannot read one reliably; that link takes you to their own page.",
     },
     {
