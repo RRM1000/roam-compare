@@ -3,7 +3,7 @@ import { InfoPage } from "@/app/components/InfoPage";
 
 export const metadata: Metadata = {
   title: "Privacy — RoamCompare",
-  description: "How the private RoamCompare working build handles information.",
+  description: "How RoamCompare handles your information: no account, no profile, anonymous analytics only, and nothing stored unless you save a comparison.",
   alternates: { canonical: "/privacy" },
   openGraph: { title: "RoamCompare privacy", description: "Privacy information for RoamCompare.", images: [] },
   twitter: { title: "RoamCompare privacy", description: "Privacy information for RoamCompare.", images: [] },
