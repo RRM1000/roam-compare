@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import DeviceCompatibilityChecker from "@/app/components/DeviceCompatibilityChecker";
 import {
   DATA_CHECKED_AT,
@@ -138,8 +138,13 @@ function mergePlans(livePlans: Plan[] | undefined) {
   return [...plans.filter((plan) => !replaced.has(`${plan.provider}|${plan.destination}`)), ...livePlans];
 }
 
-export default function CompareExperience({ initial = defaultComparison, destinationLanding = false, livePlans, guide }: { initial?: InitialComparison; destinationLanding?: boolean; livePlans?: Plan[]; guide?: ReactNode }) {
+export default function CompareExperience({ initial = defaultComparison, destinationLanding = false, livePlans, liveDestinationIds, heroAnswer, guide }: { initial?: InitialComparison; destinationLanding?: boolean; livePlans?: Plan[]; liveDestinationIds?: DestinationId[]; heroAnswer?: string; guide?: ReactNode }) {
   const [destination, setDestination] = useState<DestinationId>(initial.destination);
+  // The page ships only the starting country's live plans. Others are fetched
+  // the first time a reader switches to them, and kept for the rest of the visit.
+  const [loadedLive, setLoadedLive] = useState<Plan[]>(livePlans ?? []);
+  const [failedLive, setFailedLive] = useState<ReadonlySet<DestinationId>>(new Set());
+  const requestedLive = useRef(new Set<DestinationId>((livePlans ?? []).map((plan) => plan.destination)));
   const [days, setDays] = useState(initial.days);
   const [roamingDays, setRoamingDays] = useState(initial.roamingDays);
   // Roaming is all-or-nothing for almost everyone: the UK SIM stays connected
@@ -206,17 +211,42 @@ export default function CompareExperience({ initial = defaultComparison, destina
     ["Two to four weeks", tripLengths.filter((length) => length > 14 && length <= 30)],
     ["Longer trips", tripLengths.filter((length) => length > 30)],
   ] as const), []);
-  const availablePlans = useMemo(() => mergePlans(livePlans), [livePlans]);
-  const liveDestinationCount = useMemo(() => new Set((livePlans ?? []).map((plan) => plan.destination)).size, [livePlans]);
+  const availablePlans = useMemo(() => mergePlans(loadedLive.length ? loadedLive : undefined), [loadedLive]);
+  const liveDestinationSet = useMemo(
+    () => new Set<DestinationId>(liveDestinationIds ?? loadedLive.map((plan) => plan.destination)),
+    [liveDestinationIds, loadedLive],
+  );
+  const liveDestinationCount = liveDestinationSet.size;
   // Derived from the plans actually in hand, so the claims on the page stay true
   // whether the live feed answered or the manual snapshots are carrying it.
   const pricedDestinationIdSet = useMemo(
-    () => new Set(availablePlans.filter((plan) => plan.price !== null).map((plan) => plan.destination)),
-    [availablePlans],
+    // A country with a live feed is priced even before its plans are fetched.
+    () => new Set([...availablePlans.filter((plan) => plan.price !== null).map((plan) => plan.destination), ...liveDestinationSet]),
+    [availablePlans, liveDestinationSet],
   );
   const pricedDestination = pricedDestinationIdSet.has(destination);
   const pricedCount = pricedDestinationIdSet.size;
-  const destinationHasLivePrices = useMemo(() => (livePlans ?? []).some((plan) => plan.destination === destination), [livePlans, destination]);
+  const destinationHasLivePrices = liveDestinationSet.has(destination);
+  const liveLoading = destinationHasLivePrices && !failedLive.has(destination) && !loadedLive.some((plan) => plan.destination === destination);
+
+  useEffect(() => {
+    if (!liveDestinationSet.has(destination) || requestedLive.current.has(destination)) return;
+    requestedLive.current.add(destination);
+    const controller = new AbortController();
+    fetch(`/api/live-plans/${destination}`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() as Promise<Plan[]> : Promise.reject(new Error(String(response.status)))))
+      .then((fresh) => setLoadedLive((current) => [...current.filter((plan) => plan.destination !== destination), ...fresh]))
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          requestedLive.current.delete(destination);
+          return;
+        }
+        // The dated snapshots stay in place, so the page still works; it just
+        // stops saying it is loading.
+        setFailedLive((current) => new Set(current).add(destination));
+      });
+    return () => controller.abort();
+  }, [destination, liveDestinationSet]);
   const neededData = Math.max(1, Math.ceil(days * usagePerDay[usage]));
   const neededRoamingData = roamingDays * usagePerDay[usage];
   const roaming = network && scenario ? getRoamingResult(network, scenario, roamingDays, customCost, neededRoamingData, destination, roamingAllowance) : null;
@@ -484,7 +514,7 @@ export default function CompareExperience({ initial = defaultComparison, destina
             <div className="hero-copy">
               <p className="eyebrow">UK → {activeDestination.name} · roaming vs eSIM</p>
               <h1>{destinationLanding ? `${activeDestination.name} eSIM vs UK roaming.` : "Know the roaming cost before take-off."}</h1>
-              <p className="hero-lede">{destinationLanding ? `Compare what your UK network charges to roam in ${activeDestination.name} with travel eSIMs sized for your trip.` : "Compare a UK-network roaming estimate with travel eSIMs that fit your trip."} See the hotspot rules, speed caps and fair-use limits before opening checkout.</p>
+              <p className="hero-lede">{destinationLanding && heroAnswer && destination === initial.destination ? heroAnswer : destinationLanding ? `Compare what your UK network charges to roam in ${activeDestination.name} with travel eSIMs sized for your trip.` : "Compare a UK-network roaming estimate with travel eSIMs that fit your trip."} See the hotspot rules, speed caps and fair-use limits before opening checkout.</p>
               <div className="route-signature" aria-hidden="true"><span>United Kingdom</span><i /><span>→</span><i /><span>{activeDestination.flag} {activeDestination.name}</span></div>
               {/* On a phone the form stands between the headline and the prices, so a
                   visitor who arrived for one country can jump straight to them. */}
@@ -495,7 +525,7 @@ export default function CompareExperience({ initial = defaultComparison, destina
             <form className="compare-card" id="compare" aria-labelledby="compare-title" onSubmit={(event) => { event.preventDefault(); compare(); }}>
               <div className="card-heading"><span className="step-pill">Takes under a minute</span><h2 id="compare-title" ref={compareHeadingRef} tabIndex={-1}>What does your trip look like?</h2></div>
               <div className="field-grid">
-                <label className="field field-wide"><span>Where are you going?</span><select value={destination} onChange={(event) => updateDestination(event.target.value as DestinationId)} aria-label="Destination">{destinationsByRegion.map(([region, places]) => <optgroup label={region} key={region}>{places.map((place) => <option value={place.id} key={place.id}>{place.name}</option>)}</optgroup>)}</select><small className={`field-status ${pricedDestination ? "priced" : "catalogue"}`}><i aria-hidden="true" />{destinationHasLivePrices ? "Full comparison with live eSIM prices" : pricedDestination ? "Full comparison with dated price snapshots" : "No stored prices — we’ll send you to the provider"}</small></label>
+                <label className="field field-wide"><span>Where are you going?</span><select value={destination} onChange={(event) => updateDestination(event.target.value as DestinationId)} aria-label="Destination">{destinationsByRegion.map(([region, places]) => <optgroup label={region} key={region}>{places.map((place) => <option value={place.id} key={place.id}>{place.name}</option>)}</optgroup>)}</select><small className={`field-status ${pricedDestination ? "priced" : "catalogue"}`}><i aria-hidden="true" />{liveLoading ? "Loading live eSIM prices…" : destinationHasLivePrices ? "Full comparison with live eSIM prices" : pricedDestination ? "Full comparison with dated price snapshots" : "No stored prices — we’ll send you to the provider"}</small></label>
                 <label className="field"><span>How long is your trip?</span><select value={days} onChange={(event) => updateDays(Number(event.target.value))} aria-label="Trip length">{tripLengthGroups.map(([label, lengths]) => <optgroup label={label} key={label}>{lengths.map((length) => <option value={length} key={length}>{length} {length === 1 ? "day" : "days"}</option>)}</optgroup>)}</select></label>
                 
               </div>
@@ -512,13 +542,13 @@ export default function CompareExperience({ initial = defaultComparison, destina
         </div>
 
         <p className="sr-only" aria-live="polite">{announceResults ? `${suggestionCount} comparison options loaded for ${activeDestination.name}` : ""}</p>
-        <section className={`results-section ${hasCompared ? "is-visible" : ""}`} id="results" aria-hidden={!hasCompared}>
+        <section className={`results-section ${hasCompared ? "is-visible" : ""} ${liveLoading ? "is-loading" : ""}`} id="results" aria-hidden={!hasCompared} aria-busy={liveLoading}>
           <div className="section-heading"><div><p className="eyebrow">Your comparison</p><h2 ref={resultsHeadingRef} tabIndex={-1}>{days} {days === 1 ? "day" : "days"} in {activeDestination.name} · plan for about {neededData}GB</h2></div><div className="result-actions"><button className="text-button" type="button" onClick={shareComparison}>Share comparison ↗</button><button className="text-button" type="button" onClick={saveComparison}>Save on this device</button><button className="text-button" type="button" ref={savedToggleRef} onClick={loadSavedComparisons} aria-expanded={showSaved} aria-controls="saved-comparisons">Saved comparisons</button>{pinnedPlans.length > 0 && <button className="text-button" type="button" onClick={viewShortlist} aria-controls="pinned-comparison">View shortlist ({pinnedPlans.length})</button>}<button className="text-button" type="button" onClick={focusComparisonForm}>Change trip details ↑</button>{shareStatus && <span role="status">{shareStatus}</span>}</div></div>
 
           {showSaved && <aside className="saved-comparisons" id="saved-comparisons"><div><strong>Saved on this device</strong><button type="button" onClick={closeSavedComparisons} aria-label="Close saved comparisons">×</button></div>{savedComparisons.length === 0 ? <p>No saved comparisons yet.</p> : <ul>{savedComparisons.map((item) => <li key={`${item.savedAt}-${item.url}`}><a href={item.url}>{item.label}</a><button type="button" onClick={() => removeSaved(item.url)} aria-label={`Remove ${item.label}`}>Remove</button></li>)}</ul>}<small>Stored only in this browser. Custom costs and phone details are not saved.</small></aside>}
           <p className="sr-only" role="status" aria-live="polite">{pinStatus}</p>
 
-          {bestPricedPlan && <div className="decision-card"><div><span className="decision-label">Best value for this trip</span><h3>{bestPricedPlan.provider} · {bestPricedPlan.plan.name} <span className="plan-duration">· {bestPricedPlan.plan.validity} days</span></h3><p>{callsNeed === "yes" ? "This one includes normal calls and texts — check how many are included before you buy." : "Enough data for your whole trip at the lowest total we found. Check the limits below; the price at checkout can differ."}</p></div><div className="decision-price"><small>Estimated trip total</small><strong>≈ {money.format(bestPricedPlan.plan.gbpTotal!)}</strong>{canCompareSavings && roaming?.cost !== null && roaming.cost - bestPricedPlan.plan.gbpTotal! > 0.5 && <span>About {money.format(roaming.cost - bestPricedPlan.plan.gbpTotal!)} less than roaming that meets everything you asked for</span>}</div>{compatibility === "blocked" ? <span className="decision-blocked">Resolve compatibility first</span> : <a href={getPlanUrl(bestPricedPlan.plan, activeDestination)} target="_blank" rel={isSponsoredLink(bestPricedPlan.provider, getPlanUrl(bestPricedPlan.plan, activeDestination)) ? "sponsored noopener noreferrer" : "noopener noreferrer"}>See this plan <span aria-hidden="true">↗</span></a>}</div>}
+          {bestPricedPlan && <div className="decision-card"><div><span className="decision-label">Best value for this trip</span><h3>{bestPricedPlan.provider} · {bestPricedPlan.plan.name} <span className="plan-duration">· {bestPricedPlan.plan.validity} days</span></h3><p>{callsNeed === "yes" ? "This one includes normal calls and texts — check how many are included before you buy." : "Enough data for your whole trip at the lowest total we found. Check the limits below; the price at checkout can differ."}</p></div><div className="decision-price"><small>Estimated trip total</small><strong>≈ {money.format(bestPricedPlan.plan.gbpTotal!)}</strong>{canCompareSavings && roaming?.cost !== null && roaming.cost - bestPricedPlan.plan.gbpTotal! > 0.5 && <span>About {money.format(roaming.cost - bestPricedPlan.plan.gbpTotal!)} less than roaming that meets everything you asked for</span>}</div>{compatibility === "blocked" ? <span className="decision-blocked">Resolve compatibility first</span> : <a href={getPlanUrl(bestPricedPlan.plan, activeDestination)} target="_blank" rel={isSponsoredLink(bestPricedPlan.provider, getPlanUrl(bestPricedPlan.plan, activeDestination)) ? "sponsored noopener noreferrer" : "noopener noreferrer"}>See this plan on {bestPricedPlan.provider} <span aria-hidden="true">↗</span></a>}</div>}
 
           <div className={`results-compatibility ${compatibility}`}><span aria-hidden="true">{compatibility === "ready" ? "✓" : compatibility === "blocked" ? "!" : compatibility === "check" ? "i" : "?"}</span><div><strong>{compatibility === "ready" ? `${selectedDeviceName} looks eSIM-ready` : compatibility === "check" ? "Check this phone’s exact version" : compatibility === "blocked" ? "Pause before purchasing" : "Phone compatibility not checked"}</strong><p>{compatibility === "ready" ? "Model and network-lock checks look good; confirm the regional version at checkout." : compatibility === "blocked" ? "A travel eSIM may not work on this phone or while it is network locked." : "Check your exact model, and make sure the phone isn’t locked to a UK network, before buying."}{compatibility !== "ready" && <button className="inline-link-button" type="button" onClick={openCompatibilityCheck}>Check my phone</button>}</p></div></div>
 

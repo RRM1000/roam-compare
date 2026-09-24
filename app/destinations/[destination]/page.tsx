@@ -48,6 +48,12 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
   };
 }
 
+/** The guide's short answer, reworded to open the page: "Short answer: buy…" becomes "Buy…". */
+function heroAnswer(heading: string) {
+  const answer = heading.replace(/^Short answer:\s*/i, "");
+  return answer.charAt(0).toUpperCase() + answer.slice(1);
+}
+
 export default async function DestinationPage({ params }: DestinationPageProps) {
   const requested = (await params).destination;
   if (!isDestination(requested)) notFound();
@@ -68,6 +74,10 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
   };
   const [[saily, nomad], origin] = [await Promise.all([fetchSailyPlans(), fetchNomadPlans()]), await getSiteOrigin()];
   const livePlans = [...(saily ?? []), ...(nomad ?? [])];
+  // Only this country's plans are sent to the browser. Embedding all 26 made
+  // every page ~670KB and cost ~30ms of CPU to render, which is what tipped the
+  // Worker into 503s; other countries load from /api/live-plans on demand.
+  const destinationPlans = livePlans.filter((plan) => plan.destination === requested);
   const destination = destinationById[requested];
   const guide = getGuide(requested);
   const pageUrl = `${origin}/destinations/${destination.id}`;
@@ -103,9 +113,11 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <CompareExperience
         initial={initial}
-        livePlans={livePlans.length ? livePlans : undefined}
+        livePlans={destinationPlans}
+        liveDestinationIds={[...new Set(livePlans.map((plan) => plan.destination))]}
+        heroAnswer={guide ? heroAnswer(guide.verdict.heading) : undefined}
         destinationLanding
-        guide={guide ? <DestinationGuide guide={guide} livePlans={livePlans.length ? livePlans : undefined} /> : undefined}
+        guide={guide ? <DestinationGuide guide={guide} livePlans={destinationPlans.length ? destinationPlans : undefined} /> : undefined}
       />
     </>
   );

@@ -392,3 +392,11 @@ test("the saving against roaming is stated once in prose, not on every row", asy
   // anyone reading the row on its own.
   assert.match(html, /title="About £[\d.,]+ less than roaming that meets everything you asked for"/);
 });
+
+test("other countries' live plans load from a small route rather than riding in every page", async () => {
+  const response = await render("/api/live-plans/india");
+  assert.equal(response.status, 200);
+  assert.ok(Array.isArray(await response.json()));
+  assert.equal(response.headers.get("x-robots-tag"), "noindex");
+  assert.equal((await render("/api/live-plans/atlantis")).status, 404);
+});

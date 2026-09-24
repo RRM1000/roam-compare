@@ -179,6 +179,8 @@ export default function DestinationGuide({ guide, livePlans }: Props) {
         </div>
       </div>
 
+      <p className="guide-cta"><a href="#results">See the cheapest {destination.name} eSIMs for your trip <span aria-hidden="true">↑</span></a></p>
+
       <div className="guide-block guide-related" id="guide-related">
         <h3>Other destinations from the UK</h3>
         <ul>

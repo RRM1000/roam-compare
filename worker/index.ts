@@ -1,6 +1,14 @@
 /** Cloudflare Worker entry point for RoamCompare. */
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { cacheableCopy, pageCacheKey, servedFromCache } from "../lib/page-cache";
+
+/** Replaced at build time (vite.config.ts), so each deploy gets its own page cache. */
+declare const __ROAMCOMPARE_BUILD_ID__: string | undefined;
+const BUILD_ID = typeof __ROAMCOMPARE_BUILD_ID__ === "string" ? __ROAMCOMPARE_BUILD_ID__ : undefined;
+
+type EdgeCache = { match(request: Request): Promise<Response | undefined>; put(request: Request, response: Response): Promise<void> };
+const edgeCache = () => (globalThis as { caches?: { default?: EdgeCache } }).caches?.default ?? null;
 
 interface Env {
   ASSETS: Fetcher;
@@ -62,7 +70,19 @@ const worker = {
       return withSecurityHeaders(response);
     }
 
-    return withSecurityHeaders(await handler.fetch(request, env, ctx));
+    const key = pageCacheKey(request, BUILD_ID);
+    const cache = key ? edgeCache() : null;
+    if (key && cache) {
+      const hit = await cache.match(key).catch(() => undefined);
+      if (hit) return withSecurityHeaders(servedFromCache(hit));
+    }
+
+    const response = await handler.fetch(request, env, ctx);
+    if (key && cache) {
+      const copy = cacheableCopy(response);
+      if (copy) ctx.waitUntil(cache.put(key, copy).catch(() => undefined));
+    }
+    return withSecurityHeaders(response);
   },
 };
 

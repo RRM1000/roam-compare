@@ -85,7 +85,12 @@ export default async function HomePage({ searchParams }: PageProps) {
     <>
       <Analytics />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-      <CompareExperience initial={initial} livePlans={livePlans.length ? livePlans : undefined} />
+      {/* Only this destination's plans go to the browser; the rest load on demand. */}
+      <CompareExperience
+        initial={initial}
+        livePlans={livePlans.filter((plan) => plan.destination === initial.destination)}
+        liveDestinationIds={[...new Set(livePlans.map((plan) => plan.destination))]}
+      />
     </>
   );
 }

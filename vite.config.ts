@@ -44,6 +44,9 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    // A new id every build keys the Worker's page cache, so a deploy never
+    // serves HTML that points at the previous build's assets.
+    define: { __ROAMCOMPARE_BUILD_ID__: JSON.stringify(Date.now().toString(36)) },
     server: {
       // Bind every interface, not just the IPv6 loopback Vite defaults to.
       // Chrome resolves `localhost` to 127.0.0.1, so a ::1-only bind refuses the
