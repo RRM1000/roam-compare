@@ -51,7 +51,7 @@ test("server-renders the premium comparison and complete controls", async () => 
   assert.match(text, /Roaming priced, never guessed/);
   // Roaming coverage differs by network: EE prices all 26 destinations, the other
   // nine price fewer. The page must not flatten that into a single blanket claim.
-  assert.match(text, /On EE we price roaming for all 26 destinations/);
+  assert.match(text, /EE for all 26 destinations, plus \d+ more network-and-country pairings/);
   assert.doesNotMatch(text, /calculated for all 26 destinations/);
   assert.doesNotMatch(text, /on all 10 UK networks/);
   assert.match(html, /<option value="" disabled="" selected="">Choose your network<\/option>/);
@@ -262,7 +262,7 @@ for (const [slug, name] of [["spain", "Spain"], ["japan", "Japan"]]) {
     assert.equal(response.status, 200);
     const html = await response.text();
     const { guides } = await import("../lib/guides/index.ts");
-    const expectedTitle = guides[slug] ? `${guides[slug].title} — RoamCompare` : `${name} eSIM and UK roaming comparison — RoamCompare`;
+    const expectedTitle = guides[slug] ? guides[slug].title : `${name} eSIM vs UK roaming: 2026 costs`;
     assert.match(html, new RegExp(`<title>${expectedTitle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}<\\/title>`, "i"));
     // The origin is whatever NEXT_PUBLIC_SITE_URL resolves to — localhost in a
     // plain checkout, the real domain once it's configured for deploy. Reading
@@ -274,7 +274,7 @@ for (const [slug, name] of [["spain", "Spain"], ["japan", "Japan"]]) {
     assert.match(html, new RegExp(`rel="canonical" href="${escapedOrigin}\\/destinations\\/${slug}"`, "i"));
     assert.match(html, new RegExp(`property="og:url" content="${escapedOrigin}\\/destinations\\/${slug}"`, "i"));
     assert.match(visible(html), new RegExp(`UK → ${name} · roaming vs eSIM`));
-    assert.match(visible(html), new RegExp(`Compare eSIMs for ${name}\\.`));
+    assert.match(visible(html), new RegExp(`${name} eSIM vs UK roaming\\.`));
     assert.doesNotMatch(html, /og-premium\.png|og\.png/);
   });
 }
@@ -286,8 +286,8 @@ test("the Turkey page carries its written guide, structured data and disclosed a
   const text = visible(html);
 
   // Metadata comes from the guide, not the generic destination template.
-  assert.match(html, /<title>Turkey eSIM vs UK roaming: what it costs from the UK \(2026\) — RoamCompare<\/title>/);
-  assert.match(html, /<meta name="description" content="Turkey is outside every UK network/);
+  assert.match(html, /<title>Turkey eSIM vs UK roaming: what it costs from the UK \(2026\)<\/title>/);
+  assert.match(html, /<meta name="description" content="Turkey sits outside every UK network/);
   assert.match(html, /property="og:locale" content="en_GB"/);
 
   // The guide is server-rendered into the HTML, under the comparison and above the methodology.
@@ -347,7 +347,7 @@ test("a destination without a guide keeps the generic page and no FAQ markup", a
   if (!unguided) return t.skip("every destination has a guide");
   const response = await render(`/destinations/${unguided.id}`);
   const html = await response.text();
-  assert.match(html, new RegExp(`<title>${unguided.name} eSIM and UK roaming comparison — RoamCompare<\\/title>`));
+  assert.match(html, new RegExp(`<title>${unguided.name} eSIM vs UK roaming: 2026 costs<\\/title>`));
   assert.doesNotMatch(html, /id="guide"/);
   assert.doesNotMatch(html, /"FAQPage"/);
   assert.doesNotMatch(html, /<a href="#guide">/);

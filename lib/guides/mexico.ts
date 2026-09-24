@@ -7,7 +7,7 @@ export const mexicoGuide: DestinationGuide = {
   keyword: "Mexico eSIM",
   title: "Mexico eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Mexico is outside every UK network's Europe zone, and Three charges more there than in the US. Compare live Mexico eSIM prices with EE, O2, Three and the rest, and see which local networks the eSIMs use.",
+    "Mexico is outside every UK network's Europe zone. Compare live Mexico eSIM prices with what EE, O2, Three and the rest charge to roam there.",
   verdict: {
     heading: "Short answer: buy a Mexico eSIM before you fly, and check which network it uses if you're leaving the resorts.",
     body:

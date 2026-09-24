@@ -7,7 +7,7 @@ export const egyptGuide: DestinationGuide = {
   keyword: "Egypt eSIM",
   title: "Egypt eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Egypt is outside every UK network's Europe zone. Compare live Egypt eSIM prices with what EE, O2, Three and the rest charge, whether you're heading to a Red Sea resort, Cairo or a Nile cruise.",
+    "Egypt is in EE's dearer Zone 2. Compare live Egypt eSIM prices with what EE, O2, Three and the rest charge, including the Red Sea resorts.",
   verdict: {
     heading: "Short answer: buy an Egypt eSIM before you fly, unless your plan already covers Egypt.",
     body:

@@ -11,7 +11,7 @@ export const irelandGuide: DestinationGuide = {
   keyword: "Ireland eSIM",
   title: "Ireland eSIM vs UK roaming: do you need one? (2026)",
   description:
-    "Most UK networks let you use your plan in the Republic of Ireland at no extra cost, including EE, Vodafone and Three. See which networks do, what the caps are, and when an Ireland eSIM is still worth having.",
+    "Several UK networks include Ireland outright, and the rest charge. Compare live Ireland eSIM prices with what your own network charges to roam there.",
   verdict: {
     heading: "Short answer: on most UK networks, you don't need an eSIM for the Republic of Ireland.",
     body:

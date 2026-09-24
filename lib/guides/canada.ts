@@ -7,7 +7,7 @@ export const canadaGuide: DestinationGuide = {
   keyword: "Canada eSIM",
   title: "Canada eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Canada is outside every UK network's Europe zone. Compare live Canada eSIM prices with what EE, O2, Three and the rest charge, and plan for coverage gaps in the Rockies and national parks.",
+    "Canada is outside every UK network's Europe zone. Compare live Canada eSIM prices with UK roaming, and check coverage beyond the main highways.",
   verdict: {
     heading: "Short answer: buy a Canada eSIM before you fly, unless your plan already covers Canada.",
     body:

@@ -7,7 +7,7 @@ export const greeceGuide: DestinationGuide = {
   keyword: "Greece eSIM",
   title: "Greece eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Greece is in every UK network's Europe zone, but only some include it. Compare EE, O2, Vodafone, Three and the rest with live Greece eSIM prices, and avoid ferry roaming and the Turkish networks near the eastern islands.",
+    "Greece is in every UK network's Europe zone, but only some include it. Compare live Greece eSIM prices with UK roaming, islands and ferries included.",
   verdict: {
     heading: "Short answer: check your UK plan first, and watch for Turkish networks on the eastern islands.",
     body:

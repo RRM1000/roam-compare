@@ -7,7 +7,7 @@ export const croatiaGuide: DestinationGuide = {
   keyword: "Croatia eSIM",
   title: "Croatia eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Croatia is in every UK network's Europe zone, but the old coast road to Dubrovnik isn't. Compare EE, O2, Vodafone, Three and the rest with live Croatia eSIM prices for Split, Dubrovnik and the islands.",
+    "Croatia is in every UK network's Europe zone; the coast road through Bosnia is not. Compare live Croatia eSIM prices with what UK networks charge.",
   verdict: {
     heading: "Short answer: check your UK plan, and watch what your phone connects to on the drive south.",
     body:

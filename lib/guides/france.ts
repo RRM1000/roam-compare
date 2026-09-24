@@ -7,7 +7,7 @@ export const franceGuide: DestinationGuide = {
   keyword: "France eSIM",
   title: "France eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "France is in every UK network's Europe zone, but only some include it. Compare what EE, O2, Vodafone, Three and the rest charge in France with live eSIM prices, plus the catches on Channel ferries and in Monaco.",
+    "France is in every UK network's Europe zone, but only some include it. Compare live France eSIM prices with UK roaming, including Corsica and the Alps.",
   verdict: {
     heading: "Short answer: check your UK plan first. If it charges a daily fee in France, an eSIM usually costs less.",
     body:

@@ -7,7 +7,7 @@ export const japanGuide: DestinationGuide = {
   keyword: "Japan eSIM",
   title: "Japan eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Japan is outside every UK network's Europe zone, and EE's pass there includes just 500MB a day. Compare live Japan eSIM prices with EE, O2, Three, VOXI and the rest, and see how an eSIM compares with pocket Wi-Fi.",
+    "Japan sits in EE's dearest roaming band. Compare live Japan eSIM prices with what UK networks charge, and weigh them against pocket Wi-Fi hire.",
   verdict: {
     heading: "Short answer: buy a Japan eSIM before you fly. UK roaming there is expensive, slow or both.",
     body:

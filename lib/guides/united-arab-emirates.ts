@@ -7,7 +7,7 @@ export const unitedArabEmiratesGuide: DestinationGuide = {
   keyword: "UAE eSIM",
   title: "UAE eSIM vs UK roaming: Dubai & Abu Dhabi guide (2026)",
   description:
-    "The UAE is outside every UK network's Europe zone. Compare live UAE eSIM prices with what EE, O2, Three, Sky and the rest charge in Dubai and Abu Dhabi, and know which calling apps work there.",
+    "App calling is restricted in the UAE. Compare live UAE eSIM prices with what EE, O2, Three and the rest charge to roam in Dubai and Abu Dhabi.",
   verdict: {
     heading: "Short answer: buy a UAE eSIM before you fly, and don't count on WhatsApp or FaceTime calls.",
     body:

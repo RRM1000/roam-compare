@@ -34,7 +34,9 @@ export async function generateMetadata({ params }: DestinationPageProps): Promis
   const guide = getGuide(requested);
   const origin = await getSiteOrigin();
   const canonical = `${origin}/destinations/${destination.id}`;
-  const title = guide ? `${guide.title} — RoamCompare` : `${destination.name} eSIM and UK roaming comparison — RoamCompare`;
+  // No site-name suffix: it pushed every guide title past the ~60 characters
+  // Google shows, and the country and the comparison matter more than the brand.
+  const title = guide ? guide.title : `${destination.name} eSIM vs UK roaming: 2026 costs`;
   const description = guide?.description ?? `Compare dated ${destination.name} eSIM prices, hotspot rules, speed caps and fair-use limits for a trip from the UK.`;
   const socialImage = `${origin}/og-premium.jpg`;
   return {
@@ -62,7 +64,7 @@ export default async function DestinationPage({ params }: DestinationPageProps) 
     unlimitedOnly: false,
     fiveGOnly: false,
     tetheringOnly: false,
-    compared: false,
+    compared: true,
   };
   const [[saily, nomad], origin] = [await Promise.all([fetchSailyPlans(), fetchNomadPlans()]), await getSiteOrigin()];
   const livePlans = [...(saily ?? []), ...(nomad ?? [])];

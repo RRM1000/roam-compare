@@ -7,7 +7,7 @@ export const vietnamGuide: DestinationGuide = {
   keyword: "Vietnam eSIM",
   title: "Vietnam eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Vietnam isn't even on O2 Travel's list, and EE charges rest-of-world pass rates. Compare live Vietnam eSIM prices with what UK networks charge, and check the passport rule on local SIMs before you fly.",
+    "Vietnam is not on O2 Travel's list at all. Compare live Vietnam eSIM prices with what UK networks charge, and check the passport rule on local SIMs.",
   verdict: {
     heading: "Short answer: buy an eSIM before you fly. Vietnam is one of the few destinations O2 Travel doesn't cover at all.",
     body:

@@ -5,9 +5,9 @@ import type { DestinationGuide } from "./types.ts";
 export const portugalGuide: DestinationGuide = {
   destination: "portugal",
   keyword: "Portugal eSIM",
-  title: "Portugal eSIM vs UK roaming: what it costs from the UK (2026)",
+  title: "Portugal eSIM vs UK roaming: 2026 costs from the UK",
   description:
-    "Portugal is in every UK network's Europe zone, but only some include it. Compare EE, O2, Vodafone, Three and the rest with live Portugal eSIM prices, including trips to Madeira and the Azores.",
+    "Portugal is in every UK network's Europe zone, but only some include it. Compare live Portugal eSIM prices with UK roaming, Madeira and the Azores too.",
   verdict: {
     heading: "Short answer: check your UK plan first. If it charges a daily fee in Portugal, an eSIM usually costs less.",
     body:

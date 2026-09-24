@@ -5,9 +5,9 @@ import type { DestinationGuide } from "./types.ts";
 export const netherlandsGuide: DestinationGuide = {
   destination: "netherlands",
   keyword: "Netherlands eSIM",
-  title: "Netherlands eSIM vs UK roaming: what it costs from the UK (2026)",
+  title: "Netherlands eSIM vs UK roaming: 2026 costs from the UK",
   description:
-    "The Netherlands is in every UK network's Europe zone, but only some include it. Compare EE, O2, Vodafone, Three and the rest with live Netherlands eSIM prices, and see whether an eSIM is worth it for a weekend in Amsterdam.",
+    "The Netherlands is in every UK network's Europe zone, but only some include it. Compare live Netherlands eSIM prices with what UK roaming costs.",
   verdict: {
     heading: "Short answer: for a weekend, UK roaming is often fine. For a week or more on a network that charges, an eSIM costs less.",
     body:

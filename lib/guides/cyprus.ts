@@ -7,7 +7,7 @@ export const cyprusGuide: DestinationGuide = {
   keyword: "Cyprus eSIM",
   title: "Cyprus eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "The Republic of Cyprus is in every UK network's Europe zone; Northern Cyprus isn't. Compare EE, O2, Vodafone, Three and the rest with live Cyprus eSIM prices, and avoid roaming onto northern networks near the Green Line.",
+    "Cyprus is in every UK network's Europe zone, but the north is not. Compare live Cyprus eSIM prices with UK roaming, and avoid a bill across the line.",
   verdict: {
     heading: "Short answer: your Europe roaming applies in the Republic of Cyprus, but not in the north.",
     body:

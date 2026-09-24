@@ -104,8 +104,10 @@ for (const [id, guide] of entries) {
   });
 
   test(`${id}: metadata is sized for a search result`, () => {
-    assert.ok(guide.title.length <= 70, `${id}: title is ${guide.title.length} characters`);
-    assert.ok(guide.description.length >= 80 && guide.description.length <= 320, `${id}: description is ${guide.description.length} characters`);
+    // Sized for what a search result actually shows: Google truncates titles
+    // near 60 characters and descriptions near 160, mid-sentence.
+    assert.ok(guide.title.length <= 60, `${id}: title is ${guide.title.length} characters`);
+    assert.ok(guide.description.length >= 120 && guide.description.length <= 160, `${id}: description is ${guide.description.length} characters`);
     assert.ok(guide.title.includes(guide.keyword), `${id}: title should contain the keyword "${guide.keyword}"`);
   });
 }

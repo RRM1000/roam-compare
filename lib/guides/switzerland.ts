@@ -7,7 +7,7 @@ export const switzerlandGuide: DestinationGuide = {
   keyword: "Switzerland eSIM",
   title: "Switzerland eSIM vs UK roaming: the 2026 cost from the UK",
   description:
-    "Switzerland is outside the EU but inside most UK networks' Europe zones, and giffgaff's EU roaming leaves it out. Compare EE, O2, Vodafone, Three and the rest with live Switzerland eSIM prices before you book the train.",
+    "Switzerland is outside the EU but inside most UK Europe zones, and giffgaff leaves it out. Compare live Switzerland eSIM prices with UK roaming.",
   verdict: {
     heading: "Short answer: check your UK plan, because Switzerland is the one European country some networks leave out.",
     body:

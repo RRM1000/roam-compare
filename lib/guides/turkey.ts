@@ -11,7 +11,7 @@ export const turkeyGuide: DestinationGuide = {
   keyword: "Turkey eSIM",
   title: "Turkey eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Turkey is outside every UK network's Europe zone, so roaming costs extra on all of them. Compare live Turkey eSIM prices with what EE, O2, Vodafone, Three and the rest charge, and read the catches — including the block on buying an eSIM once you land.",
+    "Turkey sits outside every UK network's Europe zone, so roaming costs extra. Compare live Turkey eSIM prices with what EE, O2, Three and the rest charge.",
   verdict: {
     heading: "Short answer: buy a Turkey eSIM before you fly, unless your plan already includes Turkey.",
     body:

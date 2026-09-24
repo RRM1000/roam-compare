@@ -7,7 +7,7 @@ export const indiaGuide: DestinationGuide = {
   keyword: "India eSIM",
   title: "India eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "A local Indian SIM needs your passport, visa and a local address, and can take a day to activate. Compare live India eSIM prices with what EE, O2, Three and the rest charge to roam there from the UK.",
+    "A local Indian SIM needs a passport, visa and local address. Compare live India eSIM prices with what EE, O2, Three and the rest charge to roam there.",
   verdict: {
     heading: "Short answer: buy an eSIM before you fly. India's own SIMs are cheap but slow to get, and UK roaming is dear.",
     body:

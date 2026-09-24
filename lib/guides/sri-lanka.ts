@@ -7,7 +7,7 @@ export const sriLankaGuide: DestinationGuide = {
   keyword: "Sri Lanka eSIM",
   title: "Sri Lanka eSIM vs UK roaming: the 2026 cost from the UK",
   description:
-    "Sri Lanka has some of the cheapest tourist SIMs anywhere, and EE charges its dearest pass rate to roam there. Compare live Sri Lanka eSIM prices with UK roaming, and decide before you reach the arrivals hall.",
+    "Sri Lanka is in EE's dearest band, and Colombo airport SIMs are cheap. Compare live Sri Lanka eSIM prices with what UK networks charge to roam there.",
   verdict: {
     heading: "Short answer: UK roaming is poor value here. An eSIM is the easy choice, and an airport SIM is the cheap one.",
     body:

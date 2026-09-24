@@ -5,9 +5,9 @@ import type { DestinationGuide } from "./types.ts";
 export const australiaGuide: DestinationGuide = {
   destination: "australia",
   keyword: "Australia eSIM",
-  title: "Australia eSIM vs UK roaming: what it costs from the UK (2026)",
+  title: "Australia eSIM vs UK roaming: 2026 costs from the UK",
   description:
-    "Australia is outside every UK network's Europe zone, and long trips make roaming add up. Compare live Australia eSIM prices with EE, O2 and Three, and check your phone works on Australia's 4G-only networks.",
+    "Australia is outside every UK network's Europe zone. Compare live Australia eSIM prices with what EE, O2, Three and the rest charge to roam there.",
   verdict: {
     heading: "Short answer: for anything longer than a few days, an Australia eSIM costs less than UK roaming.",
     body:

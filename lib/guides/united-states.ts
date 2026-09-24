@@ -7,7 +7,7 @@ export const unitedStatesGuide: DestinationGuide = {
   keyword: "USA eSIM",
   title: "USA eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "The US is outside every UK network's Europe zone. Compare live USA eSIM prices with what EE, O2, Three, Sky and the rest charge there, and check the 3G shutdown, calling and cruise catches before you fly.",
+    "The US is outside every UK network's Europe zone. Compare live USA eSIM prices with UK roaming, and check the 3G shutdown and cruise catches first.",
   verdict: {
     heading: "Short answer: buy a USA eSIM before you fly, unless your plan already includes the US.",
     body:

@@ -7,7 +7,7 @@ export const italyGuide: DestinationGuide = {
   keyword: "Italy eSIM",
   title: "Italy eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Italy is in every UK network's Europe zone, but only some include it. Compare EE, O2, Vodafone, Three and the rest with live Italy eSIM prices, and check San Marino, the Vatican and cruise ship roaming.",
+    "Italy is in every UK network's Europe zone, but only some include it. Compare live Italy eSIM prices with UK roaming, from Rome to Sicily and Sardinia.",
   verdict: {
     heading: "Short answer: check your UK plan first. If it charges a daily fee in Italy, an eSIM usually costs less.",
     body:

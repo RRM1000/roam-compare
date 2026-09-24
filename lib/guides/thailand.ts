@@ -5,9 +5,9 @@ import type { DestinationGuide } from "./types.ts";
 export const thailandGuide: DestinationGuide = {
   destination: "thailand",
   keyword: "Thailand eSIM",
-  title: "Thailand eSIM vs UK roaming: what it costs from the UK (2026)",
+  title: "Thailand eSIM vs UK roaming: 2026 costs from the UK",
   description:
-    "Thailand is outside every UK network's Europe zone. Compare live Thailand eSIM prices with what EE, O2, Three and the rest charge, for Bangkok, the islands and the north.",
+    "Thailand is outside every UK network's Europe zone. Compare live Thailand eSIM prices with what EE, O2, Three and the rest charge to roam there.",
   verdict: {
     heading: "Short answer: buy a Thailand eSIM before you fly, unless your plan already covers Thailand.",
     body:

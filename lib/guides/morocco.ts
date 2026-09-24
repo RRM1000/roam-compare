@@ -7,7 +7,7 @@ export const moroccoGuide: DestinationGuide = {
   keyword: "Morocco eSIM",
   title: "Morocco eSIM vs UK roaming: Marrakech & travel guide (2026)",
   description:
-    "Morocco is outside every UK network's Europe zone, and O2 Travel doesn't cover it. Compare live Morocco eSIM prices with EE and Three, and watch for Moroccan networks on Spain's south coast.",
+    "Morocco is in EE's dearer Zone 2 and off O2 Travel's list. Compare live Morocco eSIM prices with what UK networks actually charge to roam there.",
   verdict: {
     heading: "Short answer: buy a Morocco eSIM before you fly. UK roaming there is expensive, and O2 Travel doesn't cover it.",
     body:

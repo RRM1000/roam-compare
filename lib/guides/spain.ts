@@ -7,7 +7,7 @@ export const spainGuide: DestinationGuide = {
   keyword: "Spain eSIM",
   title: "Spain eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Spain is in every UK network's Europe zone, but only some include it. Compare what EE, O2, Vodafone, Three and the rest charge in Spain with live eSIM prices, and check the roaming caps and the Gibraltar and Andorra catches.",
+    "Spain is in every UK network's Europe zone, but only some include it. Compare live Spain eSIM prices with what EE, O2, Vodafone and Three charge.",
   verdict: {
     heading: "Short answer: check your UK plan first. If it charges a daily fee in Spain, an eSIM usually costs less.",
     body:

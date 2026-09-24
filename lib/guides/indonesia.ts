@@ -5,9 +5,9 @@ import type { DestinationGuide } from "./types.ts";
 export const indonesiaGuide: DestinationGuide = {
   destination: "indonesia",
   keyword: "Indonesia eSIM",
-  title: "Indonesia eSIM vs UK roaming: Bali & travel data guide (2026)",
+  title: "Indonesia eSIM vs UK roaming: 2026 costs from the UK",
   description:
-    "Indonesia is outside every UK network's Europe zone. Compare live Indonesia eSIM prices with what EE, O2, Three and the rest charge, and understand the phone registration rule before you buy a local SIM in Bali.",
+    "Indonesia is outside every UK network's Europe zone. Compare live Indonesia eSIM prices with UK roaming before Bali, Java or the islands.",
   verdict: {
     heading: "Short answer: buy an Indonesia eSIM before you fly. It also avoids the phone registration a local SIM involves on long stays.",
     body:

@@ -7,7 +7,7 @@ export const germanyGuide: DestinationGuide = {
   keyword: "Germany eSIM",
   title: "Germany eSIM vs UK roaming: what it costs from the UK (2026)",
   description:
-    "Germany is in every UK network's Europe zone, but only some include it. Compare EE, O2, Vodafone, Three and the rest with live Germany eSIM prices for city breaks, trade fairs and Christmas markets.",
+    "Germany is in every UK network's Europe zone, but only some include it. Compare live Germany eSIM prices with what UK networks charge to roam there.",
   verdict: {
     heading: "Short answer: check your UK plan first. If it charges a daily fee in Germany, an eSIM usually costs less.",
     body:
